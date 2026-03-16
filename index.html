@@ -165,6 +165,36 @@
         
         /* 密碼鎖畫面 */
         #auth-modal { position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(18,18,18,0.95); backdrop-filter:blur(10px); z-index:99999; display:flex; flex-direction:column; justify-content:center; align-items:center; }
+   /* =========================================
+   電腦版 (寬螢幕) RWD 分頁顯示修復補丁
+   ========================================= */
+@media (min-width: 768px) {
+    /* 1. 確保上方選單列不會被擠壓消失 */
+    .top-nav {
+        display: flex !important;
+        flex-wrap: nowrap !important;
+        overflow-x: auto !important;
+        justify-content: center !important;
+    }
+    .nav-tab {
+        display: block !important;
+        flex-shrink: 0 !important;
+        min-width: 100px !important; /* 給予按鈕基本寬度 */
+    }
+    /* 2. 確保下方滑動內容區塊 (多軍/空軍陣地) 正常撐開 */
+    .swipe-container {
+        display: flex !important;
+        width: 100% !important;
+        overflow-x: hidden !important; 
+    }
+    .page {
+        width: 100% !important; /* 確保每一頁都佔滿畫面 */
+        min-width: 100% !important;
+        flex-shrink: 0 !important;
+        display: block !important;
+        visibility: visible !important;
+    }
+}
     </style>
 </head>
 <body>
@@ -687,5 +717,56 @@
             res.innerHTML = html; res.style.display = 'block'; showToast("🔎 查核完畢");
         }
     </script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+<script>
+  // 建立全域變數，供您的 input 欄位讀取
+  let stockMappingData = []; 
+
+  document.addEventListener("DOMContentLoaded", function() {
+      // ⚠️ 請確保您放在同一個資料夾的 CSV 檔名叫做 stock.csv (大小寫須完全一致)
+      const csvFileName = "stock.csv"; 
+
+      Papa.parse(csvFileName, {
+          download: true,
+          header: true, // 讓資料變成 {股號: "2330", 股名: "台積電"} 的格式
+          complete: function(results) {
+              stockMappingData = results.data;
+              console.log("✅ 戰區對照表載入完成！共 " + stockMappingData.length + " 筆資料");
+              
+              // 在畫面右上角或控制台顯示成功提示 (選用)
+              const toast = document.getElementById("toast");
+              if(toast) {
+                  toast.innerHTML = "✅ 股號對照表載入完畢";
+                  toast.style.display = "block";
+                  setTimeout(() => toast.style.display = "none", 3000);
+              }
+          },
+          error: function(err) {
+              console.error("❌ 讀取 CSV 失敗，請確認檔名是否為 stock.csv", err);
+          }
+      });
+  });
+
+  // 替換您原本的 autoFillName() 函數，讓它去搜尋剛讀取的 stockMappingData
+  function autoFillName() {
+      const codeInput = document.getElementById("wl-code").value.trim();
+      const nameInput = document.getElementById("wl-name");
+      
+      if (!codeInput) {
+          nameInput.value = "";
+          return;
+      }
+
+      // 假設您的 CSV 欄位名稱叫做 "代號" 和 "名稱"，請依據您的 CSV 標題修改這裡的 key
+      const foundStock = stockMappingData.find(stock => stock["代號"] === codeInput || stock["股號"] === codeInput);
+      
+      if (foundStock) {
+          // 填入找到的股名
+          nameInput.value = foundStock["名稱"] || foundStock["股名"] || foundStock["name"] || ""; 
+      } else {
+          nameInput.value = ""; // 找不到就留白
+      }
+  }
+</script>
 </body>
 </html>
