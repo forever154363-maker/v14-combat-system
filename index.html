@@ -5,24 +5,30 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>V14.4 戰區總司令 (雲端連動版)</title>
-    <link rel="manifest" href="manifest.json">
-    <link rel="apple-touch-icon" href="icon-192.png">
+    <title>V14.5 戰區總司令 (效能極速版)</title>
     
     <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-database-compat.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
 
     <style>
         /* 基礎設定 */
         body { margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: #121212; color: #e0e0e0; overflow: hidden; -webkit-user-select: none; }
         
-        /* 電腦端大螢幕適配 (行動裝置模擬模式) */
+        /* =========================================
+           電腦端大螢幕適配 (精準手機模擬模式修正)
+           ========================================= */
         @media (min-width: 768px) {
             body { display: flex; justify-content: center; background-color: #050505; }
-            .top-nav { width: 414px; left: 50%; transform: translateX(-50%); }
-            .swipe-container { width: 414px; border-left: 1px solid #333; border-right: 1px solid #333; box-shadow: 0 0 30px rgba(0, 255, 204, 0.05); scrollbar-width: thin; }
-            .swipe-container::-webkit-scrollbar { display: block; height: 8px; }
-            .page { min-width: 414px; width: 414px; padding-bottom: 60px; }
+            .top-nav { width: 414px !important; left: 50%; transform: translateX(-50%); }
+            .swipe-container { 
+                width: 414px !important; 
+                border-left: 1px solid #333; 
+                border-right: 1px solid #333; 
+                box-shadow: 0 0 30px rgba(0, 255, 204, 0.05); 
+                overflow-x: auto !important; /* 確保JS可以控制滑動 */
+            }
+            .page { min-width: 414px !important; width: 414px !important; padding-bottom: 60px; }
             #btt-btn { right: calc(50% - 187px); }
             #toast { top: 80px; }
         }
@@ -31,7 +37,7 @@
         .top-nav { position: fixed; top: 0; left: 0; width: 100%; height: 50px; background-color: #1a1a1a; display: flex; z-index: 999; box-shadow: 0 4px 10px rgba(0,0,0,0.8); border-bottom: 1px solid #333; }
         .nav-tab { flex: 1; text-align: center; line-height: 50px; font-weight: bold; color: #666; transition: 0.2s; font-size: 0.95rem; cursor: pointer; white-space: nowrap; }
         .nav-tab.active { color: #fff; border-bottom: 3px solid #00ffcc; background-color: rgba(0,255,204,0.1); }
-        .nav-icon { flex: 0.4; font-size: 1.1rem; color: #888; border-left: 1px dashed #333; }
+        .nav-icon { flex: 0.4; font-size: 1.1rem; color: #888; border-left: 1px dashed #333; display: flex; align-items: center; justify-content: center;}
 
         /* 頁面滑動容器 */
         .swipe-container { display: flex; width: 100vw; height: 100vh; overflow-x: auto; overflow-y: hidden; scroll-snap-type: x mandatory; scroll-behavior: smooth; padding-top: 50px; box-sizing: border-box; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
@@ -147,54 +153,24 @@
         #toast { position: fixed; top: 60px; left: 50%; transform: translateX(-50%); background-color: #00ffcc; color: #000; padding: 8px 20px; border-radius: 20px; font-weight: bold; font-size: 0.9rem; z-index: 10000; display: none; box-shadow: 0 4px 10px rgba(0,0,0,0.5); white-space: nowrap; }
         .logistics-header { text-align:center; padding: 25px 0 15px 0; margin-top: 40px; border-top: 1px dashed #555; color: #888; font-size: 0.85rem; letter-spacing: 2px; }
 
-        /* K線表 */
-        .k-table-container { width: 100%; margin-bottom: 20px;}
+        /* =========================================
+           K線表 (修復版)
+           ========================================= */
+        .k-table-container { width: 100%; margin-bottom: 20px; overflow-x: auto; }
         .k-table { width: 100%; table-layout: fixed; border-collapse: collapse; text-align: center; background-color:#1a1a1a;}
-        .k-table th, .k-table td { border: 1px solid #333; padding: 4px 2px; vertical-align: middle; }
-        .k-table th { background-color: #222; color: #aaa; font-size: 0.65rem; font-weight: normal; }
+        .k-table th, .k-table td { border: 1px solid #333; padding: 10px 4px; vertical-align: middle; }
+        .k-table th { background-color: #222; color: #aaa; font-size: 0.8rem; font-weight: bold; }
         .k-table th:first-child { width: 16%; } 
-        .k-title { font-weight: bold; font-size: 0.7rem; margin-bottom: 2px; }
-        .kl-box { display: flex; justify-content: center; align-items: center; height: 35px; margin-bottom: 2px; }
-        .kl { position: relative; width: 8px; height: 28px; }
-        .kl .wick { position: absolute; left: 3px; width: 2px; height: 100%; background: #ccc; }
+        .k-title { font-weight: bold; font-size: 0.8rem; margin-top: 8px; }
+        
+        .kl-box { display: flex; justify-content: center; align-items: center; height: 50px; }
+        .kl { position: relative; width: 12px; height: 40px; }
+        .kl .wick { position: absolute; left: 5px; width: 2px; height: 100%; background: #ccc; }
         .kl .body { position: absolute; left: 0; width: 100%; }
         .kl.red .wick, .kl.red .body { background: #ff4d4d; }
-        .kl.green .wick, .kl.green .body { background: #00e676; }
-        .kl.white .wick { background: #fff; }
-        .kl.white .body { background: #fff !important; height: 2px !important; }
         
         /* 密碼鎖畫面 */
         #auth-modal { position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(18,18,18,0.95); backdrop-filter:blur(10px); z-index:99999; display:flex; flex-direction:column; justify-content:center; align-items:center; }
-   /* =========================================
-   電腦版 (寬螢幕) RWD 分頁顯示修復補丁
-   ========================================= */
-@media (min-width: 768px) {
-    /* 1. 確保上方選單列不會被擠壓消失 */
-    .top-nav {
-        display: flex !important;
-        flex-wrap: nowrap !important;
-        overflow-x: auto !important;
-        justify-content: center !important;
-    }
-    .nav-tab {
-        display: block !important;
-        flex-shrink: 0 !important;
-        min-width: 100px !important; /* 給予按鈕基本寬度 */
-    }
-    /* 2. 確保下方滑動內容區塊 (多軍/空軍陣地) 正常撐開 */
-    .swipe-container {
-        display: flex !important;
-        width: 100% !important;
-        overflow-x: hidden !important; 
-    }
-    .page {
-        width: 100% !important; /* 確保每一頁都佔滿畫面 */
-        min-width: 100% !important;
-        flex-shrink: 0 !important;
-        display: block !important;
-        visibility: visible !important;
-    }
-}
     </style>
 </head>
 <body>
@@ -273,7 +249,7 @@
 
             <div class="logistics-header">⬇️ 系統後勤基地 ⬇️</div>
 
-            <div class="card quota">
+            <div class="card quota" style="margin-bottom: 80px;">
                 <h3 style="color:#ffeb3b; margin:0 0 10px 0; text-align:center;">💰 實戰連動額度天網</h3>
                 <div style="display:flex; gap:10px;">
                     <div style="flex:1;">
@@ -298,15 +274,6 @@
                     <span class="quota-val highlight" id="quota-global-remain" style="font-size:1.1rem; color:#00e676;">-</span>
                 </div>
             </div>
-
-            <div class="card" style="border-left-color: #888; margin-bottom: 80px;">
-                <h3 style="color:#aaa; margin:0; text-align:center; cursor:pointer;" onclick="toggleDictPanel()">⚙️ 展開 股號字典擴充 🔽</h3>
-                <div id="dict-panel" style="display:none; margin-top:15px;">
-                    <input type="file" id="file-uploader" accept=".txt,.csv" style="font-size:0.85rem; margin-bottom:8px; color:#fff; width:100%;">
-                    <textarea id="paste-area" placeholder="或在此貼上 (例如: 1101 台泥)" style="width:100%; height:70px; background:#222; border:1px solid #555; color:#fff; border-radius:4px; padding:8px;"></textarea>
-                    <button class="btn" style="background-color:#555; color:#fff; margin-top:8px;" onclick="importFromTextarea()">📥 執行解析與永久記憶</button>
-                </div>
-            </div>
             <div id="btt-btn" onclick="scrollToTop()">⬆️</div>
         </div>
 
@@ -324,12 +291,31 @@
             <h3 style="color:#00ffcc; text-align:center; margin-top:0;">📊 實戰 K 線型態圖鑑</h3>
             <div class="k-table-container">
                 <table class="k-table">
-                    <tr><th colspan="4" style="background:#ff4d4d; color:#000; font-size:1rem; font-weight:bold;">🟥 紅K 陣營 (實體收高)</th></tr>
-                    <tr><th></th><th>光頭</th><th>短上影線</th><th>長上影線</th></tr>
-                    <tr><th>光腳</th><td><div class="kl-box"><div class="kl red"><div class="body" style="top:0; height:100%;"></div></div></div><div class="k-title t-red">絕對統治</div></td><td><div class="kl-box"><div class="kl red"><div class="wick" style="top:0; height:20%;"></div><div class="body" style="top:20%; height:80%;"></div></div></div><div class="k-title t-red">強勢推進</div></td><td><div class="kl-box"><div class="kl red"><div class="wick" style="top:0; height:60%;"></div><div class="body" style="top:60%; height:40%;"></div></div></div><div class="k-title t-red">避雷針</div></td></tr>
+                    <tr><th colspan="4" style="background:#ff4d4d; color:#000; font-size:1.1rem; font-weight:bold;">🟥 紅K 陣營 (實體收高)</th></tr>
+                    <tr>
+                        <th></th>
+                        <th>光頭</th>
+                        <th>短上影線</th>
+                        <th>長上影線</th>
+                    </tr>
+                    <tr>
+                        <th style="color:#ccc;">光腳</th>
+                        <td>
+                            <div class="kl-box"><div class="kl red"><div class="body" style="top:0; height:100%;"></div></div></div>
+                            <div class="k-title t-red">絕對統治</div>
+                        </td>
+                        <td>
+                            <div class="kl-box"><div class="kl red"><div class="wick" style="top:0; height:20%;"></div><div class="body" style="top:20%; height:80%;"></div></div></div>
+                            <div class="k-title t-red">強勢推進</div>
+                        </td>
+                        <td>
+                            <div class="kl-box"><div class="kl red"><div class="wick" style="top:0; height:60%;"></div><div class="body" style="top:60%; height:40%;"></div></div></div>
+                            <div class="k-title t-red">避雷針</div>
+                        </td>
+                    </tr>
                 </table>
             </div>
-            </div>
+        </div>
 
         <div class="page" id="page-4">
             <h3 style="color:#ff9800; text-align:center; margin-top:0;">🔎 戰後情報圖復盤中心</h3>
@@ -361,6 +347,19 @@
     </div>
 
     <script>
+        // ================= CSV 本地對照載入 =================
+        let stockMappingData = []; 
+        document.addEventListener("DOMContentLoaded", function() {
+            Papa.parse("stock.csv", {
+                download: true,
+                header: true,
+                complete: function(results) {
+                    stockMappingData = results.data;
+                    console.log("✅ 對照表載入完成");
+                }
+            });
+        });
+
         // ================= Firebase 雲端引擎 =================
         const firebaseConfig = {
           apiKey: "AIzaSyDGNZDiQNsRccruZlULw2ZZ_HSWXnwDjms",
@@ -380,7 +379,6 @@
 
         // --- 全局核心變數 ---
         let wl = []; 
-        let customDict = {"2330":"台積電"};
         let sysQuota = { total: 50, manualUsed: 0 };
         let activeLongMissions = {}; 
         let activeShortMissions = {};
@@ -411,7 +409,6 @@
                         currentStateString = incomingString; // 阻斷自我迴圈
                         wl = data.wl || [];
                         sysQuota = data.quota || { total: 50, manualUsed: 0 };
-                        customDict = data.dict || {"2330":"台積電"};
                         activeLongMissions = data.longMissions || {};
                         activeShortMissions = data.shortMissions || {};
 
@@ -430,7 +427,8 @@
             if(!syncRoom) return;
             clearTimeout(syncTimeout);
             syncTimeout = setTimeout(() => {
-                let state = { wl: wl, quota: sysQuota, dict: customDict, longMissions: activeLongMissions, shortMissions: activeShortMissions };
+                // ⚠️ 注意：移除了肥大的 dict 同步，大幅提升傳輸速度
+                let state = { wl: wl, quota: sysQuota, longMissions: activeLongMissions, shortMissions: activeShortMissions };
                 currentStateString = JSON.stringify(state);
                 db.ref('rooms/' + syncRoom).set(state);
             }, 300); // 300毫秒防抖動
@@ -442,17 +440,15 @@
 
         function scrollToPage(index) { slider.scrollTo({ left: index * slider.clientWidth, behavior: 'smooth' }); }
         function updateTabs() { let idx = Math.round(slider.scrollLeft / slider.clientWidth); tabs.forEach((t, i) => { if(i===idx) t.classList.add('active'); else t.classList.remove('active'); }); }
-        function toggleDictPanel() { let p = document.getElementById('dict-panel'); p.style.display = p.style.display === 'none' ? 'block' : 'none'; }
         
-        function autoFillName() { let code = document.getElementById('wl-code').value.toUpperCase(); if(code.length >= 4 && customDict[code]) document.getElementById('wl-name').value = customDict[code]; }
-        function parseTextToDict(text) {
-            let count = 0; let lines = text.replace(/[\t\u3000\xA0]/g, ' ').split(/\r?\n/);
-            lines.forEach(line => { let m = line.trim().match(/(?:^|\s)([A-Z0-9]{4,6})\s+([^\s]+)/i); if (m) { customDict[m[1].toUpperCase()] = m[2]; count++; } });
-            if (count > 0) { triggerSync(); autoFillName(); showToast(`✅ 解析 ${count} 筆股號`); } else { alert("❌ 解析失敗"); }
+        function autoFillName() { 
+            let code = document.getElementById('wl-code').value.trim(); 
+            let nameInput = document.getElementById('wl-name');
+            if(!code) { nameInput.value = ''; return; }
+            let found = stockMappingData.find(s => s["股號"] === code || s["代號"] === code);
+            nameInput.value = found ? (found["股名"] || found["名稱"] || "") : "";
         }
-        function importFromTextarea() { let t = document.getElementById('paste-area').value; if(!t) return; parseTextToDict(t); document.getElementById('paste-area').value=''; toggleDictPanel(); }
-        document.getElementById('file-uploader').addEventListener('change', function(e) { let f = e.target.files[0]; if(!f) return; let r = new FileReader(); r.onload = function(e) { parseTextToDict(e.target.result); e.target.value=''; toggleDictPanel(); }; r.readAsText(f); });
-
+        
         function updateGlobalQuota() {
             sysQuota.total = parseFloat(document.getElementById('quota-total').value) || 0;
             sysQuota.manualUsed = parseFloat(document.getElementById('quota-manual-used').value) || 0;
@@ -493,7 +489,7 @@
             const container = document.getElementById('watchlist-container'); const navContainer = document.getElementById('quick-nav');
             container.innerHTML = ''; navContainer.innerHTML = ''; navContainer.style.display = (wl.length > 0 && !isPanelOpen) ? 'flex' : 'none';
             wl.forEach((item, index) => {
-                let stockId = `stock-card-${index}`; let dName = item.name || customDict[item.code] || "未知"; let dCode = item.code || "---";
+                let stockId = `stock-card-${index}`; let dName = item.name || "未知"; let dCode = item.code || "---";
                 let upLimit = calcUp(item.yc); let downLimit = calcDown(item.yc);
                 navContainer.innerHTML += `<div class="chip" onclick="jumpToStockHome('${stockId}')">${dName}</div>`;
                 let html = `<div class="card-compact" id="${stockId}"><div class="card-header"><h3>📌 ${dName} (${dCode})</h3><div style="display:flex;"><button class="btn-icon" style="color:#00ffcc;" onclick="editWatchlist(${index})">✏️</button><button class="btn-icon" style="color:#ff4d4d;" onclick="delWatchlist(${index})">🗑️</button></div></div>`;
@@ -518,7 +514,6 @@
             let shorts = [document.getElementById('sb').value, document.getElementById('st1').value, document.getElementById('st2').value, document.getElementById('st3').value, document.getElementById('st4').value, document.getElementById('st5').value];
             let hb = document.getElementById('hb').value; let ht1 = document.getElementById('ht1').value; let lowt1 = document.getElementById('lowt1').value; let lowb = document.getElementById('lowb').value;
             
-            if(code && name) customDict[code] = name;
             wl.push({ name: name, code: code, yc: yc, lb: longs[0], lt1: longs[1], lt2: longs[2], lt3: longs[3], lt4: longs[4], lt5: longs[5], sb: shorts[0], st1: shorts[1], st2: shorts[2], st3: shorts[3], st4: shorts[4], st5: shorts[5], hb: hb, ht1: ht1, lowb: lowb, lowt1: lowt1 });
             document.querySelectorAll('#input-panel input').forEach(i => i.value = ''); 
             triggerSync(); showToast("✅ 儲存並同步至雲端");
@@ -717,56 +712,5 @@
             res.innerHTML = html; res.style.display = 'block'; showToast("🔎 查核完畢");
         }
     </script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
-<script>
-  // 建立全域變數，供您的 input 欄位讀取
-  let stockMappingData = []; 
-
-  document.addEventListener("DOMContentLoaded", function() {
-      // ⚠️ 請確保您放在同一個資料夾的 CSV 檔名叫做 stock.csv (大小寫須完全一致)
-      const csvFileName = "stock.csv"; 
-
-      Papa.parse(csvFileName, {
-          download: true,
-          header: true, // 讓資料變成 {股號: "2330", 股名: "台積電"} 的格式
-          complete: function(results) {
-              stockMappingData = results.data;
-              console.log("✅ 戰區對照表載入完成！共 " + stockMappingData.length + " 筆資料");
-              
-              // 在畫面右上角或控制台顯示成功提示 (選用)
-              const toast = document.getElementById("toast");
-              if(toast) {
-                  toast.innerHTML = "✅ 股號對照表載入完畢";
-                  toast.style.display = "block";
-                  setTimeout(() => toast.style.display = "none", 3000);
-              }
-          },
-          error: function(err) {
-              console.error("❌ 讀取 CSV 失敗，請確認檔名是否為 stock.csv", err);
-          }
-      });
-  });
-
-  // 替換您原本的 autoFillName() 函數，讓它去搜尋剛讀取的 stockMappingData
-  function autoFillName() {
-      const codeInput = document.getElementById("wl-code").value.trim();
-      const nameInput = document.getElementById("wl-name");
-      
-      if (!codeInput) {
-          nameInput.value = "";
-          return;
-      }
-
-      // 假設您的 CSV 欄位名稱叫做 "代號" 和 "名稱"，請依據您的 CSV 標題修改這裡的 key
-      const foundStock = stockMappingData.find(stock => stock["代號"] === codeInput || stock["股號"] === codeInput);
-      
-      if (foundStock) {
-          // 填入找到的股名
-          nameInput.value = foundStock["名稱"] || foundStock["股名"] || foundStock["name"] || ""; 
-      } else {
-          nameInput.value = ""; // 找不到就留白
-      }
-  }
-</script>
 </body>
 </html>
