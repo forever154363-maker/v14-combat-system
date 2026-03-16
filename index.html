@@ -51,17 +51,21 @@
            💻 電腦版大螢幕自適應 (自然寬度展開)
            ========================================= */
         @media (min-width: 768px) {
+            /* 1. 移除鎖死寬度的 padding，改用靈活比例邊距 */
             .page { padding: 30px 4vw 120px 4vw; }
             
+            /* 2. 讓大型卡片與面板最大寬度自然展開，並置中對齊 */
             #input-panel, .card.quota, .k-table-container, .logistics-header, .rule-card, .card:not(.card-compact):not(.mission-card) { 
                 max-width: 1400px; 
                 margin-left: auto; 
                 margin-right: auto; 
             }
             
+            /* 3. 目標價輸入框：在電腦上水平展開為 6 格 (不影響手機) */
             .target-grid { grid-template-columns: repeat(6, minmax(0, 1fr)) !important; }
             .ex-grid { grid-template-columns: repeat(4, minmax(0, 1fr)) !important; }
             
+            /* 4. 戰區彈匣、任務陣地：在電腦上變成瀑布流網格，自動排成多欄 */
             #watchlist-container, #long-missions-container, #short-missions-container {
                 display: grid;
                 grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
@@ -82,7 +86,7 @@
         .card.quota { border-left-color: #ffeb3b; background-color: #1c1a10; }
         .rule-card { border-left-color: #00ffcc; background-color: #1a1a1a; margin-top: 30px; }
         
-        /* 增減控制器 */
+        /* 增減控制器 (維持完美的 iPhone 不溢出寬度) */
         .stepper-wrapper { display: flex; align-items: stretch; background: #2c2c2c; border: 1px solid #444; border-radius: 6px; overflow: hidden; height: 36px; }
         .stepper-wrapper input { flex: 1; min-width: 0; width: 100%; border: none; background: transparent; color: #fff; text-align: center; font-size: 1rem; font-weight: bold; -moz-appearance: textfield; padding: 0 2px;}
         .stepper-wrapper input::-webkit-outer-spin-button, .stepper-wrapper input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
@@ -90,6 +94,7 @@
         .stepper-btn { background: #3a3a3a; color: #ccc; border: none; width: 26px; cursor: pointer; font-size: 1.1rem; display: flex; align-items: center; justify-content: center; user-select: none; transition: 0.1s; flex-shrink: 0;}
         .stepper-btn:active { background: #00ffcc; color: #000; }
         
+        /* 進場專用大型增減控制器 */
         .entry-stepper { height: 50px; border: 2px solid #555; position: relative; padding-right: 35px; }
         .entry-stepper.w-long { border-color: #ff4d4d; }
         .entry-stepper.w-short { border-color: #00e676; }
@@ -100,11 +105,11 @@
         .input-group { margin-bottom: 10px; }
         label { display: block; font-size: 0.85rem; color: #aaa; margin-bottom: 4px; }
         
+        /* 訊號燈與結算結果 */
         .signal { text-align: center; padding: 10px; border-radius: 6px; font-weight: bold; background-color: #333; font-size: 1rem; margin: 10px 0; }
         .signal.go { background-color: rgba(0, 230, 118, 0.2); color: #00e676; border: 1px solid #00e676;}
         .signal.stop { background-color: rgba(255, 77, 77, 0.2); color: #ff4d4d; border: 1px solid #ff4d4d; }
         .signal.warn { background-color: rgba(255, 152, 0, 0.2); color: #ff9800; border: 1px solid #ff9800; }
-        
         .result-box { background-color: #252525; padding: 10px; border-radius: 6px; margin-top: 10px; font-size: 0.9rem; }
         .result-row { display: flex; justify-content: space-between; margin-bottom: 8px; border-bottom: 1px dashed #444; padding-bottom: 4px; align-items: center;}
         .result-row:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
@@ -115,6 +120,7 @@
         .shocking-loss { background: #660000; color: #ff4d4d; padding: 4px 10px; border-radius: 6px; font-size: 1.15rem; font-weight: 900; box-shadow: 0 0 10px rgba(255, 0, 0, 0.8); display: inline-block; animation: pulse-red 1s infinite alternate; }
         @keyframes pulse-red { from { box-shadow: 0 0 5px rgba(255,0,0,0.5); transform: scale(1); } to { box-shadow: 0 0 15px rgba(255,0,0,1); transform: scale(1.05); } }
 
+        /* 一鍵出場/進場 雷達帶 */
         .quick-exit-strip { display: flex; flex-wrap: nowrap; overflow-x: auto; gap: 8px; padding: 10px 0 15px 0; border-top: 1px dashed #555; border-bottom: 1px dashed #555; margin-bottom: 15px; scrollbar-width: thin; scrollbar-color: #666 #1a1a1a; }
         .quick-exit-strip::-webkit-scrollbar { height: 8px; display: block; }
         .quick-exit-strip::-webkit-scrollbar-thumb { background: #666; border-radius: 4px; }
@@ -182,17 +188,24 @@
         #auth-modal { position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(18,18,18,0.98); z-index:99999; display:flex; flex-direction:column; justify-content:center; align-items:center; }
 
         /* =========================================
-           📊 完整版 K 線圖鑑
+           📊 終極版 K 線圖鑑專屬樣式
            ========================================= */
-        .k-table-container { width: 100%; margin-bottom: 30px; overflow-x: auto; background-color: #1a1a1a; border-radius: 8px; padding: 10px; box-sizing: border-box; }
-        .k-table { width: 100%; min-width: 360px; border-collapse: collapse; text-align: center; color: #fff; }
-        .k-table th, .k-table td { border: 1px solid #333; padding: 10px 4px; vertical-align: middle; word-wrap: break-word;}
-        .k-table th { background-color: #222; color: #aaa; font-size: 0.75rem; font-weight: normal; line-height: 1.3;}
-        .k-table th:first-child { width: 22%; font-weight: bold; color: #ccc;} 
-        .k-title { font-weight: bold; font-size: 0.8rem; margin-top: 6px; line-height: 1.2;}
+        .k-book-table { width: 100%; min-width: 340px; table-layout: fixed; border-collapse: collapse; text-align: center; color: #fff; background-color:#1a1a1a; }
+        .k-book-table th, .k-book-table td { border: 1px solid #333; padding: 8px 4px; vertical-align: top; word-wrap: break-word; }
+        .k-book-table th { background-color: #222; font-weight: normal; line-height: 1.4; }
+        .k-book-table th:first-child { width: 18%; vertical-align: middle; }
         
-        .kl-box { display: flex; justify-content: center; align-items: center; height: 50px; margin-bottom: 4px;}
-        .kl { position: relative; width: 10px; height: 40px; }
+        .k-main-th { font-size:1.1rem; font-weight:bold; text-align:left; padding: 12px !important; }
+        .k-sub-th { font-size:0.85rem; color:#aaa; text-align:left; padding: 8px 12px !important; border-bottom: 2px solid #555; line-height: 1.6; }
+        .k-col-th { font-size:0.8rem; color:#fff; }
+        .k-row-th { font-size:0.8rem; color:#fff; }
+        .k-yellow-tip { color: #ffeb3b; font-size: 0.7rem; display: block; margin-top: 4px; }
+        
+        .k-title { font-weight: bold; font-size: 0.8rem; margin-top: 8px; line-height: 1.3; }
+        .k-desc { font-size: 0.7rem; color: #aaa; margin-top: 6px; line-height: 1.5; text-align: left; padding: 0 2px; }
+        
+        .kl-box { display: flex; justify-content: center; align-items: center; height: 45px; margin-top: 5px; }
+        .kl { position: relative; width: 10px; height: 35px; }
         .kl .wick { position: absolute; left: 4px; width: 2px; height: 100%; background: #ccc; }
         .kl .body { position: absolute; left: 0; width: 100%; }
         
@@ -200,15 +213,20 @@
         .kl.green .wick, .kl.green .body { background: #00e676; }
         .kl.white .wick { background: #fff; }
         .kl.white .body { background: #fff !important; height: 2px !important; }
+        
+        .t-red { color: #ff4d4d; }
+        .t-green { color: #00e676; }
+        .t-warn { color: #ffeb3b; }
 
-        @media (min-width: 600px) {
-            .k-table th, .k-table td { padding: 15px 8px; }
-            .k-table th { font-size: 0.9rem; }
-            .k-table th:first-child { width: 15%; }
-            .k-title { font-size: 0.95rem; }
+        @media (min-width: 768px) {
+            .k-book-table th, .k-book-table td { padding: 15px 10px; }
+            .k-col-th, .k-row-th { font-size: 0.95rem; }
+            .k-title { font-size: 0.95rem; margin-top: 12px; }
+            .k-desc { font-size: 0.85rem; margin-top: 8px; padding: 0 8px; }
+            .kl-box { height: 60px; }
             .kl { width: 14px; height: 50px; }
             .kl .wick { left: 6px; }
-            .kl-box { height: 60px; margin-bottom: 8px;}
+            .k-yellow-tip { font-size: 0.85rem; margin-top: 6px; }
         }
     </style>
 </head>
@@ -288,7 +306,7 @@
 
             <div class="logistics-header">⬇️ 系統後勤基地 ⬇️</div>
 
-            <div class="card quota" style="margin-bottom: 80px;">
+            <div class="card quota">
                 <h3 style="color:#ffeb3b; margin:0 0 10px 0; text-align:center;">💰 實戰連動額度天網</h3>
                 <div style="display:flex; gap:10px;">
                     <div style="flex:1;">
@@ -356,174 +374,244 @@
         </div>
 
         <div class="page" id="page-3">
-            <h3 style="color:#00ffcc; text-align:center; margin-top:0;">📊 實戰 K 線型態圖鑑</h3>
+            <h3 style="color:#00ffcc; text-align:center; margin-top:0; margin-bottom: 20px;">📊 實戰 K 線型態圖鑑</h3>
             
-            <div class="k-table-container">
-                <table class="k-table">
-                    <tr><th colspan="4" style="background:#ff4d4d; color:#000; font-size:1.1rem; font-weight:bold;">🟥 紅K 陣營 (實體收高)</th></tr>
+            <style>
+                .k-book-table { width: 100%; min-width: 340px; table-layout: fixed; border-collapse: collapse; text-align: center; color: #fff; background-color:#1a1a1a; }
+                .k-book-table th, .k-book-table td { border: 1px solid #333; padding: 8px 4px; vertical-align: top; word-wrap: break-word; }
+                .k-book-table th { background-color: #222; font-weight: normal; line-height: 1.4; }
+                .k-book-table th:first-child { width: 18%; vertical-align: middle; }
+                .k-main-th { font-size:1.1rem; font-weight:bold; text-align:left; padding: 12px !important; }
+                .k-sub-th { font-size:0.85rem; color:#aaa; text-align:left; padding: 8px 12px !important; border-bottom: 2px solid #555; line-height: 1.6; }
+                .k-col-th { font-size:0.8rem; color:#fff; }
+                .k-row-th { font-size:0.8rem; color:#fff; }
+                .k-yellow-tip { color: #ffeb3b; font-size: 0.7rem; display: block; margin-top: 4px; }
+                
+                .k-title { font-weight: bold; font-size: 0.8rem; margin-top: 8px; line-height: 1.3; }
+                .k-desc { font-size: 0.7rem; color: #aaa; margin-top: 6px; line-height: 1.5; text-align: left; padding: 0 2px; }
+                
+                .kl-box { display: flex; justify-content: center; align-items: center; height: 45px; margin-top: 5px; }
+                .kl { position: relative; width: 10px; height: 35px; }
+                .kl .wick { position: absolute; left: 4px; width: 2px; height: 100%; background: #ccc; }
+                .kl .body { position: absolute; left: 0; width: 100%; }
+                
+                .kl.red .wick, .kl.red .body { background: #ff4d4d; }
+                .kl.green .wick, .kl.green .body { background: #00e676; }
+                .kl.white .wick { background: #fff; }
+                .kl.white .body { background: #fff !important; height: 2px !important; }
+                
+                .t-red { color: #ff4d4d; }
+                .t-green { color: #00e676; }
+                .t-warn { color: #ffeb3b; }
+
+                @media (min-width: 768px) {
+                    .k-book-table th, .k-book-table td { padding: 15px 10px; }
+                    .k-col-th, .k-row-th { font-size: 0.95rem; }
+                    .k-title { font-size: 0.95rem; margin-top: 12px; }
+                    .k-desc { font-size: 0.85rem; margin-top: 8px; padding: 0 8px; }
+                    .kl-box { height: 60px; }
+                    .kl { width: 14px; height: 50px; }
+                    .kl .wick { left: 6px; }
+                    .k-yellow-tip { font-size: 0.85rem; margin-top: 6px; }
+                }
+            </style>
+
+            <div class="k-table-container" style="margin-bottom: 30px;">
+                <table class="k-book-table">
+                    <tr><th colspan="4" class="k-main-th" style="background:#331111; border-bottom:none;"><span class="t-red">🟥 第一張表：紅 K 陣營 (收盤 > 開盤)</span></th></tr>
+                    <tr><th colspan="4" class="k-sub-th" style="background:#1a0000;">【戰場大前提】：紅K代表這5分鐘內「買單總量勝出」。但影線決定了多軍是「贏得輕鬆」還是「贏得很心虛」。</th></tr>
                     <tr>
                         <th></th>
-                        <th>無上影線<br>(光頭)</th>
-                        <th>短上影線<br>(上 &lt; 實體)</th>
-                        <th>長上影線<br>(上 &gt; 實體)</th>
+                        <th class="k-col-th">無上影線(光頭)<span class="k-yellow-tip">👉 多軍狂推，上方無阻</span></th>
+                        <th class="k-col-th">短上影線<span class="k-yellow-tip">👉 微幅反壓，正常交火</span></th>
+                        <th class="k-col-th">長上影線<span class="k-yellow-tip">👉 衝高被打臉，賣壓極重</span></th>
                     </tr>
                     <tr>
-                        <th>無下影線<br>(光腳)</th>
+                        <th class="k-row-th">無下影線(光腳)<br><span class="k-yellow-tip">👉 開盤即最低，沒人想賣</span></th>
                         <td>
                             <div class="kl-box"><div class="kl red"><div class="body" style="top:0; height:100%;"></div></div></div>
-                            <div class="k-title" style="color:#ff4d4d;">【極多】絕對統治</div>
+                            <div class="k-title t-red">【極多】光頭光腳大紅K</div>
+                            <div class="k-desc">買盤絕對統治，下一根高機率繼續衝。</div>
                         </td>
                         <td>
                             <div class="kl-box"><div class="kl red"><div class="wick" style="top:0; height:20%;"></div><div class="body" style="top:20%; height:80%;"></div></div></div>
-                            <div class="k-title" style="color:#ff4d4d;">【強多】強勢推進</div>
+                            <div class="k-title t-red">【強多】強勢推進</div>
+                            <div class="k-desc">穩健上攻，雖然高點遇微壓，但不影響多頭氣勢。</div>
                         </td>
                         <td>
                             <div class="kl-box"><div class="kl red"><div class="wick" style="top:0; height:60%;"></div><div class="body" style="top:60%; height:40%;"></div></div></div>
-                            <div class="k-title" style="color:#ff4d4d;">【誘多】避雷針</div>
+                            <div class="k-title t-warn">【⚠️極度危險】避雷針/誘多紅</div>
+                            <div class="k-desc">主力拉高出貨！這5分鐘內套死一堆追高散戶，準備反轉向下。</div>
                         </td>
                     </tr>
                     <tr>
-                        <th>短下影線<br>(下 &lt; 實體)</th>
+                        <th class="k-row-th">短下影線<br><span class="k-yellow-tip">👉 開盤微跌即拉回，下有撐</span></th>
                         <td>
                             <div class="kl-box"><div class="kl red"><div class="wick" style="top:80%; height:20%;"></div><div class="body" style="top:0; height:80%;"></div></div></div>
-                            <div class="k-title" style="color:#ff4d4d;">【強多】穩健上漲</div>
+                            <div class="k-title t-red">【強多】光頭微下影</div>
+                            <div class="k-desc">踩穩後一路往上尻，收盤收在最高點，攻勢強勁。</div>
                         </td>
                         <td>
                             <div class="kl-box"><div class="kl red"><div class="wick" style="top:10%; height:80%;"></div><div class="body" style="top:20%; height:60%;"></div></div></div>
-                            <div class="k-title" style="color:#ff4d4d;">【看多】標準紅K</div>
+                            <div class="k-title t-red">【看多】標準換手紅K</div>
+                            <div class="k-desc">最常見的推進K線，多空有來有往，多軍穩步佔優。</div>
                         </td>
                         <td>
-                            <div class="kl-box"><div class="kl red"><div class="wick" style="top:0; height:80%;"></div><div class="body" style="top:50%; height:20%;"></div></div></div>
-                            <div class="k-title" style="color:#00e676;">【偏空】倒槌線</div>
+                            <div class="kl-box"><div class="kl red"><div class="wick" style="top:0; height:80%;"></div><div class="body" style="top:50%; height:30%;"></div></div></div>
+                            <div class="k-title t-green">【偏空轉折】力竭紅K</div>
+                            <div class="k-desc">雖然底盤有撐、且收紅，但上面被打臉打得太慘，多頭沒力了。</div>
                         </td>
                     </tr>
                     <tr>
-                        <th>長下影線<br>(下 &gt; 實體)</th>
+                        <th class="k-row-th">長下影線<br><span class="k-yellow-tip">👉 殺低被瘋狂買回，鐵板一塊</span></th>
                         <td>
                             <div class="kl-box"><div class="kl red"><div class="wick" style="top:40%; height:60%;"></div><div class="body" style="top:0; height:40%;"></div></div></div>
-                            <div class="k-title" style="color:#ff4d4d;">【極多】槌子線</div>
+                            <div class="k-title t-warn">【極多轉折】強勢掃底</div>
+                            <div class="k-desc">殺低後V轉且收在最高，主力在此強勢接刀，準備發動攻擊。</div>
                         </td>
                         <td>
                             <div class="kl-box"><div class="kl red"><div class="wick" style="top:10%; height:90%;"></div><div class="body" style="top:30%; height:20%;"></div></div></div>
-                            <div class="k-title" style="color:#ff4d4d;">【強多】吊人線</div>
+                            <div class="k-title t-warn">【強多轉折】下檔鐵板</div>
+                            <div class="k-desc">探底後強力抽高，代表這5分鐘內下方有重兵防守，適合進場做多。</div>
                         </td>
                         <td>
                             <div class="kl-box"><div class="kl red"><div class="wick" style="top:0; height:100%;"></div><div class="body" style="top:40%; height:20%;"></div></div></div>
-                            <div class="k-title" style="color:#ff9800;">【觀望】紡錘線</div>
+                            <div class="k-title t-warn">【⚠️震盪觀望】雙殺絞肉機</div>
+                            <div class="k-desc">上不去也下不來，多空這5分鐘內互殺極度劇烈，下一根方向不明，先收槍。</div>
                         </td>
                     </tr>
                 </table>
             </div>
 
-            <div class="k-table-container">
-                <table class="k-table">
-                    <tr><th colspan="4" style="background:#00e676; color:#000; font-size:1.1rem; font-weight:bold;">🟩 綠K 陣營 (實體收低)</th></tr>
+            <div class="k-table-container" style="margin-bottom: 30px;">
+                <table class="k-book-table">
+                    <tr><th colspan="4" class="k-main-th" style="background:#0f2b1a; border-bottom:none;"><span class="t-green">🟩 第二張表：綠 K 陣營 (收盤 < 開盤)</span></th></tr>
+                    <tr><th colspan="4" class="k-sub-th" style="background:#051a0f;">【戰場大前提】：綠K代表這5分鐘內「賣單總量勝出」。影線決定了空軍是「碾壓局」還是「踢到鐵板」。</th></tr>
                     <tr>
                         <th></th>
-                        <th>無上影線<br>(光頭)</th>
-                        <th>短上影線<br>(上 &lt; 實體)</th>
-                        <th>長上影線<br>(上 &gt; 實體)</th>
+                        <th class="k-col-th">無上影線(光頭)<span class="k-yellow-tip">👉 開盤即最高，沒人想買</span></th>
+                        <th class="k-col-th">短上影線<span class="k-yellow-tip">👉 微幅反彈，瞬間被空</span></th>
+                        <th class="k-col-th">長上影線<span class="k-yellow-tip">👉 彈高被打臉，空頭死壓</span></th>
                     </tr>
                     <tr>
-                        <th>無下影線<br>(光腳)</th>
+                        <th class="k-row-th">無下影線(光腳)<br><span class="k-yellow-tip">👉 空軍狂殺，下方無撐</span></th>
                         <td>
                             <div class="kl-box"><div class="kl green"><div class="body" style="top:0; height:100%;"></div></div></div>
-                            <div class="k-title" style="color:#00e676;">【極空】絕對統治</div>
+                            <div class="k-title t-green">【極空】光頭光腳大綠K</div>
+                            <div class="k-desc">賣盤絕對統治，這5分鐘呈現崩跌狀態，下一根高機率續殺。</div>
                         </td>
                         <td>
                             <div class="kl-box"><div class="kl green"><div class="wick" style="top:0; height:20%;"></div><div class="body" style="top:20%; height:80%;"></div></div></div>
-                            <div class="k-title" style="color:#00e676;">【強空】殘酷鎮壓</div>
+                            <div class="k-title t-green">【強空】開高走低</div>
+                            <div class="k-desc">開盤誘多假抽一下，馬上被空軍按在地上摩擦，殺到底。</div>
                         </td>
                         <td>
                             <div class="kl-box"><div class="kl green"><div class="wick" style="top:0; height:60%;"></div><div class="body" style="top:60%; height:40%;"></div></div></div>
-                            <div class="k-title" style="color:#00e676;">【極空】墓碑線</div>
+                            <div class="k-title t-warn">【⚠️極空轉折】墓碑線</div>
+                            <div class="k-desc">主力拉高倒貨！反彈完全失敗，上方全是冤魂，準備大跌。</div>
                         </td>
                     </tr>
                     <tr>
-                        <th>短下影線<br>(下 &lt; 實體)</th>
+                        <th class="k-row-th">短下影線<br><span class="k-yellow-tip">👉 殺到底有微弱買盤抵抗</span></th>
                         <td>
                             <div class="kl-box"><div class="kl green"><div class="wick" style="top:80%; height:20%;"></div><div class="body" style="top:0; height:80%;"></div></div></div>
-                            <div class="k-title" style="color:#00e676;">【強空】穩健下殺</div>
+                            <div class="k-title t-green">【強空】弱勢緩跌</div>
+                            <div class="k-desc">一路殺，到底部稍微踩個煞車，但空軍氣勢依然壓制全場。</div>
                         </td>
                         <td>
                             <div class="kl-box"><div class="kl green"><div class="wick" style="top:10%; height:80%;"></div><div class="body" style="top:20%; height:60%;"></div></div></div>
-                            <div class="k-title" style="color:#00e676;">【看空】標準綠K</div>
+                            <div class="k-title t-green">【看空】標準下殺綠K</div>
+                            <div class="k-desc">最常見的退水K線，多空正常交火，空軍穩步佔優。</div>
                         </td>
                         <td>
-                            <div class="kl-box"><div class="kl green"><div class="wick" style="top:0; height:80%;"></div><div class="body" style="top:50%; height:20%;"></div></div></div>
-                            <div class="k-title" style="color:#00e676;">【偏空】倒槌線</div>
+                            <div class="kl-box"><div class="kl green"><div class="wick" style="top:0; height:80%;"></div><div class="body" style="top:50%; height:30%;"></div></div></div>
+                            <div class="k-title t-green">【強空】假突破真下殺</div>
+                            <div class="k-desc">衝高失敗後一路破底，上方套牢賣壓重，反彈無望。</div>
                         </td>
                     </tr>
                     <tr>
-                        <th>長下影線<br>(下 &gt; 實體)</th>
+                        <th class="k-row-th">長下影線<br><span class="k-yellow-tip">👉 殺低被打臉，買盤極重</span></th>
                         <td>
                             <div class="kl-box"><div class="kl green"><div class="wick" style="top:40%; height:60%;"></div><div class="body" style="top:0; height:40%;"></div></div></div>
-                            <div class="k-title" style="color:#00e676;">【誘空】槌子線</div>
+                            <div class="k-title t-warn">【偏多轉折】深水炸彈</div>
+                            <div class="k-desc">一路殺到極低點突然爆量買回，空軍殺不下去，隨時準備V轉向上。</div>
                         </td>
                         <td>
                             <div class="kl-box"><div class="kl green"><div class="wick" style="top:10%; height:90%;"></div><div class="body" style="top:30%; height:20%;"></div></div></div>
-                            <div class="k-title" style="color:#00e676;">【看空】吊人線</div>
+                            <div class="k-title t-warn">【⚠️危險轉折】探底誘空</div>
+                            <div class="k-desc">雖然收綠，但下面有一根長長的避震器，追空極容易被嘎爆，先撤退。</div>
                         </td>
                         <td>
                             <div class="kl-box"><div class="kl green"><div class="wick" style="top:0; height:100%;"></div><div class="body" style="top:40%; height:20%;"></div></div></div>
-                            <div class="k-title" style="color:#ff9800;">【觀望】紡錘線</div>
+                            <div class="k-title t-warn">【⚠️震盪觀望】雙殺絞肉機</div>
+                            <div class="k-desc">這5分鐘內上沖下洗，主力在亂洗籌碼，不要在這種線型裡面猜方向。</div>
                         </td>
                     </tr>
                 </table>
             </div>
 
             <div class="k-table-container">
-                <table class="k-table">
-                    <tr><th colspan="4" style="background:#ddd; color:#000; font-size:1.1rem; font-weight:bold;">⬜ 白K / 十字 陣營 (開收同價)</th></tr>
+                <table class="k-book-table">
+                    <tr><th colspan="4" class="k-main-th" style="background:#2a2a2a; border-bottom:none;"><span style="color:#ddd;">⬜ 第三張表：白 K 陣營 (收盤 = 開盤 / 十字星)</span></th></tr>
+                    <tr><th colspan="4" class="k-sub-th" style="background:#1a1a1a;">【戰場大前提】：這5分鐘內多空打平。白K出現代表「趨勢暫停」，往往是準備變盤的發令槍！</th></tr>
                     <tr>
                         <th></th>
-                        <th>無上影線<br>(光頭)</th>
-                        <th>短上影線<br>(上 &lt; 下)</th>
-                        <th>長上影線<br>(上 &gt; 下)</th>
+                        <th class="k-col-th">無上影線(光頭)<span class="k-yellow-tip">👉 高點等於開收盤</span></th>
+                        <th class="k-col-th">短上影線<span class="k-yellow-tip">👉 高點微幅凸出</span></th>
+                        <th class="k-col-th">長上影線<span class="k-yellow-tip">👉 高點極度凸出</span></th>
                     </tr>
                     <tr>
-                        <th>無下影線<br>(光腳)</th>
+                        <th class="k-row-th">無下影線(光腳)<br><span class="k-yellow-tip">👉 低點等於開收盤</span></th>
                         <td>
                             <div class="kl-box"><div class="kl white"><div class="body" style="top:48%;"></div></div></div>
-                            <div class="k-title" style="color:#ff9800;">【觀望】一字線</div>
+                            <div class="k-title t-warn">【極端】死水一字線</div>
+                            <div class="k-desc">5分鐘內一動也不動，只有漲跌停鎖死或完全沒量才會出現。</div>
                         </td>
                         <td>
                             <div class="kl-box"><div class="kl white"><div class="wick" style="top:0; height:50%;"></div><div class="body" style="top:48%;"></div></div></div>
-                            <div class="k-title" style="color:#00e676;">【看空】倒 T 字</div>
+                            <div class="k-title t-green">【偏空】倒 T 字星</div>
+                            <div class="k-desc">想往上漲但被完全壓回起點，空方在此處略佔上風。</div>
                         </td>
                         <td>
                             <div class="kl-box"><div class="kl white"><div class="wick" style="top:0; height:100%;"></div><div class="body" style="top:98%;"></div></div></div>
-                            <div class="k-title" style="color:#00e676;">【極空】墓碑十字</div>
+                            <div class="k-title t-warn">【⚠️極空轉折】墓碑十字</div>
+                            <div class="k-desc">向上拉升遇到毀滅性賣壓，被徹底打回原形，高檔見此必逃命！</div>
                         </td>
                     </tr>
                     <tr>
-                        <th>短下影線<br>(下 &lt; 上)</th>
+                        <th class="k-row-th">短下影線<br><span class="k-yellow-tip">👉 低點微幅下探</span></th>
                         <td>
                             <div class="kl-box"><div class="kl white"><div class="wick" style="top:50%; height:50%;"></div><div class="body" style="top:48%;"></div></div></div>
-                            <div class="k-title" style="color:#ff4d4d;">【看多】正 T 字</div>
+                            <div class="k-title t-red">【偏多】正 T 字星</div>
+                            <div class="k-desc">稍微跌一下就被買回起點，下方有微弱買盤墊著。</div>
                         </td>
                         <td>
                             <div class="kl-box"><div class="kl white"><div class="wick" style="top:30%; height:40%;"></div><div class="body" style="top:48%;"></div></div></div>
-                            <div class="k-title" style="color:#ff9800;">【觀望】小十字星</div>
+                            <div class="k-title t-warn">【中立觀望】小十字星</div>
+                            <div class="k-desc">多空都在休息喘氣，這5分鐘毫無波瀾，等下一根K線決定方向。</div>
                         </td>
                         <td>
                             <div class="kl-box"><div class="kl white"><div class="wick" style="top:0; height:100%;"></div><div class="body" style="top:70%;"></div></div></div>
-                            <div class="k-title" style="color:#00e676;">【偏空】射擊十字</div>
+                            <div class="k-title t-green">【偏空】射擊之星</div>
+                            <div class="k-desc">上方壓力明顯大於下方支撐，多軍反撲失敗的機率高。</div>
                         </td>
                     </tr>
                     <tr>
-                        <th>長下影線<br>(下 &gt; 上)</th>
+                        <th class="k-row-th">長下影線<br><span class="k-yellow-tip">👉 低點極度深探</span></th>
                         <td>
                             <div class="kl-box"><div class="kl white"><div class="wick" style="top:0; height:100%;"></div><div class="body" style="top:0;"></div></div></div>
-                            <div class="k-title" style="color:#ff4d4d;">【極多】蜻蜓十字</div>
+                            <div class="k-title t-warn">【⚠️極多轉折】蜻蜓十字</div>
+                            <div class="k-desc">恐怖下殺後被神秘力量「全數買回原點」，低檔見此準備做多！</div>
                         </td>
                         <td>
                             <div class="kl-box"><div class="kl white"><div class="wick" style="top:0; height:100%;"></div><div class="body" style="top:30%;"></div></div></div>
-                            <div class="k-title" style="color:#ff4d4d;">【強多】鐵鎚十字</div>
+                            <div class="k-title t-warn">【偏多轉折】鐵鎚十字</div>
+                            <div class="k-desc">向下試探重重踢到鐵板，多頭展現強大防守韌性。</div>
                         </td>
                         <td>
                             <div class="kl-box"><div class="kl white"><div class="wick" style="top:0; height:100%;"></div><div class="body" style="top:48%;"></div></div></div>
-                            <div class="k-title" style="color:#ff9800;">【轉折】長腿十字</div>
+                            <div class="k-title t-warn">【⚠️極險轉折】長腿十字</div>
+                            <div class="k-desc">這5分鐘內經歷了暴漲暴跌，雙方死傷慘重，原趨勢極可能在此反轉！</div>
                         </td>
                     </tr>
                 </table>
@@ -547,7 +635,7 @@
                             if(code && name) customDict[code] = name;
                         }
                     });
-                    console.log("✅ 對照表載入完成");
+                    console.log("✅ 股名對照表載入完成");
                 }
             });
         });
@@ -599,20 +687,22 @@
                 if(data) {
                     let incomingString = JSON.stringify(data);
                     if(incomingString !== currentStateString) {
-                        currentStateString = incomingString; // 阻斷自我迴圈
+                        currentStateString = incomingString; 
                         wl = data.wl || [];
                         sysQuota = data.quota || { total: 50, manualUsed: 0 };
                         activeLongMissions = data.longMissions || {};
                         activeShortMissions = data.shortMissions || {};
 
-                        renderWatchlist();
-                        renderMissions('long'); renderMissions('short');
                         document.getElementById('quota-total').value = sysQuota.total;
                         document.getElementById('quota-manual-used').value = sysQuota.manualUsed;
+                        
+                        renderWatchlist();
+                        renderMissions('long'); 
+                        renderMissions('short');
                         updateGlobalQuota();
                         showToast("☁️ 雲端數據已同步");
                     }
-                } else { triggerSync(); } // 新房間，推送預設值
+                } else { triggerSync(); } 
             });
         }
 
@@ -623,10 +713,10 @@
                 let state = { wl: wl, quota: sysQuota, longMissions: activeLongMissions, shortMissions: activeShortMissions };
                 currentStateString = JSON.stringify(state);
                 db.ref('rooms/' + syncRoom).set(state);
-            }, 300); // 300毫秒防抖動
+            }, 300); 
         }
 
-        // ================= 介面與功能邏輯 =================
+        // ================= 導航與視圖控制 =================
         const slider = document.getElementById('slider');
         const tabs = [document.getElementById('tab-0'), document.getElementById('tab-1'), document.getElementById('tab-2'), document.getElementById('tab-3')];
 
@@ -793,7 +883,7 @@
                     <div class="result-box" style="background:#1a1a1a; border:1px solid #555; margin-bottom:15px;">
                         <div style="font-size:0.8rem; color:#aaa; margin-bottom:5px;">⚖️ 交割額度佔用</div>
                         <div class="quota-box"><span>佔用:</span><span style="display:flex; flex-direction:column; align-items:flex-end;"><span class="quota-val" id="quota-cost-${mode}-${m.id}">-</span><span id="quota-type-${mode}-${m.id}" style="font-size:0.7rem; color:#888;"></span></span></div>
-                        <div class="quota-box" style="background:transparent; padding:4px 0 0 0;"><span>全球額度剩餘:</span><span class="quota-val quota-remain-val" id="quota-remain-${mode}-${m.id}">-</span></div>
+                        <div class="quota-box" style="background:transparent; padding:4px 0 0 0;"><span>全域剩餘:</span><span class="quota-val quota-remain-val" id="quota-remain-${mode}-${m.id}">-</span></div>
                     </div>
                     
                     <div class="result-box">
@@ -867,7 +957,9 @@
 
             if (entry) {
                 let cost = 0; let typeLabel = "";
-                if (isLong) { cost = entry * lots * 1000; typeLabel = "(預扣進場總價)"; } else { if (upLimitNum > 0) { cost = upLimitNum * lots * 1000; typeLabel = "(無情鎖死漲停價)"; } else { cost = entry * lots * 1000; typeLabel = "(依進場價估算)"; } }
+                if (isLong) { cost = entry * lots * 1000; typeLabel = "(預扣進場總價)"; } 
+                else { if (upLimitNum > 0) { cost = upLimitNum * lots * 1000; typeLabel = "(無情鎖死漲停價)"; } else { cost = entry * lots * 1000; typeLabel = "(依進場價估算)"; } }
+                
                 V14_combat_state.activeMissionsCosts[`${mode}-${mId}`] = cost; updateGlobalQuota(); 
                 document.getElementById(`quota-cost-${mode}-${mId}`).innerText = "NT$ " + cost.toLocaleString(); 
                 document.getElementById(`quota-type-${mode}-${mId}`).innerText = typeLabel;
@@ -878,12 +970,16 @@
                 document.getElementById(`be-${mode}-${mId}`).innerText = be.toFixed(2) + " 回本";
             } else { 
                 V14_combat_state.activeMissionsCosts[`${mode}-${mId}`] = 0; updateGlobalQuota();
-                document.getElementById(`be-${mode}-${mId}`).innerText = "-"; document.getElementById(`quota-cost-${mode}-${mId}`).innerText = "-"; document.getElementById(`quota-type-${mode}-${mId}`).innerText = "";
+                document.getElementById(`be-${mode}-${mId}`).innerText = "-"; 
+                document.getElementById(`quota-cost-${mode}-${mId}`).innerText = "-"; 
+                document.getElementById(`quota-type-${mode}-${mId}`).innerText = "";
             }
 
             if (entry && target && base) {
                 let risk = isLong ? (entry - stopLoss) : (stopLoss - entry); let reward = isLong ? (target - entry) : (entry - target); 
-                let rr = risk > 0 ? (reward / risk) : 0; document.getElementById(`rr-${mode}-${mId}`).innerText = rr.toFixed(2);
+                let rr = risk > 0 ? (reward / risk) : 0; 
+                document.getElementById(`rr-${mode}-${mId}`).innerText = rr.toFixed(2);
+                
                 let slData = calcPnL(entry, stopLoss, lots, isLong);
                 document.getElementById(`loss-${mode}-${mId}`).innerHTML = `<span class="shocking-loss">NT$ ${Math.round(slData.full).toLocaleString()}</span>`;
                 
@@ -891,15 +987,15 @@
                     let currentGlobalRemain = parseFloat(document.getElementById('quota-global-remain').innerText.replace(/[^\d.-]/g, ''));
                     if (currentGlobalRemain < 0) { sigBox.className = "signal stop"; sigBox.innerText = "❌ 額度不足！違約交割警告！"; } 
                     else if (isLong) {
-                        if (entry < base) { sigBox.className = "signal stop"; sigBox.innerText = "❌ 逆勢多 (進場須大於等於基準)"; } 
-                        else if (entry > finalEntryBound && rr >= 1.5) { sigBox.className = "signal stop"; sigBox.innerText = "❌ 風險過高 (虧損大於系統容許)"; } 
-                        else if (entry > finalEntryBound && rr < 1.5) { sigBox.className = "signal stop"; sigBox.innerText = "❌ 追高警告 (盈虧比低於 1.5)"; } 
-                        else { sigBox.className = "signal go"; sigBox.innerText = "✅ 完美狙擊，准許開槍"; }
+                        if (entry < base) sigBox.className="signal stop", sigBox.innerText="❌ 逆勢多 (進場須大於等於基準)";
+                        else if (entry > finalEntryBound && rr >= 1.5) sigBox.className="signal stop", sigBox.innerText="❌ 風險過高 (虧損大於系統容許)";
+                        else if (entry > finalEntryBound && rr < 1.5) sigBox.className="signal stop", sigBox.innerText="❌ 追高警告 (盈虧比低於 1.5)";
+                        else sigBox.className="signal go", sigBox.innerText="✅ 完美狙擊，准許開槍";
                     } else {
-                        if (entry > base) { sigBox.className = "signal stop"; sigBox.innerText = "❌ 逆勢空 (進場須小於等於基準)"; } 
-                        else if (entry < finalEntryBound && rr >= 1.5) { sigBox.className = "signal stop"; sigBox.innerText = "❌ 風險過高 (虧損大於系統容許)"; } 
-                        else if (entry < finalEntryBound && rr < 1.5) { sigBox.className = "signal stop"; sigBox.innerText = "❌ 殺低警告 (盈虧比低於 1.5)"; } 
-                        else { sigBox.className = "signal go"; sigBox.innerText = "✅ 完美狙擊，准許開槍"; }
+                        if (entry > base) sigBox.className="signal stop", sigBox.innerText="❌ 逆勢空 (進場須小於等於基準)";
+                        else if (entry < finalEntryBound && rr >= 1.5) sigBox.className="signal stop", sigBox.innerText="❌ 風險過高 (虧損大於系統容許)";
+                        else if (entry < finalEntryBound && rr < 1.5) sigBox.className="signal stop", sigBox.innerText="❌ 殺低警告 (盈虧比低於 1.5)";
+                        else sigBox.className="signal go", sigBox.innerText="✅ 完美狙擊，准許開槍";
                     }
                 }
             } else if(!limitWarn) { sigBox.className = "signal"; sigBox.innerText = "等待進場價..."; document.getElementById(`loss-${mode}-${mId}`).innerText = "-"; }
