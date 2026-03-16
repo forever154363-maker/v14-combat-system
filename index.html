@@ -1,0 +1,1329 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="icon-192.png"><title>V14.4 戰區總司令</title>
+    <style>
+        /* 基礎設定 */
+        body { 
+            margin: 0; padding: 0; 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
+            background-color: #121212; color: #e0e0e0; 
+            overflow: hidden; -webkit-user-select: none; 
+        }
+        
+        /* 頂部導航列 */
+        .top-nav { 
+            position: fixed; top: 0; left: 0; width: 100%; height: 50px; 
+            background-color: #1a1a1a; display: flex; z-index: 999; 
+            box-shadow: 0 4px 10px rgba(0,0,0,0.8); border-bottom: 1px solid #333;
+        }
+        .nav-tab { 
+            flex: 1; text-align: center; line-height: 50px; font-weight: bold; 
+            color: #666; transition: 0.2s; font-size: 0.95rem; cursor: pointer; white-space: nowrap;
+        }
+        .nav-tab.active { 
+            color: #fff; border-bottom: 3px solid #00ffcc; background-color: rgba(0,255,204,0.1); 
+        }
+
+        /* 頁面滑動容器 */
+        .swipe-container { 
+            display: flex; width: 100vw; height: 100vh; overflow-x: auto; overflow-y: hidden; 
+            scroll-snap-type: x mandatory; scroll-behavior: smooth; padding-top: 50px; 
+            box-sizing: border-box; -webkit-overflow-scrolling: touch; scrollbar-width: none; 
+        }
+        .swipe-container::-webkit-scrollbar { display: none; }
+        .page { 
+            min-width: 100vw; width: 100vw; height: 100%; overflow-y: auto; 
+            scroll-snap-align: start; padding: 15px 10px 120px 10px; 
+            box-sizing: border-box; -webkit-overflow-scrolling: touch; position: relative; 
+        }
+        
+        /* 卡片共用樣式 */
+        .card { 
+            background-color: #1e1e1e; border-radius: 10px; padding: 12px; 
+            margin-bottom: 15px; border-left: 5px solid #444; box-shadow: 0 4px 6px rgba(0,0,0,0.3); 
+        }
+        .card.info { border-left-color: #00ffcc; }
+        .card.quota { border-left-color: #ffeb3b; background-color: #1c1a10; }
+        
+        /* 增減控制器 (Stepper) - V14.4 極限壓縮寬度適配 iPhone */
+        .stepper-wrapper { 
+            display: flex; align-items: stretch; background: #2c2c2c; 
+            border: 1px solid #444; border-radius: 6px; overflow: hidden; height: 36px; 
+        }
+        .stepper-wrapper input { 
+            flex: 1; min-width: 0; width: 100%; border: none; background: transparent; 
+            color: #fff; text-align: center; font-size: 1rem; font-weight: bold; 
+            -moz-appearance: textfield; padding: 0 2px;
+        }
+        .stepper-wrapper input::-webkit-outer-spin-button, 
+        .stepper-wrapper input::-webkit-inner-spin-button { 
+            -webkit-appearance: none; margin: 0; 
+        }
+        .stepper-wrapper input:focus { outline: none; background: #333; }
+        .stepper-btn { 
+            background: #3a3a3a; color: #ccc; border: none; width: 26px; /* 極限微縮 */
+            cursor: pointer; font-size: 1.1rem; display: flex; align-items: center; 
+            justify-content: center; user-select: none; transition: 0.1s; flex-shrink: 0;
+        }
+        .stepper-btn:active { background: #00ffcc; color: #000; }
+        
+        /* 進場專用大型增減控制器 */
+        .entry-stepper { 
+            height: 50px; border: 2px solid #555; position: relative; padding-right: 35px; 
+        }
+        .entry-stepper.w-long { border-color: #ff4d4d; }
+        .entry-stepper.w-short { border-color: #00e676; }
+        .entry-stepper input { font-size: 1.4rem; }
+        .entry-stepper .stepper-btn { width: 40px; font-size: 1.4rem; }
+        .btn-clear { 
+            position: absolute; right: 5px; top: 10px; width: 28px; height: 28px; 
+            border-radius: 50%; background-color: #444; color: #fff; border: none; 
+            font-size: 0.9rem; font-weight: bold; display: flex; justify-content: center; 
+            align-items: center; cursor: pointer; z-index: 5;
+        }
+        .btn-clear:active { background-color: #666; }
+
+        /* 一般輸入框與標籤 */
+        .input-group { margin-bottom: 10px; }
+        label { display: block; font-size: 0.85rem; color: #aaa; margin-bottom: 4px; }
+        
+        /* 訊號燈 */
+        .signal { 
+            text-align: center; padding: 10px; border-radius: 6px; 
+            font-weight: bold; background-color: #333; font-size: 1rem; margin: 10px 0;
+        }
+        .signal.go { background-color: rgba(0, 230, 118, 0.2); color: #00e676; border: 1px solid #00e676;}
+        .signal.stop { background-color: rgba(255, 77, 77, 0.2); color: #ff4d4d; border: 1px solid #ff4d4d; }
+        .signal.warn { background-color: rgba(255, 152, 0, 0.2); color: #ff9800; border: 1px solid #ff9800; }
+        
+        /* 結算結果區塊 */
+        .result-box { 
+            background-color: #252525; padding: 10px; border-radius: 6px; 
+            margin-top: 10px; font-size: 0.9rem; 
+        }
+        .result-row { 
+            display: flex; justify-content: space-between; margin-bottom: 8px; 
+            border-bottom: 1px dashed #444; padding-bottom: 4px; align-items: center;
+        }
+        .result-row:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+        .highlight { font-weight: bold; font-size: 1rem; }
+        
+        /* 資金天網區塊 */
+        .quota-box { 
+            display: flex; justify-content: space-between; align-items: center; 
+            background: #222; padding: 8px 10px; border-radius: 6px; margin-top: 5px; font-size: 0.9rem;
+        }
+        .quota-val { font-weight: bold; font-size: 1rem; }
+
+        /* 怵目驚心停損特效 */
+        .shocking-loss { 
+            background: #660000; color: #ff4d4d; padding: 4px 10px; border-radius: 6px; 
+            font-size: 1.15rem; font-weight: 900; box-shadow: 0 0 10px rgba(255, 0, 0, 0.8); 
+            display: inline-block; animation: pulse-red 1s infinite alternate; 
+        }
+        @keyframes pulse-red { 
+            from { box-shadow: 0 0 5px rgba(255,0,0,0.5); transform: scale(1); } 
+            to { box-shadow: 0 0 15px rgba(255,0,0,1); transform: scale(1.05); } 
+        }
+
+        /* 一鍵出場/進場 雷達帶 */
+        .quick-exit-strip { 
+            display: flex; flex-wrap: nowrap; overflow-x: auto; gap: 8px; 
+            padding: 10px 0 15px 0; border-top: 1px dashed #555; border-bottom: 1px dashed #555; 
+            margin-bottom: 15px; scrollbar-width: thin; scrollbar-color: #666 #1a1a1a; 
+        }
+        .quick-exit-strip::-webkit-scrollbar { height: 8px; display: block; }
+        .quick-exit-strip::-webkit-scrollbar-thumb { background: #666; border-radius: 4px; }
+        .quick-exit-strip::-webkit-scrollbar-track { background: #111; }
+        
+        .btn-quick { 
+            background: #111; border: 1px solid #444; border-radius: 8px; padding: 8px 12px; 
+            color: #fff; text-align: center; min-width: 75px; cursor: pointer; flex-shrink: 0; transition: 0.2s; 
+        }
+        .btn-quick:active { transform: scale(0.95); }
+        .btn-quick.profit { border-color: #00e676; background: rgba(0,230,118,0.1); color: #00e676; }
+        .btn-quick.loss { border-color: #ff4d4d; background: rgba(255,77,77,0.1); color: #ff4d4d; }
+        .btn-quick .price { font-size: 0.85rem; color: #ccc; margin-bottom: 4px; display:block; letter-spacing: -0.5px;}
+        .btn-quick .pnl { font-size: 1.1rem; font-weight: bold; }
+
+        /* 文字與列表 */
+        .t-red { color: #ff4d4d; font-weight: bold; }
+        .t-green { color: #00e676; font-weight: bold; }
+        .rules-list { padding-left: 20px; font-size: 0.85rem; color: #ccc; line-height: 1.5; margin:0;}
+        .rules-list li { margin-bottom: 12px; }
+
+        /* 戰備佈署面板 */
+        .wl-title-bar { display: flex; gap: 8px; margin-bottom: 15px; align-items: center;}
+        .wl-title-bar input { 
+            width: 100%; box-sizing: border-box; background-color: #2c2c2c; 
+            border: 1px solid #444; color: #fff; padding: 8px; border-radius: 6px; 
+            font-size: 1rem; font-weight: bold;
+        }
+        .wl-title-bar input:focus { outline: none; border-color: #00ffcc; background-color: #333;}
+        
+        .wl-section { 
+            background-color: #252525; padding: 10px; border-radius: 6px; 
+            margin-bottom: 10px; border-left: 3px solid #666;
+        }
+        .wl-section.s-long { border-left-color: #ff4d4d; }
+        .wl-section.s-short { border-left-color: #00e676; }
+        .wl-section.s-ex { border-left-color: #ff9800; }
+        
+        /* V14.4 RWD 強制使用 minmax(0, 1fr) 確保不會被撐開溢出 */
+        .target-grid { 
+            display: grid; 
+            grid-template-columns: repeat(3, minmax(0, 1fr)); 
+            gap: 6px; margin-top: 5px;
+        }
+        .ex-grid { 
+            display: grid; 
+            grid-template-columns: repeat(2, minmax(0, 1fr)); 
+            gap: 6px; margin-top: 5px;
+        }
+        .target-label { font-size: 0.75rem; color: #aaa; text-align: center; margin-bottom: 2px;}
+
+        .btn { 
+            padding: 12px; border: none; border-radius: 6px; font-weight: bold; 
+            color: white; cursor: pointer; text-align: center; font-size: 0.95rem; 
+            width: 100%; box-sizing: border-box; transition: 0.2s;
+        }
+        .btn:active { transform: scale(0.98); }
+        .btn-add { background-color: #00ffcc; color: #000; margin-top: 10px;}
+        
+        .toggle-panel-btn { background-color: #333; color: #00ffcc; border: 1px dashed #00ffcc; margin-bottom: 10px; font-size: 0.9rem;}
+        
+        /* 陣地快速導航 */
+        .quick-nav-container { display: none; flex-wrap: wrap; gap: 8px; padding: 5px 0 10px 0; border-bottom: 1px solid #333; margin-bottom: 15px;}
+        .combat-nav { position: sticky; top: 0; background: #121212; z-index: 100; display: flex; flex-wrap: wrap; gap: 6px; padding: 10px 0; border-bottom: 1px dashed #444; margin-bottom: 15px;}
+        
+        .chip { 
+            padding: 6px 14px; background-color: #444; color: #fff; border-radius: 20px; 
+            font-size: 0.85rem; font-weight: bold; border: 1px solid #666; cursor: pointer; transition: 0.2s;
+        }
+        .chip:active, .chip.active { background-color: #00ffcc; color: #000; border-color: #00ffcc; transform: scale(0.95);}
+        .chip.l { border-color: #ff4d4d; color: #ff4d4d; background: transparent;}
+        .chip.l.active { background-color: #ff4d4d; color: #fff;}
+        .chip.s { border-color: #00e676; color: #00e676; background: transparent;}
+        .chip.s.active { background-color: #00e676; color: #000;}
+
+        /* 戰備列表卡片 */
+        .card-compact { 
+            background-color: #1e1e1e; border-radius: 8px; padding: 10px; 
+            margin-bottom: 12px; border-left: 4px solid #444; box-shadow: 0 2px 4px rgba(0,0,0,0.4); 
+        }
+        .card-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #333; padding-bottom: 5px; margin-bottom: 5px; }
+        .card-header h3 { margin: 0; font-size: 1.05rem; color: #fff; }
+        .btn-icon { background: transparent; border: none; font-size: 1.2rem; padding: 0; margin: 0 0 0 12px; cursor: pointer; opacity: 0.8; transition: 0.2s;}
+        .btn-icon:active { opacity: 1; transform: scale(0.9); }
+        .limits-bar { display:flex; justify-content:space-between; font-size: 0.75rem; background: #222; padding: 4px 8px; border-radius: 4px; margin-bottom: 10px;}
+        
+        .row-group { display: flex; align-items: center; margin-bottom: 6px; }
+        .row-label { width: 45px; font-size: 0.8rem; font-weight: bold; text-align: center; margin-right: 5px; flex-shrink: 0;}
+        .row-label.l { color: #ff4d4d; border-right: 2px solid #ff4d4d; padding-right: 4px;}
+        .row-label.s { color: #00e676; border-right: 2px solid #00e676; padding-right: 4px;}
+        .row-label.ex { color: #ff9800; border-right: 2px solid #ff9800; padding-right: 4px;}
+        
+        .btn-grid { display: flex; flex-wrap: wrap; gap: 5px; flex: 1; }
+        .btn-mini { padding: 8px 4px; border: 1px solid transparent; border-radius: 4px; font-weight: bold; text-align: center; cursor: pointer; flex: 1; min-width: 45px; max-width: 65px; font-size: 0.95rem; transition: 0.1s;}
+        .btn-mini.l { background-color: rgba(255, 77, 77, 0.15); border-color: #ff4d4d; color: #ff4d4d; }
+        .btn-mini.l:active { background-color: #ff4d4d; color: #fff; transform: scale(0.95);}
+        .btn-mini.s { background-color: rgba(0, 230, 118, 0.15); border-color: #00e676; color: #00e676; }
+        .btn-mini.s:active { background-color: #00e676; color: #000; transform: scale(0.95);}
+        .btn-mini.ex-s { background-color: rgba(255, 152, 0, 0.1); border-color: #ff9800; color: #00e676; } 
+        .btn-mini.ex-s:active { background-color: #00e676; color: #000; border-color: #00e676; transform: scale(0.95);}
+        .btn-mini.ex-l { background-color: rgba(255, 152, 0, 0.1); border-color: #ff9800; color: #ff4d4d; } 
+        .btn-mini.ex-l:active { background-color: #ff4d4d; color: #fff; border-color: #ff4d4d; transform: scale(0.95);}
+
+        /* 實戰陣地卡片 */
+        .mission-card { background-color: #1e1e1e; border-radius: 10px; padding: 12px; margin-bottom: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.5); border-left: 5px solid #444;}
+        .mission-card.mode-long { border-left-color: #ff4d4d; }
+        .mission-card.mode-short { border-left-color: #00e676; }
+        .m-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px dashed #444; padding-bottom: 8px; margin-bottom: 10px;}
+        .m-header h3 { margin: 0; font-size: 1.1rem; }
+        .m-header.mode-long h3 { color: #ff4d4d; }
+        .m-header.mode-short h3 { color: #00e676; }
+
+        /* UI 輔助組件 */
+        #btt-btn { position: fixed; bottom: 20px; right: 20px; z-index: 1000; border-radius: 50%; width: 45px; height: 45px; background: rgba(0, 255, 204, 0.8); color: #000; font-size: 1.2rem; display: none; border: 2px solid #00ffcc; box-shadow: 0 4px 10px rgba(0,0,0,0.8); justify-content: center; align-items: center; cursor: pointer; }
+        #toast { position: fixed; top: 60px; left: 50%; transform: translateX(-50%); background-color: #00ffcc; color: #000; padding: 8px 20px; border-radius: 20px; font-weight: bold; font-size: 0.9rem; z-index: 10000; display: none; box-shadow: 0 4px 10px rgba(0,0,0,0.5); white-space: nowrap;}
+        .logistics-header { text-align:center; padding: 25px 0 15px 0; margin-top: 40px; border-top: 1px dashed #555; color: #888; font-size: 0.85rem; letter-spacing: 2px;}
+
+        /* K線圖鑑 */
+        .k-table-container { width: 100%; margin-bottom: 20px;}
+        .k-table { width: 100%; table-layout: fixed; border-collapse: collapse; text-align: center; background-color:#1a1a1a;}
+        .k-table th, .k-table td { border: 1px solid #333; padding: 4px 2px; vertical-align: middle; word-wrap: break-word;}
+        .k-table th { background-color: #222; color: #aaa; font-size: 0.65rem; font-weight: normal; line-height: 1.1;}
+        .k-table th:first-child { width: 16%; } 
+        .k-title { font-weight: bold; font-size: 0.7rem; margin-bottom: 2px; line-height: 1.1;}
+        .kl-box { display: flex; justify-content: center; align-items: center; height: 35px; margin-bottom: 2px;}
+        .kl { position: relative; width: 8px; height: 28px; }
+        .kl .wick { position: absolute; left: 3px; width: 2px; height: 100%; background: #ccc; }
+        .kl .body { position: absolute; left: 0; width: 100%; }
+        .kl.red .wick, .kl.red .body { background: #ff4d4d; }
+        .kl.green .wick, .kl.green .body { background: #00e676; }
+        
+        .kl.white .wick { background: #fff; }
+        .kl.white .body { background: #fff !important; height: 2px !important; }
+        
+        @media (min-width: 600px) {
+            .k-table th, .k-table td { padding: 8px; }
+            .k-table th { font-size: 0.85rem; }
+            .k-table th:first-child { width: 20%; }
+            .k-title { font-size: 0.9rem; margin-bottom: 5px;}
+            .kl-box { height: 60px; margin-bottom: 5px;}
+            .kl { width: 14px; height: 50px; }
+            .kl .wick { left: 6px; }
+        }
+        /* 電腦端大螢幕適配 (行動裝置模擬模式) */
+        @media (min-width: 768px) {
+            body {
+                display: flex;
+                justify-content: center;
+                background-color: #050505; /* 背景加深，突顯主體 */
+            }
+            .top-nav {
+                width: 414px; /* 鎖定 iPhone 14 Pro Max 寬度 */
+                left: 50%;
+                transform: translateX(-50%);
+            }
+            .swipe-container {
+                width: 414px;
+                border-left: 1px solid #333;
+                border-right: 1px solid #333;
+                box-shadow: 0 0 30px rgba(0, 255, 204, 0.05); /* 邊緣發光效果 */
+                /* 電腦端開啟水平捲軸以防萬一，但建議使用點擊導航 */
+                scrollbar-width: thin; 
+            }
+            .swipe-container::-webkit-scrollbar { 
+                display: block; 
+                height: 8px; 
+            }
+            .page {
+                min-width: 414px;
+                width: 414px;
+                padding-bottom: 60px; /* 修正電腦端底部留白 */
+            }
+            #btt-btn {
+                right: calc(50% - 187px); /* 回到頂部按鈕定位修正 */
+            }
+            #toast {
+                top: 80px; /* 提示框微調 */
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="toast">✅ 系統準備完畢</div>
+
+    <div class="top-nav">
+        <div id="tab-0" class="nav-tab active" onclick="scrollToPage(0)">📋 戰備</div>
+        <div id="tab-1" class="nav-tab" onclick="scrollToPage(1)">🔴 多軍</div>
+        <div id="tab-2" class="nav-tab" onclick="scrollToPage(2)">🟢 空軍</div>
+        <div id="tab-3" class="nav-tab" onclick="scrollToPage(3)">📊 圖鑑</div>
+    </div>
+
+    <div class="swipe-container" id="slider" onscroll="updateTabs()">
+        
+        <div class="page" id="page-0" onscroll="checkScroll()">
+            
+            <button class="btn toggle-panel-btn" id="toggle-btn" onclick="toggleInputPanel()">🔽 收起戰前佈署面板</button>
+            <div id="quick-nav" class="quick-nav-container"></div>
+
+            <form id="input-panel" class="card info" onsubmit="return false;">
+                <h3 style="color:#00ffcc; margin-top:0; text-align:center;">➕ 手動戰前佈署</h3>
+                
+                <div class="wl-title-bar">
+                    <input type="tel" id="wl-code" placeholder="股號" oninput="autoFillName()" tabindex="1" style="width:30%;">
+                    <input type="text" id="wl-name" placeholder="股名" tabindex="-1" style="width:35%;">
+                    <input type="number" inputmode="decimal" id="wl-yc" placeholder="昨收" tabindex="2" style="width:35%; color:#ffeb3b; border-color:#ffeb3b;">
+                </div>
+
+                <div class="wl-section s-long">
+                    <div style="color:#ff4d4d; font-size:0.85rem; font-weight:bold;">🔴 順勢多方 (需由小到大)</div>
+                    <div class="target-grid">
+                        <div>
+                            <div class="target-label">基準</div>
+                            <div class="stepper-wrapper">
+                                <button type="button" class="stepper-btn" tabindex="-1" onclick="stepPrice('lb',-1)">-</button>
+                                <input type="number" inputmode="decimal" id="lb" tabindex="3">
+                                <button type="button" class="stepper-btn" tabindex="-1" onclick="stepPrice('lb',1)">+</button>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="target-label">T1</div>
+                            <div class="stepper-wrapper">
+                                <button type="button" class="stepper-btn" tabindex="-1" onclick="stepPrice('lt1',-1)">-</button>
+                                <input type="number" inputmode="decimal" id="lt1" tabindex="4">
+                                <button type="button" class="stepper-btn" tabindex="-1" onclick="stepPrice('lt1',1)">+</button>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="target-label">T2</div>
+                            <div class="stepper-wrapper">
+                                <button type="button" class="stepper-btn" tabindex="-1" onclick="stepPrice('lt2',-1)">-</button>
+                                <input type="number" inputmode="decimal" id="lt2" tabindex="5">
+                                <button type="button" class="stepper-btn" tabindex="-1" onclick="stepPrice('lt2',1)">+</button>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="target-label">T3</div>
+                            <div class="stepper-wrapper">
+                                <button type="button" class="stepper-btn" tabindex="-1" onclick="stepPrice('lt3',-1)">-</button>
+                                <input type="number" inputmode="decimal" id="lt3" tabindex="6">
+                                <button type="button" class="stepper-btn" tabindex="-1" onclick="stepPrice('lt3',1)">+</button>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="target-label">T4</div>
+                            <div class="stepper-wrapper">
+                                <button type="button" class="stepper-btn" tabindex="-1" onclick="stepPrice('lt4',-1)">-</button>
+                                <input type="number" inputmode="decimal" id="lt4" tabindex="7">
+                                <button type="button" class="stepper-btn" tabindex="-1" onclick="stepPrice('lt4',1)">+</button>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="target-label">漲停</div>
+                            <div class="stepper-wrapper">
+                                <button type="button" class="stepper-btn" tabindex="-1" onclick="stepPrice('lt5',-1)">-</button>
+                                <input type="number" inputmode="decimal" id="lt5" tabindex="8">
+                                <button type="button" class="stepper-btn" tabindex="-1" onclick="stepPrice('lt5',1)">+</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="wl-section s-short">
+                    <div style="color:#00e676; font-size:0.85rem; font-weight:bold;">🟢 順勢空方 (需由大到小)</div>
+                    <div class="target-grid">
+                        <div>
+                            <div class="target-label">基準</div>
+                            <div class="stepper-wrapper">
+                                <button type="button" class="stepper-btn" tabindex="-1" onclick="stepPrice('sb',-1)">-</button>
+                                <input type="number" inputmode="decimal" id="sb" tabindex="9">
+                                <button type="button" class="stepper-btn" tabindex="-1" onclick="stepPrice('sb',1)">+</button>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="target-label">T1</div>
+                            <div class="stepper-wrapper">
+                                <button type="button" class="stepper-btn" tabindex="-1" onclick="stepPrice('st1',-1)">-</button>
+                                <input type="number" inputmode="decimal" id="st1" tabindex="10">
+                                <button type="button" class="stepper-btn" tabindex="-1" onclick="stepPrice('st1',1)">+</button>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="target-label">T2</div>
+                            <div class="stepper-wrapper">
+                                <button type="button" class="stepper-btn" tabindex="-1" onclick="stepPrice('st2',-1)">-</button>
+                                <input type="number" inputmode="decimal" id="st2" tabindex="11">
+                                <button type="button" class="stepper-btn" tabindex="-1" onclick="stepPrice('st2',1)">+</button>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="target-label">T3</div>
+                            <div class="stepper-wrapper">
+                                <button type="button" class="stepper-btn" tabindex="-1" onclick="stepPrice('st3',-1)">-</button>
+                                <input type="number" inputmode="decimal" id="st3" tabindex="12">
+                                <button type="button" class="stepper-btn" tabindex="-1" onclick="stepPrice('st3',1)">+</button>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="target-label">T4</div>
+                            <div class="stepper-wrapper">
+                                <button type="button" class="stepper-btn" tabindex="-1" onclick="stepPrice('st4',-1)">-</button>
+                                <input type="number" inputmode="decimal" id="st4" tabindex="13">
+                                <button type="button" class="stepper-btn" tabindex="-1" onclick="stepPrice('st4',1)">+</button>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="target-label">跌停</div>
+                            <div class="stepper-wrapper">
+                                <button type="button" class="stepper-btn" tabindex="-1" onclick="stepPrice('st5',-1)">-</button>
+                                <input type="number" inputmode="decimal" id="st5" tabindex="14">
+                                <button type="button" class="stepper-btn" tabindex="-1" onclick="stepPrice('st5',1)">+</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="wl-section s-ex">
+                    <div style="color:#ff9800; font-size:0.85rem; font-weight:bold; margin-bottom:5px;">⚠️ 轉折反向打擊區 (左大右小)</div>
+                    <div class="ex-grid">
+                        <div>
+                            <div class="target-label">極高點(空)</div>
+                            <div class="stepper-wrapper">
+                                <button type="button" class="stepper-btn" tabindex="-1" onclick="stepPrice('hb',-1)">-</button>
+                                <input type="number" inputmode="decimal" id="hb" tabindex="15">
+                                <button type="button" class="stepper-btn" tabindex="-1" onclick="stepPrice('hb',1)">+</button>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="target-label">次高點(目標)</div>
+                            <div class="stepper-wrapper">
+                                <button type="button" class="stepper-btn" tabindex="-1" onclick="stepPrice('ht1',-1)">-</button>
+                                <input type="number" inputmode="decimal" id="ht1" tabindex="16">
+                                <button type="button" class="stepper-btn" tabindex="-1" onclick="stepPrice('ht1',1)">+</button>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="target-label">次低點(目標)</div>
+                            <div class="stepper-wrapper">
+                                <button type="button" class="stepper-btn" tabindex="-1" onclick="stepPrice('lowt1',-1)">-</button>
+                                <input type="number" inputmode="decimal" id="lowt1" tabindex="17">
+                                <button type="button" class="stepper-btn" tabindex="-1" onclick="stepPrice('lowt1',1)">+</button>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="target-label">極低點(多)</div>
+                            <div class="stepper-wrapper">
+                                <button type="button" class="stepper-btn" tabindex="-1" onclick="stepPrice('lowb',-1)">-</button>
+                                <input type="number" inputmode="decimal" id="lowb" tabindex="18">
+                                <button type="button" class="stepper-btn" tabindex="-1" onclick="stepPrice('lowb',1)">+</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <button type="button" class="btn btn-add" onclick="addWatchlist()" tabindex="19">💾 儲存並生成彈匣</button>
+            </form>
+            
+            <div id="watchlist-container"></div>
+
+            <div class="logistics-header">⬇️ 系統後勤基地 ⬇️</div>
+
+            <div class="card quota">
+                <h3 style="color:#ffeb3b; margin:0 0 10px 0; text-align:center;">💰 實戰連動額度天網</h3>
+                <div style="display:flex; gap:10px;">
+                    <div style="flex:1;">
+                        <label>總額度 (萬)</label>
+                        <div class="stepper-wrapper">
+                            <button class="stepper-btn" tabindex="-1" onclick="stepPrice('quota-total',-10)">-</button>
+                            <input type="number" inputmode="numeric" pattern="[0-9]*" id="quota-total" value="50" oninput="updateGlobalQuota()">
+                            <button class="stepper-btn" tabindex="-1" onclick="stepPrice('quota-total',10)">+</button>
+                        </div>
+                    </div>
+                    <div style="flex:1;">
+                        <label>已消耗額度(萬) <span style="font-size:0.7rem; color:#ff4d4d;">*手動</span></label>
+                        <div class="stepper-wrapper">
+                            <button class="stepper-btn" tabindex="-1" onclick="stepPrice('quota-manual-used',-1)">-</button>
+                            <input type="number" inputmode="decimal" id="quota-manual-used" value="0" placeholder="如: 23.9" oninput="updateGlobalQuota()">
+                            <button class="stepper-btn" tabindex="-1" onclick="stepPrice('quota-manual-used',1)">+</button>
+                        </div>
+                    </div>
+                </div>
+                <div style="font-size:0.75rem; color:#888; text-align:center; margin-top:5px;">(※ 凡是平倉、留倉或委託中的開倉交易，請手動填入上方已消耗)</div>
+                <div class="quota-box" style="background:#1a1a1a; border:1px solid #ffeb3b; padding:10px; margin-top:10px; justify-content:center; gap:10px;">
+                    <span>🛡️ 當前連動剩餘:</span>
+                    <span class="quota-val highlight" id="quota-global-remain" style="font-size:1.1rem; color:#00e676;">NT$ 500,000</span>
+                </div>
+            </div>
+
+            <div class="card" style="border-left-color: #888; margin-bottom: 80px;">
+                <h3 style="color:#aaa; margin:0; text-align:center; cursor:pointer;" onclick="toggleDictPanel()">⚙️ 展開 股號字典擴充 🔽</h3>
+                <div id="dict-panel" style="display:none; margin-top:15px;">
+                    <div style="font-size:0.75rem; color:#888; margin-bottom:10px; text-align:center;">上傳官方 TXT/CSV，或貼上文字。<br>自動過濾亂碼，瞬間擴充彈藥庫！</div>
+                    <input type="file" id="file-uploader" accept=".txt,.csv" style="font-size:0.85rem; margin-bottom:8px; color:#fff; width:100%;">
+                    <textarea id="paste-area" placeholder="或在此貼上 (例如: 1101 台泥)" style="width:100%; box-sizing:border-box; height:70px; background:#222; border:1px solid #555; color:#fff; border-radius:4px; padding:8px; font-size:0.9rem;"></textarea>
+                    <button class="btn" style="background-color:#555; color:#fff; margin-top:8px;" onclick="importFromTextarea()">📥 執行解析與永久記憶</button>
+                </div>
+            </div>
+            
+            <div id="btt-btn" onclick="scrollToTop()">⬆️</div>
+        </div>
+
+        <div class="page" id="page-1">
+            <div id="long-combat-nav" class="combat-nav" style="display:none;"></div>
+            <div id="long-missions-container">
+                <div style="text-align:center; color:#666; margin-top:50px;">尚未鎖定多方目標。<br>請至「戰備」頁面點擊紅色多方彈匣。</div>
+            </div>
+            <div class="card info" style="margin-top:30px;">
+                <h4 style="margin:0 0 10px 0; color:#00ffcc;">📖 多軍戰場守則</h4>
+                <ol class="rules-list">
+                    <li><b>開盤 5 分鐘</b> 先觀望，不盲目開槍。</li>
+                    <li>做<span class="t-red">多</span>：5分K必須是<span class="t-red">紅K</span>，且收過基準。</li>
+                    <li><b>停損：</b>設基準退1檔。盤中觸價<b>直接砍</b>。</li>
+                    <li>防避雷針或吞噬，看到需有出場準備。</li>
+                    <li><b>Tick：</b><span class="t-red">紅字</span>=看<span class="t-red">多</span>；<span class="t-green">綠字</span>=看<span class="t-green">空</span>。<br>⚠️ 看到瞬間<b>大量反向綠單</b>，立刻撤退！</li>
+                </ol>
+            </div>
+        </div>
+
+        <div class="page" id="page-2">
+            <div id="short-combat-nav" class="combat-nav" style="display:none;"></div>
+            <div id="short-missions-container">
+                <div style="text-align:center; color:#666; margin-top:50px;">尚未鎖定空方目標。<br>請至「戰備」頁面點擊綠色空方彈匣。</div>
+            </div>
+            <div class="card info" style="margin-top:30px;">
+                <h4 style="margin:0 0 10px 0; color:#00ffcc;">📖 空軍戰場守則</h4>
+                <ol class="rules-list">
+                    <li><b>開盤 5 分鐘</b> 先觀望，不盲目開槍。</li>
+                    <li>做<span class="t-green">空</span>：5分K必須是<span class="t-green">綠K</span>，且收破基準。</li>
+                    <li><b>停損：</b>設基準退1檔(空方往上推)。盤中觸價<b>直接砍</b>。</li>
+                    <li>防鐵鎚線或吞噬，看到需有出場準備。</li>
+                    <li><b>Tick：</b><span class="t-red">紅字</span>=看<span class="t-red">多</span>；<span class="t-green">綠字</span>=看<span class="t-green">空</span>。<br>⚠️ 看到瞬間<b>大量反向紅單</b>，立刻撤退！</li>
+                </ol>
+            </div>
+        </div>
+
+        <div class="page" id="page-3">
+            <h3 style="color:#00ffcc; text-align:center; margin-top:0;">📊 實戰 K 線型態圖鑑</h3>
+            
+            <div class="k-table-container">
+                <table class="k-table">
+                    <tr><th colspan="4" style="background:#ff4d4d; color:#000; font-size:1rem; font-weight:bold;">🟥 紅K 陣營 (實體收高)</th></tr>
+                    <tr><th></th><th>無上影線<br>(光頭)</th><th>短上影線<br>(上 &lt; 實體)</th><th>長上影線<br>(上 &gt; 實體)</th></tr>
+                    <tr>
+                        <th>無下影線</th>
+                        <td><div class="kl-box"><div class="kl red"><div class="body" style="top:0; height:100%;"></div></div></div><div class="k-title t-red">【極多】絕對統治</div></td>
+                        <td><div class="kl-box"><div class="kl red"><div class="wick" style="top:0; height:20%;"></div><div class="body" style="top:20%; height:80%;"></div></div></div><div class="k-title t-red">【強多】強勢推進</div></td>
+                        <td><div class="kl-box"><div class="kl red"><div class="wick" style="top:0; height:60%;"></div><div class="body" style="top:60%; height:40%;"></div></div></div><div class="k-title t-red">【誘多】避雷針</div></td>
+                    </tr>
+                    <tr>
+                        <th>短下影線</th>
+                        <td><div class="kl-box"><div class="kl red"><div class="wick" style="top:80%; height:20%;"></div><div class="body" style="top:0; height:80%;"></div></div></div><div class="k-title t-red">【強多】穩健上漲</div></td>
+                        <td><div class="kl-box"><div class="kl red"><div class="wick" style="top:10%; height:80%;"></div><div class="body" style="top:20%; height:60%;"></div></div></div><div class="k-title t-red">【看多】標準戰役</div></td>
+                        <td><div class="kl-box"><div class="kl red"><div class="wick" style="top:0; height:100%;"></div><div class="body" style="top:60%; height:20%;"></div></div></div><div class="k-title t-green">【偏空】攻擊受挫</div></td>
+                    </tr>
+                    <tr>
+                        <th>長下影線</th>
+                        <td><div class="kl-box"><div class="kl red"><div class="wick" style="top:40%; height:60%;"></div><div class="body" style="top:0; height:40%;"></div></div></div><div class="k-title t-red">【極多】觸底反攻</div></td>
+                        <td><div class="kl-box"><div class="kl red"><div class="wick" style="top:20%; height:80%;"></div><div class="body" style="top:20%; height:30%;"></div></div></div><div class="k-title t-red">【強多】下方鐵板</div></td>
+                        <td><div class="kl-box"><div class="kl red"><div class="wick" style="top:0; height:100%;"></div><div class="body" style="top:40%; height:20%;"></div></div></div><div class="k-title" style="color:#ff9800;">【觀望】絞肉機</div></td>
+                    </tr>
+                </table>
+            </div>
+            
+            <div class="k-table-container">
+                <table class="k-table">
+                    <tr><th colspan="4" style="background:#00e676; color:#000; font-size:1rem; font-weight:bold;">🟩 綠K 陣營 (實體收低)</th></tr>
+                    <tr><th></th><th>無上影線<br>(光頭)</th><th>短上影線<br>(上 &lt; 實體)</th><th>長上影線<br>(上 &gt; 實體)</th></tr>
+                    <tr>
+                        <th>無下影線</th>
+                        <td><div class="kl-box"><div class="kl green"><div class="body" style="top:0; height:100%;"></div></div></div><div class="k-title t-green">【極空】絕對統治</div></td>
+                        <td><div class="kl-box"><div class="kl green"><div class="wick" style="top:0; height:20%;"></div><div class="body" style="top:20%; height:80%;"></div></div></div><div class="k-title t-green">【強空】殘酷鎮壓</div></td>
+                        <td><div class="kl-box"><div class="kl green"><div class="wick" style="top:0; height:60%;"></div><div class="body" style="top:60%; height:40%;"></div></div></div><div class="k-title t-green">【極空】墓碑線</div></td>
+                    </tr>
+                    <tr>
+                        <th>短下影線</th>
+                        <td><div class="kl-box"><div class="kl green"><div class="wick" style="top:80%; height:20%;"></div><div class="body" style="top:0; height:80%;"></div></div></div><div class="k-title t-green">【強空】穩健下殺</div></td>
+                        <td><div class="kl-box"><div class="kl green"><div class="wick" style="top:10%; height:80%;"></div><div class="body" style="top:20%; height:60%;"></div></div></div><div class="k-title t-green">【看空】標準戰役</div></td>
+                        <td><div class="kl-box"><div class="kl green"><div class="wick" style="top:0; height:100%;"></div><div class="body" style="top:60%; height:20%;"></div></div></div><div class="k-title t-green">【強空】反彈無望</div></td>
+                    </tr>
+                    <tr>
+                        <th>長下影線</th>
+                        <td><div class="kl-box"><div class="kl green"><div class="wick" style="top:40%; height:60%;"></div><div class="body" style="top:0; height:40%;"></div></div></div><div class="k-title t-green">【誘空】釘子線</div></td>
+                        <td><div class="kl-box"><div class="kl green"><div class="wick" style="top:20%; height:80%;"></div><div class="body" style="top:20%; height:30%;"></div></div></div><div class="k-title t-red">【偏多】殺不下去</div></td>
+                        <td><div class="kl-box"><div class="kl green"><div class="wick" style="top:0; height:100%;"></div><div class="body" style="top:40%; height:20%;"></div></div></div><div class="k-title" style="color:#ff9800;">【觀望】絞肉機</div></td>
+                    </tr>
+                </table>
+            </div>
+
+            <div class="k-table-container">
+                <table class="k-table">
+                    <tr><th colspan="4" style="background:#ddd; color:#000; font-size:1rem; font-weight:bold;">⬜ 白K / 十字 陣營 (開收同價)</th></tr>
+                    <tr><th></th><th>無上影線<br>(光頭)</th><th>短上影線<br>(上 &lt; 下)</th><th>長上影線<br>(上 &gt; 下)</th></tr>
+                    <tr>
+                        <th>無下影線</th>
+                        <td><div class="kl-box"><div class="kl white"><div class="body" style="top:48%; height:2px; background-color:#fff;"></div></div></div><div class="k-title" style="color:#aaa;">【觀望】一字線</div></td>
+                        <td><div class="kl-box"><div class="kl white"><div class="wick" style="top:0; height:50%;"></div><div class="body" style="top:48%; height:2px; background-color:#fff;"></div></div></div><div class="k-title t-green">【偏空】倒T字</div></td>
+                        <td><div class="kl-box"><div class="kl white"><div class="wick" style="top:0; height:100%;"></div><div class="body" style="top:96%; height:2px; background-color:#fff;"></div></div></div><div class="k-title t-green">【極空】墓碑十字</div></td>
+                    </tr>
+                    <tr>
+                        <th>短下影線</th>
+                        <td><div class="kl-box"><div class="kl white"><div class="wick" style="top:50%; height:50%;"></div><div class="body" style="top:48%; height:2px; background-color:#fff;"></div></div></div><div class="k-title t-red">【偏多】正T字</div></td>
+                        <td><div class="kl-box"><div class="kl white"><div class="wick" style="top:30%; height:40%;"></div><div class="body" style="top:48%; height:2px; background-color:#fff;"></div></div></div><div class="k-title" style="color:#aaa;">【觀望】小十字星</div></td>
+                        <td><div class="kl-box"><div class="kl white"><div class="wick" style="top:0; height:100%;"></div><div class="body" style="top:70%; height:2px; background-color:#fff;"></div></div></div><div class="k-title t-green">【偏空】射擊之星</div></td>
+                    </tr>
+                    <tr>
+                        <th>長下影線</th>
+                        <td><div class="kl-box"><div class="kl white"><div class="wick" style="top:0; height:100%;"></div><div class="body" style="top:0%; height:2px; background-color:#fff;"></div></div></div><div class="k-title t-red">【極多】蜻蜓十字</div></td>
+                        <td><div class="kl-box"><div class="kl white"><div class="wick" style="top:0; height:100%;"></div><div class="body" style="top:30%; height:2px; background-color:#fff;"></div></div></div><div class="k-title t-red">【偏多】鐵鎚十字</div></td>
+                        <td><div class="kl-box"><div class="kl white"><div class="wick" style="top:0; height:100%;"></div><div class="body" style="top:48%; height:2px; background-color:#fff;"></div></div></div><div class="k-title" style="color:#ff9800;">【極險】長腿十字</div></td>
+                    </tr>
+                </table>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        // --- 導航與視圖控制 ---
+        const slider = document.getElementById('slider');
+        const tabs = [document.getElementById('tab-0'), document.getElementById('tab-1'), document.getElementById('tab-2'), document.getElementById('tab-3')];
+
+        function scrollToPage(index) { 
+            slider.scrollTo({ left: index * slider.clientWidth, behavior: 'smooth' }); 
+        }
+        
+        function updateTabs() { 
+            let idx = Math.round(slider.scrollLeft / slider.clientWidth); 
+            tabs.forEach((t, i) => { 
+                if(i===idx) t.classList.add('active'); 
+                else t.classList.remove('active'); 
+            }); 
+        }
+
+        function toggleDictPanel() {
+            let p = document.getElementById('dict-panel'); 
+            p.style.display = p.style.display === 'none' ? 'block' : 'none';
+            if(p.style.display === 'block') { 
+                let pg = document.getElementById('page-0'); 
+                pg.scrollTo({top: pg.scrollHeight, behavior: 'smooth'}); 
+            }
+        }
+
+        // --- 字典記憶系統 ---
+        let customDict = JSON.parse(localStorage.getItem('v144_stock_dict')) || {"2330":"台積電"};
+        
+        function autoFillName() { 
+            let code = document.getElementById('wl-code').value.toUpperCase(); 
+            if(code.length >= 4 && customDict[code]) document.getElementById('wl-name').value = customDict[code]; 
+        }
+
+        function parseTextToDict(text) {
+            let count = 0; 
+            let lines = text.replace(/[\t\u3000\xA0]/g, ' ').split(/\r?\n/);
+            lines.forEach(line => {
+                let m = line.trim().match(/(?:^|\s)([A-Z0-9]{4,6})\s+([^\s]+)/i);
+                if (m) { 
+                    let c = m[1].toUpperCase(); let n = m[2]; 
+                    if(!/^\d+$/.test(n) && !n.startsWith('TW000')) { 
+                        customDict[c] = n; count++; 
+                    } 
+                }
+            });
+            if (count > 0) { 
+                localStorage.setItem('v144_stock_dict', JSON.stringify(customDict)); 
+                autoFillName(); 
+                showToast(`✅ 成功解析記憶 ${count} 筆股號！`); 
+            } else { 
+                alert("❌ 解析失敗！"); 
+            }
+        }
+
+        function importFromTextarea() { 
+            let t = document.getElementById('paste-area').value; 
+            if(!t) return alert("請先貼上文字內容！"); 
+            parseTextToDict(t); 
+            document.getElementById('paste-area').value=''; 
+            toggleDictPanel(); 
+        }
+        
+        document.getElementById('file-uploader').addEventListener('change', function(e) { 
+            let f = e.target.files[0]; if(!f) return; 
+            let r = new FileReader(); 
+            r.onload = function(e) { 
+                parseTextToDict(e.target.result); 
+                e.target.value=''; 
+                toggleDictPanel(); 
+            }; 
+            r.readAsText(f); 
+        });
+
+        // --- 戰備彈匣管理 ---
+        let wl = JSON.parse(localStorage.getItem('v144_wl')) || []; 
+        let isPanelOpen = true;
+
+        let V14_combat_state = { activeMissionsCosts: {} };
+        let sysQuota = JSON.parse(localStorage.getItem('v144_quota')) || { total: 50, manualUsed: 0 };
+        
+        document.getElementById('quota-total').value = sysQuota.total; 
+        document.getElementById('quota-manual-used').value = sysQuota.manualUsed || 0;
+
+        function updateGlobalQuota() {
+            let total = parseFloat(document.getElementById('quota-total').value) || 0;
+            let manualUsed = parseFloat(document.getElementById('quota-manual-used').value) || 0;
+            sysQuota.total = total; 
+            sysQuota.manualUsed = manualUsed; 
+            localStorage.setItem('v144_quota', JSON.stringify(sysQuota));
+            
+            let activeUsed = 0; 
+            Object.values(V14_combat_state.activeMissionsCosts).forEach(c => activeUsed += c);
+            
+            let remain = (total * 10000) - (manualUsed * 10000) - activeUsed;
+            
+            let remainEl = document.getElementById('quota-global-remain'); 
+            remainEl.innerText = "NT$ " + remain.toLocaleString(); 
+            remainEl.style.color = remain < 0 ? "#ff4d4d" : "#00e676";
+            
+            document.querySelectorAll('.quota-remain-val').forEach(el => { 
+                el.innerText = "NT$ " + remain.toLocaleString(); 
+                el.style.color = remain < 0 ? "#ff4d4d" : "#00e676"; 
+            });
+            return remain;
+        }
+
+        function toggleInputPanel() {
+            isPanelOpen = !isPanelOpen; 
+            let p = document.getElementById('input-panel'); 
+            let n = document.getElementById('quick-nav'); 
+            let b = document.getElementById('toggle-btn');
+            
+            if(isPanelOpen) { 
+                p.style.display = 'block'; n.style.display = 'none'; b.innerHTML = '🔽 收起戰前佈署面板'; 
+            } else { 
+                p.style.display = 'none'; n.style.display = 'flex'; b.innerHTML = '▶️ 展開戰前佈署面板'; 
+            }
+        }
+
+        function jumpToStockHome(id) { 
+            let t = document.getElementById(id); 
+            if(t) { let p = document.getElementById('page-0'); p.scrollTo({top: t.offsetTop - 60, behavior: 'smooth'}); } 
+        }
+        
+        function checkScroll() { 
+            let p = document.getElementById('page-0'); 
+            let b = document.getElementById('btt-btn'); 
+            b.style.display = (p.scrollTop > 300) ? 'flex' : 'none'; 
+        }
+        function scrollToTop() { document.getElementById('page-0').scrollTo({top: 0, behavior: 'smooth'}); }
+
+        // --- 天網雷達數學 (TWSE標準) ---
+        function getTickUp(p) { 
+            if(p<10) return 0.01; if(p<50) return 0.05; if(p<100) return 0.1; 
+            if(p<500) return 0.5; if(p<1000) return 1; return 5; 
+        }
+        function getTickDown(p) { 
+            if(p<=10) return 0.01; if(p<=50) return 0.05; if(p<=100) return 0.1; 
+            if(p<=500) return 0.5; if(p<=1000) return 1; return 5; 
+        }
+        function getMaxTicks(price) { 
+            if(price<50) return 15; if(price<100) return 10; if(price<200) return 4; return 6; 
+        }
+        
+        function calcUp(yc) { 
+            if(!yc) return '-'; 
+            let t = yc * 1.1; 
+            let tk = getTickUp(t - 0.001); 
+            return (Math.round(t / tk) * tk).toFixed(2); 
+        }
+        function calcDown(yc) { 
+            if(!yc) return '-'; 
+            let t = yc * 0.9; 
+            let tk = getTickDown(t + 0.001); 
+            return (Math.round(t / tk) * tk).toFixed(2); 
+        }
+
+        function stepPrice(id, dir) {
+            let el = document.getElementById(id); if(!el) return; 
+            let p = parseFloat(el.value); if(isNaN(p)) return;
+            
+            let step = 1; 
+            if (!id.startsWith('vol') && !id.startsWith('quota')) step = (dir === 1) ? getTickUp(p) : getTickDown(p);
+            if(id.startsWith('quota-total')) step = 10; 
+            
+            let newP = p + (dir * step); 
+            if(id.startsWith('vol') && newP < 1) newP = 1; 
+            if(id.startsWith('quota') && newP < 0) newP = 0; 
+            
+            el.value = Math.round(newP * 100) / 100; 
+            el.dispatchEvent(new Event('input'));
+        }
+
+        function getClosestDown(price, item) { 
+            let a = [item.lb, item.lt1, item.lt2, item.lt3, item.lt4, item.lt5, item.sb, item.st1, item.st2, item.st3, item.st4, item.st5].map(Number).filter(n => n && n < price); 
+            return a.length ? Math.max(...a) : ''; 
+        }
+        function getClosestUp(price, item) { 
+            let a = [item.lb, item.lt1, item.lt2, item.lt3, item.lt4, item.lt5, item.sb, item.st1, item.st2, item.st3, item.st4, item.st5].map(Number).filter(n => n && n > price); 
+            return a.length ? Math.min(...a) : ''; 
+        }
+
+        // --- 生成戰情卡片 ---
+        function renderWatchlist() {
+            const container = document.getElementById('watchlist-container'); 
+            const navContainer = document.getElementById('quick-nav');
+            container.innerHTML = ''; navContainer.innerHTML = '';
+            
+            if(wl.length > 0 && !isPanelOpen) navContainer.style.display = 'flex'; 
+            else navContainer.style.display = 'none';
+
+            wl.forEach((item, index) => {
+                let stockId = `stock-card-${index}`; 
+                let dName = item.name || customDict[item.code] || "未知標的"; 
+                let dCode = item.code || "---";
+                let upLimit = calcUp(item.yc); let downLimit = calcDown(item.yc);
+
+                navContainer.innerHTML += `<div class="chip" onclick="jumpToStockHome('${stockId}')">${dName}</div>`;
+
+                let html = `<div class="card-compact" id="${stockId}">
+                                <div class="card-header">
+                                    <h3>📌 ${dName} (${dCode})</h3>
+                                    <div style="display:flex;">
+                                        <button class="btn-icon" style="color:#00ffcc;" onclick="editWatchlist(${index})" title="編輯">✏️</button>
+                                        <button class="btn-icon" style="color:#ff4d4d;" onclick="delWatchlist(${index})" title="刪除">🗑️</button>
+                                    </div>
+                                </div>`;
+                
+                if(item.yc) {
+                    html += `<div class="limits-bar">
+                                <span style="color:#ff4d4d; font-weight:bold;">🔴漲停 ${upLimit}</span>
+                                <span style="color:#aaa;">昨收 ${item.yc}</span>
+                                <span style="color:#00e676; font-weight:bold;">🟢跌停 ${downLimit}</span>
+                             </div>`;
+                }
+                
+                let ycStr = item.yc || '';
+                
+                let rawLongs = [item.lb, item.lt1, item.lt2, item.lt3, item.lt4, item.lt5].filter(v => v !== '' && v !== undefined && v !== null).map(Number).sort((a,b) => a - b);
+                let longsHtml = []; 
+                for(let i=0; i<rawLongs.length-1; i++) {
+                    longsHtml.push(`<button class="btn-mini l" onclick="loadToMission('long','${dName}','${dCode}',${rawLongs[i]},${rawLongs[i+1]},'${ycStr}')">${rawLongs[i]}</button>`);
+                }
+                if(longsHtml.length > 0) html += `<div class="row-group"><div class="row-label l">🔴多</div><div class="btn-grid">${longsHtml.join('')}</div></div>`;
+                
+                let rawShorts = [item.sb, item.st1, item.st2, item.st3, item.st4, item.st5].filter(v => v !== '' && v !== undefined && v !== null).map(Number).sort((a,b) => b - a);
+                let shortsHtml = []; 
+                for(let i=0; i<rawShorts.length-1; i++) {
+                    shortsHtml.push(`<button class="btn-mini s" onclick="loadToMission('short','${dName}','${dCode}',${rawShorts[i]},${rawShorts[i+1]},'${ycStr}')">${rawShorts[i]}</button>`);
+                }
+                if(shortsHtml.length > 0) html += `<div class="row-group"><div class="row-label s">🟢空</div><div class="btn-grid">${shortsHtml.join('')}</div></div>`;
+                
+                let exBtns = [];
+                if(item.hb) { 
+                    let tgt = item.ht1 || getClosestDown(item.hb, item); 
+                    exBtns.push(`<button class="btn-mini ex-s" onclick="loadToMission('short','${dName}','${dCode}',${item.hb},'${tgt}','${ycStr}')">⚡${item.hb}</button>`); 
+                }
+                if(item.lowb) { 
+                    let tgt = item.lowt1 || getClosestUp(item.lowb, item); 
+                    exBtns.push(`<button class="btn-mini ex-l" onclick="loadToMission('long','${dName}','${dCode}',${item.lowb},'${tgt}','${ycStr}')">⚡${item.lowb}</button>`); 
+                }
+                if(exBtns.length > 0) html += `<div class="row-group"><div class="row-label ex">⚡反轉</div><div class="btn-grid">${exBtns.join('')}</div></div>`;
+
+                html += `</div>`; 
+                container.innerHTML += html;
+            });
+            updateGlobalQuota(); 
+        }
+
+        function checkAscending(arr) { 
+            let n = arr.filter(x => x !== '').map(Number); 
+            for(let i=0; i<n.length-1; i++) { if(n[i] >= n[i+1]) return false; } 
+            return true; 
+        }
+        function checkDescending(arr) { 
+            let n = arr.filter(x => x !== '').map(Number); 
+            for(let i=0; i<n.length-1; i++) { if(n[i] <= n[i+1]) return false; } 
+            return true; 
+        }
+
+        function addWatchlist() {
+            let name = document.getElementById('wl-name').value; let code = document.getElementById('wl-code').value; let yc = document.getElementById('wl-yc').value;
+            if(!name && !code) return alert("請輸入股名或股號！");
+
+            let longs = [document.getElementById('lb').value, document.getElementById('lt1').value, document.getElementById('lt2').value, document.getElementById('lt3').value, document.getElementById('lt4').value, document.getElementById('lt5').value];
+            let shorts = [document.getElementById('sb').value, document.getElementById('st1').value, document.getElementById('st2').value, document.getElementById('st3').value, document.getElementById('st4').value, document.getElementById('st5').value];
+            let hb = document.getElementById('hb').value; let ht1 = document.getElementById('ht1').value; let lowt1 = document.getElementById('lowt1').value; let lowb = document.getElementById('lowb').value;  
+
+            if (!checkAscending(longs)) return alert("❌ 【🔴多軍點位邏輯錯誤】\n數字必須由小到大排列！");
+            if (!checkDescending(shorts)) return alert("❌ 【🟢空軍點位邏輯錯誤】\n數字必須由大到小排列！");
+            if (hb !== '' && ht1 !== '' && Number(hb) <= Number(ht1)) return alert("❌ 【⚡高空反轉錯誤】\n左邊(極高點) 必須大於 右邊(次高點)！");
+            if (lowt1 !== '' && lowb !== '' && Number(lowt1) <= Number(lowb)) return alert("❌ 【⚡低多反轉錯誤】\n左邊(次低點) 必須大於 右邊(極低點)！");
+
+            if(yc) {
+                let upL = parseFloat(calcUp(yc)); let downL = parseFloat(calcDown(yc));
+                let allI = [...longs, ...shorts, hb, ht1, lowt1, lowb].filter(x => x !== '').map(Number);
+                if(allI.length > 0) {
+                    let mx = Math.max(...allI); let mn = Math.min(...allI);
+                    if(mx > upL + 0.001) {
+                        if(!confirm(`⚠️ 【天花板警告】\n最高價 (${mx}) 已超過漲停價 (${upL})！\n\n強制儲存？`)) return;
+                    }
+                    if(mn < downL - 0.001) {
+                        if(!confirm(`⚠️ 【地板警告】\n最低價 (${mn}) 已低於跌停價 (${downL})！\n\n強制儲存？`)) return;
+                    }
+                }
+            }
+
+            if(code && name) { customDict[code] = name; localStorage.setItem('v144_stock_dict', JSON.stringify(customDict)); }
+
+            let data = { 
+                name: name, code: code, yc: yc, 
+                lb: longs[0], lt1: longs[1], lt2: longs[2], lt3: longs[3], lt4: longs[4], lt5: longs[5], 
+                sb: shorts[0], st1: shorts[1], st2: shorts[2], st3: shorts[3], st4: shorts[4], st5: shorts[5], 
+                hb: hb, ht1: ht1, lowb: lowb, lowt1: lowt1 
+            };
+            wl.push(data); localStorage.setItem('v144_wl', JSON.stringify(wl));
+            document.querySelectorAll('#input-panel input').forEach(i => i.value = ''); 
+            renderWatchlist(); showToast("✅ 已手動儲存至戰術彈匣");
+        }
+
+        function editWatchlist(index) {
+            let item = wl[index];
+            document.getElementById('wl-code').value = item.code || ''; document.getElementById('wl-name').value = item.name || ''; document.getElementById('wl-yc').value = item.yc || '';
+            document.getElementById('lb').value = item.lb || ''; document.getElementById('lt1').value = item.lt1 || ''; document.getElementById('lt2').value = item.lt2 || ''; document.getElementById('lt3').value = item.lt3 || ''; document.getElementById('lt4').value = item.lt4 || ''; document.getElementById('lt5').value = item.lt5 || '';
+            document.getElementById('sb').value = item.sb || ''; document.getElementById('st1').value = item.st1 || ''; document.getElementById('st2').value = item.st2 || ''; document.getElementById('st3').value = item.st3 || ''; document.getElementById('st4').value = item.st4 || ''; document.getElementById('st5').value = item.st5 || '';
+            document.getElementById('hb').value = item.hb || ''; document.getElementById('ht1').value = item.ht1 || ''; document.getElementById('lowt1').value = item.lowt1 || ''; document.getElementById('lowb').value = item.lowb || '';
+
+            wl.splice(index, 1); localStorage.setItem('v144_wl', JSON.stringify(wl)); renderWatchlist();
+            let p = document.getElementById('input-panel'); p.style.display = 'block'; isPanelOpen = true; 
+            document.getElementById('toggle-btn').innerHTML = '🔽 收起戰前佈署面板'; scrollToTop(); showToast("✏️ 彈匣已退回");
+        }
+
+        function delWatchlist(index) { 
+            wl.splice(index, 1); localStorage.setItem('v144_wl', JSON.stringify(wl)); renderWatchlist(); 
+        }
+        
+        function showToast(msg) { 
+            let t = document.getElementById('toast'); t.innerText = msg; t.style.display = 'block'; 
+            setTimeout(() => { t.style.display = 'none'; }, 1500); 
+        }
+
+        // ================= V14.4 雙軌陣地與火控計算引擎 =================
+        let activeLongMissions = {}; let activeShortMissions = {};
+
+        function loadToMission(type, name, code, base, target, yc) {
+            let safeBase = base ? String(base).replace('.', '_') : '0'; let mId = code + '_' + safeBase;
+            if(type === 'long') {
+                activeLongMissions[mId] = { id: mId, name: name, code: code, base: base || '', target: target || '', yc: yc || '' };
+                renderMissions('long'); showToast(`✅ [${name}] 已佈署至多軍陣地`); scrollToPage(1); 
+                setTimeout(() => { let c = document.getElementById(`m-card-long-${mId}`); let p = document.getElementById('page-1'); if(c) p.scrollTo({top: c.offsetTop - 70, behavior: 'smooth'}); }, 100);
+            } else {
+                activeShortMissions[mId] = { id: mId, name: name, code: code, base: base || '', target: target || '', yc: yc || '' };
+                renderMissions('short'); showToast(`✅ [${name}] 已佈署至空軍陣地`); scrollToPage(2); 
+                setTimeout(() => { let c = document.getElementById(`m-card-short-${mId}`); let p = document.getElementById('page-2'); if(c) p.scrollTo({top: c.offsetTop - 70, behavior: 'smooth'}); }, 100);
+            }
+        }
+
+        function removeMission(mode, mId) { 
+            if(mode === 'long') delete activeLongMissions[mId]; else delete activeShortMissions[mId]; 
+            delete V14_combat_state.activeMissionsCosts[`${mode}-${mId}`]; 
+            updateGlobalQuota(); renderMissions(mode); 
+        }
+        function clearMissionEntry(mode, mId) { document.getElementById(`entry-${mode}-${mId}`).value = ''; calcMission(mode, mId); }
+        function setEntryAndCalc(mode, mId, price) { document.getElementById(`entry-${mode}-${mId}`).value = price; calcMission(mode, mId); }
+        function setExitAndCalc(mode, mId, price) { document.getElementById(`exit-${mode}-${mId}`).value = price; calcMission(mode, mId); }
+
+        function calcPnL(entry, exit, lots, isLong) {
+            let vol = lots * 1000; 
+            let gross = isLong ? (exit - entry) * vol : (entry - exit) * vol;
+            let buyF = Math.max(20, Math.floor(entry * vol * 0.001425)); 
+            let sellF = Math.max(20, Math.floor(exit * vol * 0.001425)); 
+            let tax = Math.floor(exit * vol * 0.0015);
+            let dBuyF = Math.max(20, Math.floor(entry * vol * 0.001425 * 0.27)); 
+            let dSellF = Math.max(20, Math.floor(exit * vol * 0.001425 * 0.27));
+            return { full: gross - (buyF + sellF + tax), disc: gross - (dBuyF + dSellF + tax) };
+        }
+
+        function getExitTicksArray(entry, stopLoss, base, target, isLong, yc) {
+            let prices = new Set(); 
+            if(stopLoss) prices.add(Number(stopLoss)); 
+            if(base) prices.add(Number(base)); 
+            if(target) prices.add(Number(target));
+            
+            let p = Number(entry); prices.add(p);
+            
+            for(let i=0; i<3; i++) { 
+                p = isLong ? p - getTickDown(p) : p + getTickUp(p); 
+                p = Math.round(p*100)/100; if(p > 0) prices.add(p); 
+            }
+            p = Number(entry); 
+            for(let i=0; i<12; i++) { 
+                p = isLong ? p + getTickUp(p) : p - getTickDown(p); 
+                p = Math.round(p*100)/100; if(p > 0) prices.add(p); 
+            }
+            
+            let arr = Array.from(prices); 
+            if(yc) { 
+                let up = parseFloat(calcUp(yc)); let down = parseFloat(calcDown(yc)); 
+                arr = arr.filter(x => x <= up && x >= down); 
+            }
+            arr.sort((a, b) => isLong ? a - b : b - a); 
+            return arr;
+        }
+
+        function renderMissions(mode) {
+            let isLong = mode === 'long'; let missions = isLong ? activeLongMissions : activeShortMissions;
+            let container = document.getElementById(`${mode}-missions-container`); let nav = document.getElementById(`${mode}-combat-nav`);
+            container.innerHTML = ''; nav.innerHTML = ''; let mIds = Object.keys(missions);
+            
+            if(mIds.length === 0) { 
+                nav.style.display = 'none'; 
+                container.innerHTML = `<div style="text-align:center; color:#666; margin-top:50px;">尚未鎖定目標。<br>請至「戰備」點擊彈匣按鈕。</div>`; 
+                return; 
+            }
+            nav.style.display = 'flex';
+
+            mIds.forEach(mId => {
+                let m = missions[mId]; let chipClass = isLong ? 'chip l' : 'chip s';
+                nav.innerHTML += `<div class="${chipClass}" onclick="jumpToMission('${mode}', '${m.id}')">${m.name} (${m.base})</div>`;
+
+                let upLimit = calcUp(m.yc); let downLimit = calcDown(m.yc);
+                let limitHtml = m.yc ? `<div class="limits-bar"><span style="color:#ff4d4d; font-weight:bold;">🔴漲停 ${upLimit}</span><span style="color:#aaa;">昨收 ${m.yc}</span><span style="color:#00e676; font-weight:bold;">🟢跌停 ${downLimit}</span></div>` : '';
+
+                let cClass = isLong ? 'mode-long' : 'mode-short'; 
+                let wClass = isLong ? 'w-long' : 'w-short'; 
+                let entryColor = isLong ? '#ff4d4d' : '#00e676';
+
+                let html = `
+                <div class="mission-card ${cClass}" id="m-card-${mode}-${m.id}">
+                    <div class="m-header ${cClass}">
+                        <h3>📌 ${m.name} (${m.code}) | 基準: ${m.base}</h3>
+                        <button class="btn-del-icon" onclick="removeMission('${mode}','${m.id}')">✖</button>
+                    </div>
+                    ${limitHtml}
+                    <div class="input-group">
+                        <label>基準價</label>
+                        <div class="stepper-wrapper">
+                            <button class="stepper-btn" tabindex="-1" onclick="stepPrice('base-${mode}-${m.id}',-1)">-</button>
+                            <input type="number" inputmode="decimal" id="base-${mode}-${m.id}" value="${m.base}" oninput="calcMission('${mode}','${m.id}')">
+                            <button class="stepper-btn" tabindex="-1" onclick="stepPrice('base-${mode}-${m.id}',1)">+</button>
+                        </div>
+                    </div>
+                    <div class="input-group">
+                        <label>目標價</label>
+                        <div class="stepper-wrapper">
+                            <button class="stepper-btn" tabindex="-1" onclick="stepPrice('target-${mode}-${m.id}',-1)">-</button>
+                            <input type="number" inputmode="decimal" id="target-${mode}-${m.id}" value="${m.target}" oninput="calcMission('${mode}','${m.id}')">
+                            <button class="stepper-btn" tabindex="-1" onclick="stepPrice('target-${mode}-${m.id}',1)">+</button>
+                        </div>
+                    </div>
+                    <div style="display:flex; gap:10px; margin-top:10px;">
+                        <div style="flex:2;">
+                            <label style="color:${entryColor};">進場價 (實際開槍)</label>
+                            <div class="stepper-wrapper entry-stepper ${wClass}">
+                                <button class="stepper-btn" tabindex="-1" onclick="stepPrice('entry-${mode}-${m.id}', -1)">-</button>
+                                <input type="number" inputmode="decimal" id="entry-${mode}-${m.id}" oninput="calcMission('${mode}','${m.id}')">
+                                <button class="stepper-btn" tabindex="-1" onclick="stepPrice('entry-${mode}-${m.id}', 1)">+</button>
+                                <button class="btn-clear" onclick="clearMissionEntry('${mode}','${m.id}')">✖</button>
+                            </div>
+                        </div>
+                        <div style="flex:1;">
+                            <label style="color:#aaa;">作戰張數</label>
+                            <div class="stepper-wrapper entry-stepper" style="border-color:#555; padding-right:0;">
+                                <button class="stepper-btn" tabindex="-1" style="width:30px;" onclick="stepPrice('vol-${mode}-${m.id}', -1)">-</button>
+                                <input type="number" inputmode="numeric" pattern="[0-9]*" id="vol-${mode}-${m.id}" value="1" oninput="calcMission('${mode}','${m.id}')" style="font-size:1.3rem;">
+                                <button class="stepper-btn" tabindex="-1" style="width:30px;" onclick="stepPrice('vol-${mode}-${m.id}', 1)">+</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div id="sig-${mode}-${m.id}" class="signal">等待數據輸入...</div>
+                    
+                    <label style="color:#00ffcc; margin-top:10px; display:none; font-size:0.8rem;" id="quick-lbl-${mode}-${m.id}">⚡ 雷達預覽帶</label>
+                    <div id="quick-exit-strip-${mode}-${m.id}" class="quick-exit-strip" style="display:none;"></div>
+                    
+                    <div class="result-box" style="background:#1a1a1a; border:1px solid #555; margin-bottom:15px;">
+                        <div style="font-size:0.8rem; color:#aaa; margin-bottom:5px;">⚖️ 本單交割額度佔用</div>
+                        <div class="quota-box">
+                            <span>佔用額度:</span>
+                            <span style="display:flex; flex-direction:column; align-items:flex-end;">
+                                <span class="quota-val" id="quota-cost-${mode}-${m.id}">-</span>
+                                <span id="quota-type-${mode}-${m.id}" style="font-size:0.7rem; color:#888;"></span>
+                            </span>
+                        </div>
+                        <div class="quota-box" style="background:transparent; padding:4px 0 0 0;">
+                            <span>全球額度剩餘:</span>
+                            <span class="quota-val quota-remain-val" id="quota-remain-${mode}-${m.id}">-</span>
+                        </div>
+                    </div>
+                    
+                    <div class="result-box">
+                        <div class="result-row"><span>🎯 動態擊殺區間:</span> <span id="kz-${mode}-${m.id}" class="highlight" style="color:#00ffcc;">-</span></div>
+                        <div class="result-row"><span>🛑 觸價停損 (${isLong ? '-':'退'}1檔):</span> <span id="stop-${mode}-${m.id}" class="highlight">-</span></div>
+                        <div class="result-row"><span>⚖️ 盈虧比:</span> <span id="rr-${mode}-${m.id}" class="highlight">-</span></div>
+                        <div class="result-row"><span>🟢 保本脫離價:</span> <span id="be-${mode}-${m.id}" class="highlight">-</span></div>
+                        <div class="result-row" style="margin-top:10px; padding-top:10px; border-top:1px dashed #660000;">
+                            <span>💥 若碰停損虧損:</span> <span id="loss-${mode}-${m.id}" class="highlight">-</span>
+                        </div>
+                    </div>
+                    
+                    <div class="input-group" style="margin-top:15px;">
+                        <label>實際出場價 (結算用)</label>
+                        <div class="stepper-wrapper">
+                            <button class="stepper-btn" tabindex="-1" onclick="stepPrice('exit-${mode}-${m.id}',-1)">-</button>
+                            <input type="number" inputmode="decimal" id="exit-${mode}-${m.id}" oninput="calcMission('${mode}','${m.id}')">
+                            <button class="stepper-btn" tabindex="-1" onclick="stepPrice('exit-${mode}-${m.id}',1)">+</button>
+                        </div>
+                    </div>
+                    <div class="result-box">
+                        <div class="result-row"><span>🧾 帳面交割損益 (全額):</span> <span id="pnl-full-${mode}-${m.id}" class="highlight">-</span></div>
+                        <div class="result-row"><span>💰 退佣淨損益 (估2.7折):</span> <span id="pnl-disc-${mode}-${m.id}" class="highlight" style="color:#00ffcc;">-</span></div>
+                    </div>
+                </div>`;
+                container.innerHTML += html; 
+                setTimeout(() => { calcMission(mode, m.id); }, 0);
+            });
+        }
+
+        function jumpToMission(mode, mId) { 
+            let c = document.getElementById(`m-card-${mode}-${mId}`); 
+            let p = document.getElementById(mode === 'long' ? 'page-1' : 'page-2'); 
+            if(c) p.scrollTo({top: c.offsetTop - 70, behavior: 'smooth'}); 
+        }
+
+        function calcMission(mode, mId) {
+            let isLong = mode === 'long'; let m = (isLong ? activeLongMissions : activeShortMissions)[mId];
+            let base = parseFloat(document.getElementById(`base-${mode}-${mId}`).value); 
+            let target = parseFloat(document.getElementById(`target-${mode}-${mId}`).value);
+            let entryStr = document.getElementById(`entry-${mode}-${mId}`).value; 
+            let entry = parseFloat(entryStr);
+            let exit = parseFloat(document.getElementById(`exit-${mode}-${mId}`).value); 
+            let lots = parseInt(document.getElementById(`vol-${mode}-${mId}`).value) || 1;
+            let yc = parseFloat(m.yc);
+
+            let finalEntryBound = 0; let stopLoss = 0; let sigBox = document.getElementById(`sig-${mode}-${mId}`); let limitWarn = false; 
+            let upLimitNum = yc ? parseFloat(calcUp(yc)) : 0;
+
+            if (base && target && yc) {
+                if (isLong && target > parseFloat(calcUp(yc)) + 0.001) { limitWarn = true; sigBox.className = "signal warn"; sigBox.innerText = "⚠️ 目標大於漲停價！"; }
+                if (!isLong && target < parseFloat(calcDown(yc)) - 0.001) { limitWarn = true; sigBox.className = "signal warn"; sigBox.innerText = "⚠️ 目標小於跌停價！"; }
+            }
+
+            if (base && target) {
+                let tick = getTickDown(base); 
+                stopLoss = isLong ? (base - tick) : (base + getTickUp(base)); 
+                stopLoss = Math.round(stopLoss * 100) / 100; 
+                document.getElementById(`stop-${mode}-${mId}`).innerText = stopLoss.toFixed(2);
+                
+                let absEntry = isLong ? (base + getMaxTicks(base) * getTickUp(base)) : (base - getMaxTicks(base) * getTickDown(base));
+                let rrEntry = (target + 1.5 * stopLoss) / 2.5;
+                
+                if(isLong) {
+                    finalEntryBound = Math.min(absEntry, rrEntry); 
+                    finalEntryBound = Math.floor((finalEntryBound + 0.0001) / getTickUp(base)) * getTickUp(base);
+                    document.getElementById(`kz-${mode}-${mId}`).innerText = finalEntryBound < base ? "肉太少" : `${base} ~ ${finalEntryBound.toFixed(2)}`;
+                } else {
+                    finalEntryBound = Math.max(absEntry, rrEntry); 
+                    finalEntryBound = Math.ceil((finalEntryBound - 0.0001) / getTickDown(base)) * getTickDown(base);
+                    document.getElementById(`kz-${mode}-${mId}`).innerText = finalEntryBound > base ? "肉太少" : `${finalEntryBound.toFixed(2)} ~ ${base}`;
+                }
+            } else { 
+                document.getElementById(`kz-${mode}-${mId}`).innerText = "請輸入基準與目標"; 
+                document.getElementById(`stop-${mode}-${mId}`).innerText = "-"; 
+            }
+
+            // 雷達帶運算
+            let strip = document.getElementById(`quick-exit-strip-${mode}-${mId}`); 
+            let stripLbl = document.getElementById(`quick-lbl-${mode}-${mId}`);
+            
+            if (entryStr === "" && base && target && !limitWarn) {
+                let isValidKZ = isLong ? (finalEntryBound >= base) : (finalEntryBound <= base);
+                if (isValidKZ) {
+                    stripLbl.innerText = "⚡ 動態擊殺區間 (點擊快速填入進場價)"; stripLbl.style.color = "#ffeb3b"; stripLbl.style.display = 'block';
+                    let entryPrices = []; let p = base;
+                    if (isLong) { 
+                        while(p <= finalEntryBound) { entryPrices.push(p); p = Math.round((p + getTickUp(p)) * 100) / 100; } 
+                    } else { 
+                        while(p >= finalEntryBound) { entryPrices.push(p); p = Math.round((p - getTickDown(p)) * 100) / 100; } 
+                    }
+                    let stripHtml = '';
+                    entryPrices.forEach(price => {
+                        let risk = isLong ? (price - stopLoss) : (stopLoss - price); 
+                        let reward = isLong ? (target - price) : (price - target);
+                        let rr = risk > 0 ? (reward / risk).toFixed(1) : "0.0"; 
+                        let label = (price === base) ? '🛡️基準 ' : '';
+                        stripHtml += `<div class="btn-quick" style="border-color:#555; background:#222; color:#fff;" onclick="setEntryAndCalc('${mode}', '${mId}', ${price})"><span class="price" style="color:#ffeb3b;">${label}${price}</span><span class="pnl" style="font-size:0.85rem; color:#aaa; font-weight:normal;">盈虧比 ${rr}</span></div>`;
+                    });
+                    strip.innerHTML = stripHtml; strip.style.display = 'flex';
+                } else { 
+                    strip.style.display = 'none'; stripLbl.style.display = 'none'; 
+                }
+            } else if (entry && stopLoss) {
+                stripLbl.innerText = "⚡ 一鍵出場預覽 (全額交割損益)"; stripLbl.style.color = "#00ffcc"; stripLbl.style.display = 'block';
+                let ticksArr = getExitTicksArray(entry, stopLoss, base, target, isLong, yc); 
+                let stripHtml = '';
+                ticksArr.forEach(price => {
+                    let pData = calcPnL(entry, price, lots, isLong); 
+                    let pFull = Math.round(pData.full); 
+                    let pClass = pFull >= 0 ? 'profit' : 'loss'; 
+                    let sign = pFull > 0 ? '+' : '';
+                    let label = price === stopLoss ? '🛑停損 ' : (price === target ? '🎯目標 ' : (price === base ? '🛡️基準 ' : ''));
+                    stripHtml += `<div class="btn-quick ${pClass}" onclick="setExitAndCalc('${mode}', '${mId}', ${price})"><span class="price">${label}${price}</span><span class="pnl">${sign}${pFull.toLocaleString()}</span></div>`;
+                });
+                strip.innerHTML = stripHtml; strip.style.display = 'flex';
+            } else { 
+                strip.style.display = 'none'; stripLbl.style.display = 'none'; 
+            }
+
+            // 額度與損益計算
+            if (entry) {
+                let cost = 0; let typeLabel = "";
+                if (isLong) { 
+                    cost = entry * lots * 1000; typeLabel = "(預扣進場總價)"; 
+                } else { 
+                    if (upLimitNum > 0) { cost = upLimitNum * lots * 1000; typeLabel = "(無情鎖死漲停價)"; } 
+                    else { cost = entry * lots * 1000; typeLabel = "(依進場價估計)"; } 
+                }
+                
+                V14_combat_state.activeMissionsCosts[`${mode}-${mId}`] = cost; updateGlobalQuota(); 
+                document.getElementById(`quota-cost-${mode}-${mId}`).innerText = "NT$ " + cost.toLocaleString(); 
+                document.getElementById(`quota-type-${mode}-${mId}`).innerText = typeLabel;
+
+                let be = entry; let testPnL = calcPnL(entry, be, lots, isLong).full;
+                if(isLong) { 
+                    while(testPnL < 0) { be += getTickUp(be); be = Math.round(be*100)/100; testPnL = calcPnL(entry, be, lots, isLong).full; } 
+                } else { 
+                    while(testPnL < 0) { be -= getTickDown(be); be = Math.round(be*100)/100; testPnL = calcPnL(entry, be, lots, isLong).full; } 
+                }
+                document.getElementById(`be-${mode}-${mId}`).innerText = be.toFixed(2) + " 回本";
+            } else { 
+                V14_combat_state.activeMissionsCosts[`${mode}-${mId}`] = 0; updateGlobalQuota();
+                document.getElementById(`be-${mode}-${mId}`).innerText = "-"; 
+                document.getElementById(`quota-cost-${mode}-${mId}`).innerText = "-"; 
+                document.getElementById(`quota-type-${mode}-${mId}`).innerText = "";
+            }
+
+            if (entry && target && base) {
+                let risk = isLong ? (entry - stopLoss) : (stopLoss - entry); 
+                let reward = isLong ? (target - entry) : (entry - target); 
+                let rr = risk > 0 ? (reward / risk) : 0; 
+                document.getElementById(`rr-${mode}-${mId}`).innerText = rr.toFixed(2);
+                
+                let slData = calcPnL(entry, stopLoss, lots, isLong);
+                document.getElementById(`loss-${mode}-${mId}`).innerHTML = `<span class="shocking-loss">NT$ ${Math.round(slData.full).toLocaleString()}</span>`;
+                
+                if(!limitWarn) {
+                    let currentGlobalRemain = parseFloat(document.getElementById('quota-global-remain').innerText.replace(/[^\d.-]/g, ''));
+                    if (currentGlobalRemain < 0) { 
+                        sigBox.className = "signal stop"; sigBox.innerText = "❌ 額度不足！違約交割警告！"; 
+                    } else if (isLong) {
+                        if (entry < base) { sigBox.className = "signal stop"; sigBox.innerText = "❌ 逆勢多 (進場須大於等於基準)"; } 
+                        else if (entry > finalEntryBound && rr >= 1.5) { sigBox.className = "signal stop"; sigBox.innerText = "❌ 風險過高 (虧損大於系統容許)"; } 
+                        else if (entry > finalEntryBound && rr < 1.5) { sigBox.className = "signal stop"; sigBox.innerText = "❌ 追高警告 (盈虧比低於 1.5)"; } 
+                        else { sigBox.className = "signal go"; sigBox.innerText = "✅ 完美狙擊，准許開槍"; }
+                    } else {
+                        if (entry > base) { sigBox.className = "signal stop"; sigBox.innerText = "❌ 逆勢空 (進場須小於等於基準)"; } 
+                        else if (entry < finalEntryBound && rr >= 1.5) { sigBox.className = "signal stop"; sigBox.innerText = "❌ 風險過高 (虧損大於系統容許)"; } 
+                        else if (entry < finalEntryBound && rr < 1.5) { sigBox.className = "signal stop"; sigBox.innerText = "❌ 殺低警告 (盈虧比低於 1.5)"; } 
+                        else { sigBox.className = "signal go"; sigBox.innerText = "✅ 完美狙擊，准許開槍"; }
+                    }
+                }
+            } else if(!limitWarn) { 
+                sigBox.className = "signal"; sigBox.innerText = "等待進場價..."; 
+                document.getElementById(`loss-${mode}-${mId}`).innerText = "-"; 
+            }
+
+            if (entry && exit) {
+                let outData = calcPnL(entry, exit, lots, isLong);
+                let pnlFullBox = document.getElementById(`pnl-full-${mode}-${mId}`); 
+                pnlFullBox.innerText = "NT$ " + Math.round(outData.full).toLocaleString(); 
+                pnlFullBox.style.color = outData.full >= 0 ? "#ff4d4d" : "#00e676"; 
+                
+                let pnlDiscBox = document.getElementById(`pnl-disc-${mode}-${mId}`); 
+                pnlDiscBox.innerText = "NT$ " + Math.round(outData.disc).toLocaleString(); 
+                pnlDiscBox.style.color = outData.disc >= 0 ? "#ff4d4d" : "#00e676"; 
+            } else { 
+                document.getElementById(`pnl-full-${mode}-${mId}`).innerText = "-"; 
+                document.getElementById(`pnl-disc-${mode}-${mId}`).innerText = "-"; 
+            }
+        }
+
+        renderWatchlist();
+    </script>
+<script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('service-worker.js')
+                .then(reg => console.log('作戰系統快取已就緒', reg))
+                .catch(err => console.log('快取引擎啟動失敗', err));
+            });
+        }
+    </script>
+</body>
+</html>
