@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>V14.6 戰區總司令 (雙端雲動完美版)</title>
+    <title>V14.6 戰區總司令 (實戰終極版)</title>
     
     <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-database-compat.js"></script>
@@ -52,26 +52,15 @@
            ========================================= */
         @media (min-width: 768px) {
             .page { padding: 30px 4vw 120px 4vw; }
-            
             #input-panel, .card.quota, .k-table-container, .logistics-header, .rule-card, .card:not(.card-compact):not(.mission-card) { 
-                max-width: 1400px; 
-                margin-left: auto; 
-                margin-right: auto; 
+                max-width: 1400px; margin-left: auto; margin-right: auto; 
             }
-            
             .target-grid { grid-template-columns: repeat(6, minmax(0, 1fr)) !important; }
             .ex-grid { grid-template-columns: repeat(4, minmax(0, 1fr)) !important; }
-            
             #watchlist-container, #long-missions-container, #short-missions-container {
-                display: grid;
-                grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
-                gap: 20px;
-                max-width: 1400px;
-                margin-left: auto;
-                margin-right: auto;
-                align-items: start;
+                display: grid; grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+                gap: 20px; max-width: 1400px; margin-left: auto; margin-right: auto; align-items: start;
             }
-
             .empty-msg { grid-column: 1 / -1; }
             #toast { top: 70px; font-size: 1.1rem; padding: 12px 30px; }
         }
@@ -90,7 +79,6 @@
         .stepper-btn { background: #3a3a3a; color: #ccc; border: none; width: 26px; cursor: pointer; font-size: 1.1rem; display: flex; align-items: center; justify-content: center; user-select: none; transition: 0.1s; flex-shrink: 0;}
         .stepper-btn:active { background: #00ffcc; color: #000; }
         
-        /* 進場專用大型增減控制器 */
         .entry-stepper { height: 50px; border: 2px solid #555; position: relative; padding-right: 35px; }
         .entry-stepper.w-long { border-color: #ff4d4d; }
         .entry-stepper.w-short { border-color: #00e676; }
@@ -116,7 +104,7 @@
         .shocking-loss { background: #660000; color: #ff4d4d; padding: 4px 10px; border-radius: 6px; font-size: 1.15rem; font-weight: 900; box-shadow: 0 0 10px rgba(255, 0, 0, 0.8); display: inline-block; animation: pulse-red 1s infinite alternate; }
         @keyframes pulse-red { from { box-shadow: 0 0 5px rgba(255,0,0,0.5); transform: scale(1); } to { box-shadow: 0 0 15px rgba(255,0,0,1); transform: scale(1.05); } }
 
-        /* 一鍵出場/進場 雷達帶 */
+        /* 一鍵出場 雷達帶 */
         .quick-exit-strip { display: flex; flex-wrap: nowrap; overflow-x: auto; gap: 8px; padding: 10px 0 15px 0; border-top: 1px dashed #555; border-bottom: 1px dashed #555; margin-bottom: 15px; scrollbar-width: thin; scrollbar-color: #666 #1a1a1a; }
         .quick-exit-strip::-webkit-scrollbar { height: 8px; display: block; }
         .quick-exit-strip::-webkit-scrollbar-thumb { background: #666; border-radius: 4px; }
@@ -153,7 +141,8 @@
         .card-compact { background-color: #1e1e1e; border-radius: 8px; padding: 10px; margin-bottom: 12px; border-left: 4px solid #444; box-shadow: 0 2px 4px rgba(0,0,0,0.4); }
         .card-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #333; padding-bottom: 5px; margin-bottom: 5px; }
         .card-header h3 { margin: 0; font-size: 1.05rem; color: #fff; }
-        .btn-icon { background: transparent; border: none; font-size: 1.2rem; padding: 0; margin: 0 0 0 12px; cursor: pointer; opacity: 0.8;}
+        .btn-icon { background: transparent; border: none; font-size: 1.2rem; padding: 0; margin: 0 0 0 8px; cursor: pointer; opacity: 0.8; transition: 0.2s; display: flex; align-items: center; justify-content: center;}
+        .btn-icon:disabled { opacity: 0.2; cursor: not-allowed; }
         .limits-bar { display:flex; justify-content:space-between; font-size: 0.75rem; background: #222; padding: 4px 8px; border-radius: 4px; margin-bottom: 10px;}
         
         .row-group { display: flex; align-items: center; margin-bottom: 6px; }
@@ -162,12 +151,15 @@
         .row-label.s { color: #00e676; border-right: 2px solid #00e676; padding-right: 4px;}
         .row-label.ex { color: #ff9800; border-right: 2px solid #ff9800; padding-right: 4px;}
         
-        .btn-grid { display: flex; flex-wrap: wrap; gap: 5px; flex: 1; }
+        .btn-grid { display: flex; flex-wrap: wrap; gap: 5px; flex: 1; align-items: center; }
         .btn-mini { padding: 8px 4px; border: 1px solid transparent; border-radius: 4px; font-weight: bold; text-align: center; cursor: pointer; flex: 1; min-width: 45px; max-width: 65px; font-size: 0.95rem;}
         .btn-mini.l { background-color: rgba(255, 77, 77, 0.15); border-color: #ff4d4d; color: #ff4d4d; }
         .btn-mini.s { background-color: rgba(0, 230, 118, 0.15); border-color: #00e676; color: #00e676; }
         .btn-mini.ex-s { background-color: rgba(255, 152, 0, 0.1); border-color: #ff9800; color: #00e676; } 
         .btn-mini.ex-l { background-color: rgba(255, 152, 0, 0.1); border-color: #ff9800; color: #ff4d4d; } 
+        
+        /* 靜態終點按鈕樣式 */
+        .btn-mini-static { background: transparent; border: 1px dashed; border-radius: 4px; font-weight: bold; text-align: center; padding: 8px 4px; flex: 1; min-width: 50px; max-width: 75px; font-size: 0.85rem; cursor: default; }
 
         .mission-card { background-color: #1e1e1e; border-radius: 10px; padding: 12px; margin-bottom: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.5); border-left: 5px solid #444; width: 100%; box-sizing: border-box; }
         .mission-card.mode-long { border-left-color: #ff4d4d; }
@@ -186,12 +178,16 @@
         /* =========================================
            📊 終極版 K 線圖鑑專屬樣式
            ========================================= */
-        .k-book-table { width: 100%; min-width: 340px; table-layout: fixed; border-collapse: collapse; text-align: center; color: #fff; background-color:#1a1a1a; margin-bottom: 30px;}
+        .k-book-table { width: 100%; min-width: 340px; table-layout: fixed; border-collapse: collapse; text-align: center; color: #fff; background-color:#1a1a1a; margin-bottom: 30px; }
         .k-book-table th, .k-book-table td { border: 1px solid #333; padding: 8px 4px; vertical-align: top; word-wrap: break-word; }
         .k-book-table th { background-color: #222; font-weight: normal; line-height: 1.4; }
-        .k-book-table th:first-child { width: 18%; vertical-align: middle; font-weight: bold; color: #ccc;}
+        .k-book-table th:first-child { width: 18%; vertical-align: middle; }
         
-        .k-main-th { font-size:1.1rem; font-weight:bold; text-align:center !important; padding: 12px !important; border-bottom:none !important;}
+        .k-main-th { font-size:1.1rem; font-weight:bold; text-align:left; padding: 12px !important; }
+        .k-sub-th { font-size:0.85rem; color:#aaa; text-align:left; padding: 8px 12px !important; border-bottom: 2px solid #555; line-height: 1.6; }
+        .k-col-th { font-size:0.8rem; color:#fff; }
+        .k-row-th { font-size:0.8rem; color:#fff; }
+        .k-yellow-tip { color: #ffeb3b; font-size: 0.7rem; display: block; margin-top: 4px; }
         
         .k-title { font-weight: bold; font-size: 0.8rem; margin-top: 8px; line-height: 1.3; }
         .k-desc { font-size: 0.7rem; color: #aaa; margin-top: 6px; line-height: 1.5; text-align: left; padding: 0 2px; }
@@ -206,17 +202,19 @@
         .kl.white .wick { background: #fff; }
         .kl.white .body { background: #fff !important; height: 2px !important; }
         
-        /* 圖鑑評語顏色控制 */
         .t-red { color: #ff4d4d; }
         .t-green { color: #00e676; }
         .t-warn { color: #ffeb3b; }
 
         @media (min-width: 768px) {
             .k-book-table th, .k-book-table td { padding: 15px 10px; }
+            .k-col-th, .k-row-th { font-size: 0.95rem; }
             .k-title { font-size: 0.95rem; margin-top: 12px; }
+            .k-desc { font-size: 0.85rem; margin-top: 8px; padding: 0 8px; }
             .kl-box { height: 60px; }
             .kl { width: 14px; height: 50px; }
             .kl .wick { left: 6px; }
+            .k-yellow-tip { font-size: 0.85rem; margin-top: 6px; }
         }
     </style>
 </head>
@@ -227,8 +225,8 @@
         <h2 style="color:#00ffcc; margin-bottom:10px;">☁️ 戰區雲端連線</h2>
         <p style="color:#aaa; text-align:center; font-size:0.9rem; line-height:1.5; margin-bottom:20px;">請輸入您的專屬戰區密碼鎖。<br>電腦與手機輸入相同密碼，即可實現無縫連動。</p>
         <input type="password" id="room-pwd" placeholder="輸入連線密碼" style="padding:12px; font-size:1.2rem; background:#222; border:2px solid #00ffcc; color:#fff; border-radius:8px; text-align:center; width:80%; max-width:300px; outline:none; font-weight:bold;">
-        <button class="btn" style="background:#00ffcc; color:#000; margin-top:20px; width:80%; max-width:300px; font-size:1.1rem; padding:15px; box-shadow:0 4px 10px rgba(0,255,204,0.3);" onclick="joinRoom()">🔗 啟提同步引擎</button>
-        <button class="btn" style="background:transparent; color:#888; margin-top:15px; width:80%; max-width:300px; font-size:0.9rem; border:1px dashed #555;" onclick="clearRoom()">清除本機密碼記憶</button>
+        <button type="button" class="btn" style="background:#00ffcc; color:#000; margin-top:20px; width:80%; max-width:300px; font-size:1.1rem; padding:15px; box-shadow:0 4px 10px rgba(0,255,204,0.3);" onclick="joinRoom()">🔗 啟動同步引擎</button>
+        <button type="button" class="btn" style="background:transparent; color:#888; margin-top:15px; width:80%; max-width:300px; font-size:0.9rem; border:1px dashed #555;" onclick="clearRoom()">清除本機密碼記憶</button>
     </div>
 
     <div class="top-nav">
@@ -243,7 +241,7 @@
         
         <div class="page" id="page-0" onscroll="checkScroll()">
             
-            <button class="btn toggle-panel-btn" id="toggle-btn" onclick="toggleInputPanel()">🔽 收起戰前佈署面板</button>
+            <button type="button" class="btn toggle-panel-btn" id="toggle-btn" onclick="toggleInputPanel()">🔽 收起戰前佈署面板</button>
             <div id="quick-nav" class="quick-nav-container"></div>
 
             <form id="input-panel" class="card info" onsubmit="return false;">
@@ -302,17 +300,17 @@
                     <div style="flex:1;">
                         <label>總額度 (萬)</label>
                         <div class="stepper-wrapper">
-                            <button class="stepper-btn" tabindex="-1" onclick="stepPrice('quota-total',-10)">-</button>
+                            <button type="button" class="stepper-btn" tabindex="-1" onclick="stepPrice('quota-total',-10)">-</button>
                             <input type="number" inputmode="numeric" pattern="[0-9]*" id="quota-total" value="50" oninput="updateGlobalQuota()">
-                            <button class="stepper-btn" tabindex="-1" onclick="stepPrice('quota-total',10)">+</button>
+                            <button type="button" class="stepper-btn" tabindex="-1" onclick="stepPrice('quota-total',10)">+</button>
                         </div>
                     </div>
                     <div style="flex:1;">
                         <label>已消耗額度(萬) <span style="font-size:0.7rem; color:#ff4d4d;">*手動</span></label>
                         <div class="stepper-wrapper">
-                            <button class="stepper-btn" tabindex="-1" onclick="stepPrice('quota-manual-used',-1)">-</button>
+                            <button type="button" class="stepper-btn" tabindex="-1" onclick="stepPrice('quota-manual-used',-1)">-</button>
                             <input type="number" inputmode="decimal" id="quota-manual-used" value="0" oninput="updateGlobalQuota()">
-                            <button class="stepper-btn" tabindex="-1" onclick="stepPrice('quota-manual-used',1)">+</button>
+                            <button type="button" class="stepper-btn" tabindex="-1" onclick="stepPrice('quota-manual-used',1)">+</button>
                         </div>
                     </div>
                 </div>
@@ -365,57 +363,19 @@
 
         <div class="page" id="page-3">
             <h3 style="color:#00ffcc; text-align:center; margin-top:0; margin-bottom: 20px;">📊 實戰 K 線型態圖鑑</h3>
-            
-            <style>
-                .k-book-table { width: 100%; min-width: 340px; table-layout: fixed; border-collapse: collapse; text-align: center; color: #fff; background-color:#1a1a1a; }
-                .k-book-table th, .k-book-table td { border: 1px solid #333; padding: 8px 4px; vertical-align: top; word-wrap: break-word; }
-                .k-book-table th { background-color: #222; font-weight: normal; line-height: 1.4; }
-                .k-book-table th:first-child { width: 20%; vertical-align: middle; }
-                
-                .k-main-th { font-size:1.1rem; font-weight:bold; text-align:left; padding: 12px !important; }
-                .k-sub-th { font-size:0.85rem; color:#aaa; text-align:left; padding: 8px 12px !important; border-bottom: 2px solid #555; line-height: 1.6; }
-                .k-col-th { font-size:0.85rem; color:#ccc; font-weight:bold; }
-                .k-row-th { font-size:0.85rem; color:#ccc; font-weight:bold; }
-                
-                .k-title { font-weight: bold; font-size: 0.8rem; margin-top: 8px; line-height: 1.3; }
-                .k-desc { font-size: 0.7rem; color: #aaa; margin-top: 6px; line-height: 1.5; text-align: left; padding: 0 2px; }
-                
-                .kl-box { display: flex; justify-content: center; align-items: center; height: 45px; margin-top: 5px; }
-                .kl { position: relative; width: 10px; height: 35px; }
-                .kl .wick { position: absolute; left: 4px; width: 2px; height: 100%; background: #ccc; }
-                .kl .body { position: absolute; left: 0; width: 100%; }
-                
-                .kl.red .wick, .kl.red .body { background: #ff4d4d; }
-                .kl.green .wick, .kl.green .body { background: #00e676; }
-                .kl.white .wick { background: #fff; }
-                .kl.white .body { background: #fff !important; height: 2px !important; }
-                
-                .t-red { color: #ff4d4d; }
-                .t-green { color: #00e676; }
-                .t-warn { color: #ffeb3b; }
 
-                @media (min-width: 768px) {
-                    .k-book-table th, .k-book-table td { padding: 15px 10px; }
-                    .k-col-th, .k-row-th { font-size: 0.95rem; }
-                    .k-title { font-size: 0.95rem; margin-top: 12px; }
-                    .k-desc { font-size: 0.85rem; margin-top: 8px; padding: 0 8px; }
-                    .kl-box { height: 60px; }
-                    .kl { width: 14px; height: 50px; }
-                    .kl .wick { left: 6px; }
-                }
-            </style>
-
-            <div class="k-table-container" style="margin-bottom: 30px;">
+            <div class="k-table-container">
                 <table class="k-book-table">
                     <tr><th colspan="4" class="k-main-th" style="background:#331111; border-bottom:none;"><span class="t-red">🟥 第一張表：紅 K 陣營 (收盤 &gt; 開盤)</span></th></tr>
+                    <tr><th colspan="4" class="k-sub-th" style="background:#1a0000;">【戰場大前提】：紅K代表這5分鐘內「買單總量勝出」。但影線決定了多軍是「贏得輕鬆」還是「贏得很心虛」。</th></tr>
                     <tr>
                         <th></th>
-                        <th class="k-col-th">無上影線<br><span style="font-weight:normal; font-size:0.75rem;">(光頭)</span></th>
-                        <th class="k-col-th">短上影線<br><span style="font-weight:normal; font-size:0.75rem;">(&lt;實體)</span></th>
-                        <th class="k-col-th">長上影線<br><span style="font-weight:normal; font-size:0.75rem;">(&gt;實體)</span></th>
+                        <th class="k-col-th">無上影線<br><span style="font-weight:normal; font-size:0.75rem;">(光頭)</span><span class="k-yellow-tip">👉 多軍狂推，上方無阻</span></th>
+                        <th class="k-col-th">短上影線<br><span style="font-weight:normal; font-size:0.75rem;">(&lt;實體)</span><span class="k-yellow-tip">👉 微幅反壓，正常交火</span></th>
+                        <th class="k-col-th">長上影線<br><span style="font-weight:normal; font-size:0.75rem;">(&gt;實體)</span><span class="k-yellow-tip">👉 衝高被打臉，賣壓極重</span></th>
                     </tr>
                     <tr>
-                        <th class="k-row-th">無下影線<br><span style="font-weight:normal; font-size:0.75rem;">(光腳)</span></th>
+                        <th class="k-row-th">無下影線<br><span style="font-weight:normal; font-size:0.75rem;">(光腳)</span><br><span class="k-yellow-tip">👉 開盤即最低，沒人想賣</span></th>
                         <td>
                             <div class="kl-box"><div class="kl red"><div class="body" style="top:0; height:100%;"></div></div></div>
                             <div class="k-title t-red">【極多】大陽線<br>(光頭光腳大紅K)</div>
@@ -433,7 +393,7 @@
                         </td>
                     </tr>
                     <tr>
-                        <th class="k-row-th">短下影線<br><span style="font-weight:normal; font-size:0.75rem;">(&lt;實體)</span></th>
+                        <th class="k-row-th">短下影線<br><span style="font-weight:normal; font-size:0.75rem;">(&lt;實體)</span><br><span class="k-yellow-tip">👉 開盤微跌即拉回，下有撐</span></th>
                         <td>
                             <div class="kl-box"><div class="kl red"><div class="wick" style="top:80%; height:20%;"></div><div class="body" style="top:0; height:80%;"></div></div></div>
                             <div class="k-title t-red">【強多】光頭微下影<br>(光頭紅K)</div>
@@ -451,7 +411,7 @@
                         </td>
                     </tr>
                     <tr>
-                        <th class="k-row-th">長下影線<br><span style="font-weight:normal; font-size:0.75rem;">(&gt;實體)</span></th>
+                        <th class="k-row-th">長下影線<br><span style="font-weight:normal; font-size:0.75rem;">(&gt;實體)</span><br><span class="k-yellow-tip">👉 殺低被瘋狂買回，鐵板一塊</span></th>
                         <td>
                             <div class="kl-box"><div class="kl red"><div class="wick" style="top:40%; height:60%;"></div><div class="body" style="top:0; height:40%;"></div></div></div>
                             <div class="k-title t-red">【⚠️極多轉折】<br>強勢掃底 (槌子線)</div>
@@ -471,17 +431,18 @@
                 </table>
             </div>
 
-            <div class="k-table-container" style="margin-bottom: 30px;">
+            <div class="k-table-container">
                 <table class="k-book-table">
                     <tr><th colspan="4" class="k-main-th" style="background:#0f2b1a; border-bottom:none;"><span class="t-green">🟩 第二張表：綠 K 陣營 (收盤 &lt; 開盤)</span></th></tr>
+                    <tr><th colspan="4" class="k-sub-th" style="background:#051a0f;">【戰場大前提】：綠K代表這5分鐘內「賣單總量勝出」。影線決定了空軍是「碾壓局」還是「踢到鐵板」。</th></tr>
                     <tr>
                         <th></th>
-                        <th class="k-col-th">無上影線<br><span style="font-weight:normal; font-size:0.75rem;">(光頭)</span></th>
-                        <th class="k-col-th">短上影線<br><span style="font-weight:normal; font-size:0.75rem;">(&lt;實體)</span></th>
-                        <th class="k-col-th">長上影線<br><span style="font-weight:normal; font-size:0.75rem;">(&gt;實體)</span></th>
+                        <th class="k-col-th">無上影線<br><span style="font-weight:normal; font-size:0.75rem;">(光頭)</span><span class="k-yellow-tip">👉 開盤即最高，沒人想買</span></th>
+                        <th class="k-col-th">短上影線<br><span style="font-weight:normal; font-size:0.75rem;">(&lt;實體)</span><span class="k-yellow-tip">👉 微幅反彈，瞬間被空</span></th>
+                        <th class="k-col-th">長上影線<br><span style="font-weight:normal; font-size:0.75rem;">(&gt;實體)</span><span class="k-yellow-tip">👉 彈高被打臉，空頭死壓</span></th>
                     </tr>
                     <tr>
-                        <th class="k-row-th">無下影線<br><span style="font-weight:normal; font-size:0.75rem;">(光腳)</span></th>
+                        <th class="k-row-th">無下影線<br><span style="font-weight:normal; font-size:0.75rem;">(光腳)</span><br><span class="k-yellow-tip">👉 空軍狂殺，下方無撐</span></th>
                         <td>
                             <div class="kl-box"><div class="kl green"><div class="body" style="top:0; height:100%;"></div></div></div>
                             <div class="k-title t-green">【極空】大陰線<br>(光頭光腳大綠K)</div>
@@ -499,7 +460,7 @@
                         </td>
                     </tr>
                     <tr>
-                        <th class="k-row-th">短下影線<br><span style="font-weight:normal; font-size:0.75rem;">(&lt;實體)</span></th>
+                        <th class="k-row-th">短下影線<br><span style="font-weight:normal; font-size:0.75rem;">(&lt;實體)</span><br><span class="k-yellow-tip">👉 殺到底有微弱買盤抵抗</span></th>
                         <td>
                             <div class="kl-box"><div class="kl green"><div class="wick" style="top:80%; height:20%;"></div><div class="body" style="top:0; height:80%;"></div></div></div>
                             <div class="k-title t-green">【強空】弱勢緩跌<br>(光頭綠K)</div>
@@ -517,7 +478,7 @@
                         </td>
                     </tr>
                     <tr>
-                        <th class="k-row-th">長下影線<br><span style="font-weight:normal; font-size:0.75rem;">(&gt;實體)</span></th>
+                        <th class="k-row-th">長下影線<br><span style="font-weight:normal; font-size:0.75rem;">(&gt;實體)</span><br><span class="k-yellow-tip">👉 殺低被打臉，買盤極重</span></th>
                         <td>
                             <div class="kl-box"><div class="kl green"><div class="wick" style="top:40%; height:60%;"></div><div class="body" style="top:0; height:40%;"></div></div></div>
                             <div class="k-title t-red">【⚠️偏多轉折】<br>深水炸彈 (槌子線)</div>
@@ -540,14 +501,15 @@
             <div class="k-table-container">
                 <table class="k-book-table">
                     <tr><th colspan="4" class="k-main-th" style="background:#2a2a2a; border-bottom:none;"><span style="color:#ddd;">⬜ 第三張表：白 K 陣營 (收盤 = 開盤 / 十字星)</span></th></tr>
+                    <tr><th colspan="4" class="k-sub-th" style="background:#1a1a1a;">【戰場大前提】：這5分鐘內多空打平。白K出現代表「趨勢暫停」，往往是準備變盤的發令槍！</th></tr>
                     <tr>
                         <th></th>
-                        <th class="k-col-th">無上影線<br><span style="font-weight:normal; font-size:0.75rem;">(光頭)</span></th>
-                        <th class="k-col-th">短上影線<br><span style="font-weight:normal; font-size:0.75rem;">(&lt;下影線)</span></th>
-                        <th class="k-col-th">長上影線<br><span style="font-weight:normal; font-size:0.75rem;">(&gt;下影線)</span></th>
+                        <th class="k-col-th">無上影線<br><span style="font-weight:normal; font-size:0.75rem;">(光頭)</span><span class="k-yellow-tip">👉 高點等於開收盤</span></th>
+                        <th class="k-col-th">短上影線<br><span style="font-weight:normal; font-size:0.75rem;">(&lt;下影線)</span><span class="k-yellow-tip">👉 高點微幅凸出</span></th>
+                        <th class="k-col-th">長上影線<br><span style="font-weight:normal; font-size:0.75rem;">(&gt;下影線)</span><span class="k-yellow-tip">👉 高點極度凸出</span></th>
                     </tr>
                     <tr>
-                        <th class="k-row-th">無下影線<br><span style="font-weight:normal; font-size:0.75rem;">(光腳)</span></th>
+                        <th class="k-row-th">無下影線<br><span style="font-weight:normal; font-size:0.75rem;">(光腳)</span><br><span class="k-yellow-tip">👉 低點等於開收盤</span></th>
                         <td>
                             <div class="kl-box"><div class="kl white"><div class="body" style="top:48%;"></div></div></div>
                             <div class="k-title t-warn">【⚠️極端】死水一字線</div>
@@ -565,7 +527,7 @@
                         </td>
                     </tr>
                     <tr>
-                        <th class="k-row-th">短下影線<br><span style="font-weight:normal; font-size:0.75rem;">(&lt;上影線)</span></th>
+                        <th class="k-row-th">短下影線<br><span style="font-weight:normal; font-size:0.75rem;">(&lt;上影線)</span><br><span class="k-yellow-tip">👉 低點微幅下探</span></th>
                         <td>
                             <div class="kl-box"><div class="kl white"><div class="wick" style="top:50%; height:50%;"></div><div class="body" style="top:48%;"></div></div></div>
                             <div class="k-title t-red">【偏多】正 T 字星</div>
@@ -583,7 +545,7 @@
                         </td>
                     </tr>
                     <tr>
-                        <th class="k-row-th">長下影線<br><span style="font-weight:normal; font-size:0.75rem;">(&gt;上影線)</span></th>
+                        <th class="k-row-th">長下影線<br><span style="font-weight:normal; font-size:0.75rem;">(&gt;上影線)</span><br><span class="k-yellow-tip">👉 低點極度深探</span></th>
                         <td>
                             <div class="kl-box"><div class="kl white"><div class="wick" style="top:0; height:100%;"></div><div class="body" style="top:0;"></div></div></div>
                             <div class="k-title t-red">【⚠️極多轉折】<br>蜻蜓十字</div>
@@ -616,12 +578,11 @@
                 complete: function(results) {
                     results.data.forEach(row => {
                         if(row.length >= 2) {
-                            let code = row[0].trim(); // A1 是股號
-                            let name = row[1].trim(); // B1 是股名
+                            let code = row[0].trim(); 
+                            let name = row[1].trim(); 
                             if(code && name) customDict[code] = name;
                         }
                     });
-                    console.log("✅ 對照表載入完成");
                 }
             });
         });
@@ -755,6 +716,16 @@
         function checkAscending(arr) { let n = arr.filter(x => x !== '').map(Number); for(let i=0; i<n.length-1; i++) { if(n[i] >= n[i+1]) return false; } return true; }
         function checkDescending(arr) { let n = arr.filter(x => x !== '').map(Number); for(let i=0; i<n.length-1; i++) { if(n[i] <= n[i+1]) return false; } return true; }
 
+        // --- 排序功能 ---
+        window.moveWlItem = function(index, dir) {
+            if(index + dir < 0 || index + dir >= wl.length) return;
+            let temp = wl[index];
+            wl[index] = wl[index + dir];
+            wl[index + dir] = temp;
+            triggerSync();
+            renderWatchlist();
+        };
+
         function renderWatchlist() {
             const container = document.getElementById('watchlist-container'); const navContainer = document.getElementById('quick-nav');
             container.innerHTML = ''; navContainer.innerHTML = ''; navContainer.style.display = (wl.length > 0 && !isPanelOpen) ? 'flex' : 'none';
@@ -762,13 +733,45 @@
                 let stockId = `stock-card-${index}`; let dName = item.name || "未知"; let dCode = item.code || "---";
                 let upLimit = calcUp(item.yc); let downLimit = calcDown(item.yc);
                 navContainer.innerHTML += `<div class="chip" onclick="jumpToStockHome('${stockId}')">${dName}</div>`;
-                let html = `<div class="card-compact" id="${stockId}"><div class="card-header"><h3>📌 ${dName} (${dCode})</h3><div style="display:flex;"><button class="btn-icon" style="color:#00ffcc;" onclick="editWatchlist(${index})">✏️</button><button class="btn-icon" style="color:#ff4d4d;" onclick="delWatchlist(${index})">🗑️</button></div></div>`;
+                
+                let html = `<div class="card-compact" id="${stockId}">
+                                <div class="card-header">
+                                    <h3>📌 ${dName} (${dCode})</h3>
+                                    <div style="display:flex; gap:4px;">
+                                        <button type="button" class="btn-icon" style="color:#aaa; font-size:1rem;" onclick="moveWlItem(${index}, -1)" ${index === 0 ? 'disabled' : ''}>⬆️</button>
+                                        <button type="button" class="btn-icon" style="color:#aaa; font-size:1rem;" onclick="moveWlItem(${index}, 1)" ${index === wl.length - 1 ? 'disabled' : ''}>⬇️</button>
+                                        <button type="button" class="btn-icon" style="color:#00ffcc; font-size:1rem; margin-left:6px;" onclick="editWatchlist(${index})" title="編輯">✏️</button>
+                                        <button type="button" class="btn-icon" style="color:#ff4d4d; font-size:1rem;" onclick="delWatchlist(${index})" title="刪除">🗑️</button>
+                                    </div>
+                                </div>`;
                 if(item.yc) html += `<div class="limits-bar"><span style="color:#ff4d4d; font-weight:bold;">🔴漲停 ${upLimit}</span><span style="color:#aaa;">昨收 ${item.yc}</span><span style="color:#00e676; font-weight:bold;">🟢跌停 ${downLimit}</span></div>`;
+                
                 let ycStr = item.yc || '';
+                
                 let rawLongs = [item.lb, item.lt1, item.lt2, item.lt3, item.lt4, item.lt5].filter(v => v !== '' && v !== undefined && v !== null).map(Number).sort((a,b) => a - b);
-                if(rawLongs.length > 1) { html += `<div class="row-group"><div class="row-label l">🔴多</div><div class="btn-grid">` + rawLongs.slice(0,-1).map((v,i) => `<button class="btn-mini l" onclick="loadToMission('long','${dName}','${dCode}',${v},${rawLongs[i+1]},'${ycStr}')">${v}</button>`).join('') + `</div></div>`; }
+                if(rawLongs.length > 0) {
+                    let longsHtml = []; 
+                    for(let i=0; i<rawLongs.length-1; i++) {
+                        longsHtml.push(`<button class="btn-mini l" onclick="loadToMission('long','${dName}','${dCode}',${rawLongs[i]},${rawLongs[i+1]},'${ycStr}')">${rawLongs[i]}</button>`);
+                    }
+                    let lastLong = rawLongs[rawLongs.length - 1];
+                    let isLimitUp = (lastLong === parseFloat(upLimit));
+                    longsHtml.push(`<div class="btn-mini-static" style="border-color:#ff4d4d; color:#ff4d4d;">${isLimitUp ? '漲停' : '終點'}<br>${lastLong}</div>`);
+                    html += `<div class="row-group"><div class="row-label l">🔴多</div><div class="btn-grid">${longsHtml.join('')}</div></div>`;
+                }
+
                 let rawShorts = [item.sb, item.st1, item.st2, item.st3, item.st4, item.st5].filter(v => v !== '' && v !== undefined && v !== null).map(Number).sort((a,b) => b - a);
-                if(rawShorts.length > 1) { html += `<div class="row-group"><div class="row-label s">🟢空</div><div class="btn-grid">` + rawShorts.slice(0,-1).map((v,i) => `<button class="btn-mini s" onclick="loadToMission('short','${dName}','${dCode}',${v},${rawShorts[i+1]},'${ycStr}')">${v}</button>`).join('') + `</div></div>`; }
+                if(rawShorts.length > 0) {
+                    let shortsHtml = []; 
+                    for(let i=0; i<rawShorts.length-1; i++) {
+                        shortsHtml.push(`<button class="btn-mini s" onclick="loadToMission('short','${dName}','${dCode}',${rawShorts[i]},${rawShorts[i+1]},'${ycStr}')">${rawShorts[i]}</button>`);
+                    }
+                    let lastShort = rawShorts[rawShorts.length - 1];
+                    let isLimitDown = (lastShort === parseFloat(downLimit));
+                    shortsHtml.push(`<div class="btn-mini-static" style="border-color:#00e676; color:#00e676;">${isLimitDown ? '跌停' : '終點'}<br>${lastShort}</div>`);
+                    html += `<div class="row-group"><div class="row-label s">🟢空</div><div class="btn-grid">${shortsHtml.join('')}</div></div>`;
+                }
+
                 let exBtns = [];
                 if(item.hb) exBtns.push(`<button class="btn-mini ex-s" onclick="loadToMission('short','${dName}','${dCode}',${item.hb},'${item.ht1 || getClosestDown(item.hb, item)}','${ycStr}')">⚡${item.hb}</button>`);
                 if(item.lowb) exBtns.push(`<button class="btn-mini ex-l" onclick="loadToMission('long','${dName}','${dCode}',${item.lowb},'${item.lowt1 || getClosestUp(item.lowb, item)}','${ycStr}')">⚡${item.lowb}</button>`);
@@ -855,11 +858,11 @@
                 <div class="mission-card ${isLong?'mode-long':'mode-short'}" id="m-card-${mode}-${m.id}">
                     <div class="m-header ${isLong?'mode-long':'mode-short'}"><h3>📌 ${m.name} (${m.code}) | 基準: ${m.base}</h3><button class="btn-icon" style="color:#888;" onclick="removeMission('${mode}','${m.id}')">✖</button></div>
                     ${limitHtml}
-                    <div class="input-group"><label>基準價</label><div class="stepper-wrapper"><button class="stepper-btn" tabindex="-1" onclick="stepPrice('base-${mode}-${m.id}',-1)">-</button><input type="number" inputmode="decimal" id="base-${mode}-${m.id}" value="${m.base||''}" oninput="calcMission('${mode}','${m.id}')"><button class="stepper-btn" tabindex="-1" onclick="stepPrice('base-${mode}-${m.id}',1)">+</button></div></div>
-                    <div class="input-group"><label>目標價</label><div class="stepper-wrapper"><button class="stepper-btn" tabindex="-1" onclick="stepPrice('target-${mode}-${m.id}',-1)">-</button><input type="number" inputmode="decimal" id="target-${mode}-${m.id}" value="${m.target||''}" oninput="calcMission('${mode}','${m.id}')"><button class="stepper-btn" tabindex="-1" onclick="stepPrice('target-${mode}-${m.id}',1)">+</button></div></div>
+                    <div class="input-group"><label>基準價</label><div class="stepper-wrapper"><button type="button" class="stepper-btn" tabindex="-1" onclick="stepPrice('base-${mode}-${m.id}',-1)">-</button><input type="number" inputmode="decimal" id="base-${mode}-${m.id}" value="${m.base||''}" oninput="calcMission('${mode}','${m.id}')"><button type="button" class="stepper-btn" tabindex="-1" onclick="stepPrice('base-${mode}-${m.id}',1)">+</button></div></div>
+                    <div class="input-group"><label>目標價</label><div class="stepper-wrapper"><button type="button" class="stepper-btn" tabindex="-1" onclick="stepPrice('target-${mode}-${m.id}',-1)">-</button><input type="number" inputmode="decimal" id="target-${mode}-${m.id}" value="${m.target||''}" oninput="calcMission('${mode}','${m.id}')"><button type="button" class="stepper-btn" tabindex="-1" onclick="stepPrice('target-${mode}-${m.id}',1)">+</button></div></div>
                     <div style="display:flex; gap:10px; margin-top:10px;">
-                        <div style="flex:2;"><label style="color:${isLong?'#ff4d4d':'#00e676'};">進場價 (實際開槍)</label><div class="stepper-wrapper entry-stepper ${isLong?'w-long':'w-short'}"><button class="stepper-btn" tabindex="-1" onclick="stepPrice('entry-${mode}-${m.id}', -1)">-</button><input type="number" inputmode="decimal" id="entry-${mode}-${m.id}" value="${m.entry!==undefined?m.entry:''}" oninput="calcMission('${mode}','${m.id}')"><button class="stepper-btn" tabindex="-1" onclick="stepPrice('entry-${mode}-${m.id}', 1)">+</button><button class="btn-clear" onclick="clearMissionEntry('${mode}','${m.id}')">✖</button></div></div>
-                        <div style="flex:1;"><label style="color:#aaa;">作戰張數</label><div class="stepper-wrapper entry-stepper" style="border-color:#555; padding-right:0;"><button class="stepper-btn" tabindex="-1" style="width:30px;" onclick="stepPrice('vol-${mode}-${m.id}', -1)">-</button><input type="number" inputmode="numeric" id="vol-${mode}-${m.id}" value="${m.vol||'1'}" oninput="calcMission('${mode}','${m.id}')" style="font-size:1.3rem;"><button class="stepper-btn" tabindex="-1" style="width:30px;" onclick="stepPrice('vol-${mode}-${m.id}', 1)">+</button></div></div>
+                        <div style="flex:2;"><label style="color:${isLong?'#ff4d4d':'#00e676'};">進場價 (實際開槍)</label><div class="stepper-wrapper entry-stepper ${isLong?'w-long':'w-short'}"><button type="button" class="stepper-btn" tabindex="-1" onclick="stepPrice('entry-${mode}-${m.id}', -1)">-</button><input type="number" inputmode="decimal" id="entry-${mode}-${m.id}" value="${m.entry!==undefined?m.entry:''}" oninput="calcMission('${mode}','${m.id}')"><button type="button" class="stepper-btn" tabindex="-1" onclick="stepPrice('entry-${mode}-${m.id}', 1)">+</button><button type="button" class="btn-clear" onclick="clearMissionEntry('${mode}','${m.id}')">✖</button></div></div>
+                        <div style="flex:1;"><label style="color:#aaa;">作戰張數</label><div class="stepper-wrapper entry-stepper" style="border-color:#555; padding-right:0;"><button type="button" class="stepper-btn" tabindex="-1" style="width:30px;" onclick="stepPrice('vol-${mode}-${m.id}', -1)">-</button><input type="number" inputmode="numeric" id="vol-${mode}-${m.id}" value="${m.vol||'1'}" oninput="calcMission('${mode}','${m.id}')" style="font-size:1.3rem;"><button type="button" class="stepper-btn" tabindex="-1" style="width:30px;" onclick="stepPrice('vol-${mode}-${m.id}', 1)">+</button></div></div>
                     </div>
                     
                     <div id="sig-${mode}-${m.id}" class="signal">等待數據...</div>
@@ -869,7 +872,7 @@
                     <div class="result-box" style="background:#1a1a1a; border:1px solid #555; margin-bottom:15px;">
                         <div style="font-size:0.8rem; color:#aaa; margin-bottom:5px;">⚖️ 交割額度佔用</div>
                         <div class="quota-box"><span>佔用:</span><span style="display:flex; flex-direction:column; align-items:flex-end;"><span class="quota-val" id="quota-cost-${mode}-${m.id}">-</span><span id="quota-type-${mode}-${m.id}" style="font-size:0.7rem; color:#888;"></span></span></div>
-                        <div class="quota-box" style="background:transparent; padding:4px 0 0 0;"><span>全域剩餘:</span><span class="quota-val quota-remain-val" id="quota-remain-${mode}-${m.id}">-</span></div>
+                        <div class="quota-box" style="background:transparent; padding:4px 0 0 0;"><span>全球額度剩餘:</span><span class="quota-val quota-remain-val" id="quota-remain-${mode}-${m.id}">-</span></div>
                     </div>
                     
                     <div class="result-box">
@@ -880,7 +883,7 @@
                         <div class="result-row" style="margin-top:10px; padding-top:10px; border-top:1px dashed #660000;"><span>💥 若碰停損虧損:</span> <span id="loss-${mode}-${m.id}" class="highlight">-</span></div>
                     </div>
                     
-                    <div class="input-group" style="margin-top:15px;"><label>實際出場價 (結算用)</label><div class="stepper-wrapper"><button class="stepper-btn" tabindex="-1" onclick="stepPrice('exit-${mode}-${m.id}',-1)">-</button><input type="number" inputmode="decimal" id="exit-${mode}-${m.id}" value="${m.exit!==undefined?m.exit:''}" oninput="calcMission('${mode}','${m.id}')"><button class="stepper-btn" tabindex="-1" onclick="stepPrice('exit-${mode}-${m.id}',1)">+</button></div></div>
+                    <div class="input-group" style="margin-top:15px;"><label>實際出場價 (結算用)</label><div class="stepper-wrapper"><button type="button" class="stepper-btn" tabindex="-1" onclick="stepPrice('exit-${mode}-${m.id}',-1)">-</button><input type="number" inputmode="decimal" id="exit-${mode}-${m.id}" value="${m.exit!==undefined?m.exit:''}" oninput="calcMission('${mode}','${m.id}')"><button type="button" class="stepper-btn" tabindex="-1" onclick="stepPrice('exit-${mode}-${m.id}',1)">+</button></div></div>
                     <div class="result-box">
                         <div class="result-row"><span>🧾 帳面交割損益 (全額):</span> <span id="pnl-full-${mode}-${m.id}" class="highlight">-</span></div>
                         <div class="result-row"><span>💰 退佣淨損益 (估2.7折):</span> <span id="pnl-disc-${mode}-${m.id}" class="highlight" style="color:#00ffcc;">-</span></div>
@@ -897,8 +900,6 @@
             m.entry = document.getElementById(`entry-${mode}-${mId}`).value;
             m.exit = document.getElementById(`exit-${mode}-${mId}`).value;
             m.vol = document.getElementById(`vol-${mode}-${mId}`).value;
-            
-            triggerSync(); 
             
             let base = parseFloat(m.base); let target = parseFloat(m.target); let entryStr = m.entry; let entry = parseFloat(m.entry); let exit = parseFloat(m.exit); let lots = parseInt(m.vol)||1; let yc = parseFloat(m.yc);
             let stopLoss = 0; let finalEntryBound = 0; let limitWarn = false; let sigBox = document.getElementById(`sig-${mode}-${mId}`);
@@ -943,10 +944,10 @@
 
             if (entry) {
                 let cost = 0; let typeLabel = "";
-                if (isLong) { cost = entry * lots * 1000; typeLabel = "(預扣進場總價)"; } 
-                else { if (upLimitNum > 0) { cost = upLimitNum * lots * 1000; typeLabel = "(無情鎖死漲停價)"; } else { cost = entry * lots * 1000; typeLabel = "(依進場價估算)"; } }
+                if (isLong) { cost = entry * lots * 1000; typeLabel = "(預扣實際進場總價)"; } 
+                else { if (upLimitNum > 0) { cost = upLimitNum * lots * 1000; typeLabel = "(無情鎖死漲停價)"; } else { cost = entry * lots * 1000; typeLabel = "(依進場價估計)"; } }
                 
-                V14_combat_state.activeMissionsCosts[`${mode}-${mId}`] = cost; updateGlobalQuota(); 
+                m.cost = cost; updateGlobalQuota(); 
                 document.getElementById(`quota-cost-${mode}-${mId}`).innerText = "NT$ " + cost.toLocaleString(); 
                 document.getElementById(`quota-type-${mode}-${mId}`).innerText = typeLabel;
 
@@ -955,7 +956,7 @@
                 else { while(testPnL < 0) { be -= getTickDown(be); be = Math.round(be*100)/100; testPnL = calcPnL(entry, be, lots, isLong).full; } }
                 document.getElementById(`be-${mode}-${mId}`).innerText = be.toFixed(2) + " 回本";
             } else { 
-                V14_combat_state.activeMissionsCosts[`${mode}-${mId}`] = 0; updateGlobalQuota();
+                m.cost = 0; updateGlobalQuota();
                 document.getElementById(`be-${mode}-${mId}`).innerText = "-"; 
                 document.getElementById(`quota-cost-${mode}-${mId}`).innerText = "-"; 
                 document.getElementById(`quota-type-${mode}-${mId}`).innerText = "";
@@ -993,6 +994,8 @@
                 let pnlDiscBox = document.getElementById(`pnl-disc-${mode}-${mId}`); 
                 pnlDiscBox.innerText = "NT$ " + Math.round(outData.disc).toLocaleString(); pnlDiscBox.style.color = outData.disc >= 0 ? "#ff4d4d" : "#00e676"; 
             } else { document.getElementById(`pnl-full-${mode}-${mId}`).innerText = "-"; document.getElementById(`pnl-disc-${mode}-${mId}`).innerText = "-"; }
+            
+            triggerSync(); 
         }
 
         // --- 戰後焦土作業 ---
