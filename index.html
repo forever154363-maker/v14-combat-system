@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>量化交易與資金控管系統 </title>
+    <title>量化交易與資金控管系統 V14.8</title>
     
     <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-database-compat.js"></script>
@@ -24,7 +24,7 @@
         /* 頂部導航列 */
         .top-nav { 
             position: fixed; top: 0; left: 0; width: 100%; height: 50px; 
-            background-color: #1a1a1a; display: flex; z-index: 9999; 
+            background-color: #1a1a1a; display: flex; z-index: 9990; 
             box-shadow: 0 4px 10px rgba(0,0,0,0.8); border-bottom: 1px solid #333;
             justify-content: center; 
         }
@@ -33,7 +33,7 @@
             color: #666; transition: 0.2s; font-size: 0.95rem; cursor: pointer; white-space: nowrap;
         }
         .nav-tab.active { color: #fff; border-bottom: 3px solid #00ffcc; background-color: rgba(0,255,204,0.1); }
-        .nav-icon { flex: none; width: 50px; border-left: 1px dashed #333; display: flex; align-items: center; justify-content: center; cursor: pointer;}
+        .nav-icon { flex: none; width: 50px; border-left: 1px dashed #333; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 1.1rem;}
 
         /* 頁面滑動容器 */
         .swipe-container { 
@@ -53,7 +53,7 @@
            ========================================= */
         @media (min-width: 768px) {
             .page { padding: 30px 4vw 120px 4vw; }
-            #input-panel, .card.quota, .k-table-container, .logistics-header, .rule-card, .card:not(.card-compact):not(.mission-card) { 
+            #input-panel, .k-table-container, .logistics-header, .rule-card, .card:not(.card-compact):not(.mission-card) { 
                 max-width: 1400px; margin-left: auto; margin-right: auto; 
             }
             .target-grid { grid-template-columns: repeat(6, minmax(0, 1fr)) !important; }
@@ -69,7 +69,6 @@
         /* 卡片與通用樣式 */
         .card { background-color: #1e1e1e; border-radius: 10px; padding: 12px; margin-bottom: 15px; border-left: 5px solid #444; box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
         .card.info { border-left-color: #00ffcc; }
-        .card.quota { border-left-color: #ffeb3b; background-color: #1c1a10; }
         .rule-card { border-left-color: #00ffcc; background-color: #1a1a1a; margin-top: 30px; }
         
         /* 增減控制器 */
@@ -132,7 +131,6 @@
         .wl-section.s-short { border-left-color: #00e676; }
         .wl-section.s-ex { border-left-color: #ff9800; }
         
-        /* 網格 */
         .target-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; margin-top: 5px; }
         .ex-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; margin-top: 5px; }
         .target-label { font-size: 0.75rem; color: #aaa; text-align: center; margin-bottom: 2px;}
@@ -161,7 +159,7 @@
         .chip.locked { opacity: 0.6; border-style: dashed; }
 
         /* 標的卡片 */
-        .card-compact { background-color: #1e1e1e; border-radius: 8px; padding: 10px; margin-bottom: 12px; border-left: 4px solid #444; box-shadow: 0 2px 4px rgba(0,0,0,0.4); }
+        .card-compact { background-color: #1e1e1e; border-radius: 8px; padding: 10px; margin-bottom: 12px; border-left: 4px solid #444; box-shadow: 0 2px 4px rgba(0,0,0,0.4); scroll-margin-top: 120px; }
         .card-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #333; padding-bottom: 5px; margin-bottom: 5px; }
         .card-header h3 { margin: 0; font-size: 1.05rem; color: #fff; }
         .drag-handle { color: #888; font-size: 1.5rem; padding-right: 10px; cursor: grab; display: flex; align-items: center; }
@@ -191,13 +189,11 @@
         .mission-card { 
             background-color: #1e1e1e; border-radius: 10px; padding: 12px; margin-bottom: 20px; 
             box-shadow: 0 4px 6px rgba(0,0,0,0.5); border-left: 5px solid #444; width: 100%; box-sizing: border-box; 
-            transition: all 0.3s ease; 
+            transition: all 0.3s ease; scroll-margin-top: 120px; 
         }
         
         .mission-card.mode-long { border-left-color: #ff4d4d; }
         .mission-card.mode-short { border-left-color: #00e676; }
-        
-        /* 鎖定狀態的視覺削弱 */
         .mission-card.locked { opacity: 0.75; border-left-color: #888 !important; filter: grayscale(30%); box-shadow: none; }
         
         /* 🌟 整張卡片發光效果 (由 JS 的 active-glow 觸發) */
@@ -226,6 +222,8 @@
         #toast { position: fixed; top: 60px; left: 50%; transform: translateX(-50%); background-color: #00ffcc; color: #000; padding: 8px 20px; border-radius: 20px; font-weight: bold; font-size: 0.9rem; z-index: 10000; display: none; box-shadow: 0 4px 10px rgba(0,0,0,0.5); white-space: nowrap;}
         .logistics-header { text-align:center; padding: 25px 0 15px 0; margin-top: 40px; border-top: 1px dashed #555; color: #888; font-size: 0.85rem; letter-spacing: 2px;}
 
+        /* 設定面板 Modal */
+        #settings-modal { position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(18,18,18,0.95); backdrop-filter:blur(5px); z-index:99999; display:none; flex-direction:column; justify-content:center; align-items:center; padding:20px; box-sizing:border-box; }
         #auth-modal { position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(18,18,18,0.98); z-index:99999; display:flex; flex-direction:column; justify-content:center; align-items:center; }
 
         /* =========================================
@@ -277,12 +275,55 @@
         <button type="button" class="btn" style="background:transparent; color:#888; margin-top:15px; width:80%; max-width:300px; font-size:0.9rem; border:1px dashed #555;" onclick="clearRoom()">清除本機密碼記憶</button>
     </div>
 
+    <div id="settings-modal">
+        <div class="card quota" style="width:100%; max-width:450px; position:relative; background:#1c1a10; border-left: 5px solid #ffeb3b;">
+            <button type="button" class="btn-icon" style="position:absolute; top:15px; right:15px; color:#aaa; font-size:1.5rem;" onclick="closeSettings()">✖</button>
+            <h3 style="color:#ffeb3b; margin:0 0 20px 0; text-align:center; font-size:1.3rem;">⚙️ 系統參數設定</h3>
+            
+            <div class="input-group">
+                <label>總資金額度 (萬)</label>
+                <div class="stepper-wrapper">
+                    <button type="button" class="stepper-btn" tabindex="-1" onclick="stepPrice('quota-total',-1)">-</button>
+                    <input type="number" inputmode="numeric" pattern="[0-9]*" id="quota-total" value="50" oninput="updateGlobalQuota()">
+                    <button type="button" class="stepper-btn" tabindex="-1" onclick="stepPrice('quota-total',1)">+</button>
+                </div>
+            </div>
+            
+            <div class="input-group" style="margin-top:15px;">
+                <label>券商手續費 (折)</label>
+                <div class="stepper-wrapper">
+                    <button type="button" class="stepper-btn" tabindex="-1" onclick="stepPrice('quota-discount',-1)">-</button>
+                    <input type="number" inputmode="decimal" id="quota-discount" value="2.7" step="0.1" oninput="updateGlobalQuota()">
+                    <button type="button" class="stepper-btn" tabindex="-1" onclick="stepPrice('quota-discount',1)">+</button>
+                </div>
+            </div>
+
+            <div class="input-group" style="margin-top:15px;">
+                <label>最低盈虧比要求 (R/R)</label>
+                <div class="stepper-wrapper">
+                    <button type="button" class="stepper-btn" tabindex="-1" onclick="stepPrice('quota-rr',-1)">-</button>
+                    <input type="number" inputmode="decimal" id="quota-rr" value="1.5" step="0.1" oninput="updateGlobalQuota()">
+                    <button type="button" class="stepper-btn" tabindex="-1" onclick="stepPrice('quota-rr',1)">+</button>
+                </div>
+            </div>
+
+            <button type="button" id="quota-lock-btn" class="btn" style="background:#444; margin-top:20px; padding:15px; font-size:1.1rem;" onclick="toggleQuotaLock()">🔓 點擊鎖定參數</button>
+            
+            <div style="margin-top:30px; border-top:1px dashed #555; padding-top:20px; text-align:center;">
+                <h3 style="color:#ff4d4d; margin:0 0 10px 0;">🔥 每日資料重置</h3>
+                <div id="burn-status-msg" style="font-size:0.75rem; color:#aaa; margin-bottom:10px;">(安全鎖：每日 18:00 至 08:30 開放)</div>
+                <button type="button" id="burn-btn" class="btn" style="background-color:#444; color:#888; font-weight:900;" onclick="attemptClearAll()">🔒 非開放時間保險鎖定中</button>
+            </div>
+        </div>
+    </div>
+
     <div class="top-nav">
         <div id="tab-0" class="nav-tab active" onclick="scrollToPage(0)">📋 標的</div>
         <div id="tab-1" class="nav-tab" onclick="scrollToPage(1)">🔴 做多</div>
         <div id="tab-2" class="nav-tab" onclick="scrollToPage(2)">🟢 做空</div>
         <div id="tab-3" class="nav-tab" onclick="scrollToPage(3)">📊 圖鑑</div>
-        <div class="nav-icon" onclick="logoutRoom()" title="登出連線">🔒</div>
+        <div class="nav-icon" onclick="openSettings()" title="系統設定">⚙️</div>
+        <div class="nav-icon" onclick="logoutRoom()" title="登出連線" style="border-left:none;">🔒</div>
     </div>
 
     <div class="swipe-container" id="slider" onscroll="updateTabs()">
@@ -326,7 +367,7 @@
                 </div>
                 
                 <div class="wl-section s-ex">
-                    <div style="color:#ff9800; font-size:0.85rem; font-weight:bold; margin-bottom:5px;">⚠️ 轉折反向打擊區 (左大右小)</div>
+                    <div style="color:#ff9800; font-size:0.85rem; font-weight:bold; margin-bottom:5px;">⚠️ 轉折規劃 (左大右小)</div>
                     <div class="ex-grid">
                         <div><div class="target-label">極高點(空)</div><div class="stepper-wrapper"><button type="button" class="stepper-btn" tabindex="-1" onclick="stepPrice('hb',-1)">-</button><input type="number" inputmode="decimal" id="hb" tabindex="15" oninput="markLocalEdit()"><button type="button" class="stepper-btn" tabindex="-1" onclick="stepPrice('hb',1)">+</button></div></div>
                         <div><div class="target-label">次高點(目標)</div><div class="stepper-wrapper"><button type="button" class="stepper-btn" tabindex="-1" onclick="stepPrice('ht1',-1)">-</button><input type="number" inputmode="decimal" id="ht1" tabindex="16" oninput="markLocalEdit()"><button type="button" class="stepper-btn" tabindex="-1" onclick="stepPrice('ht1',1)">+</button></div></div>
@@ -340,42 +381,14 @@
             
             <div id="watchlist-container"></div>
 
-            <div class="logistics-header">⬇️ 系統後台設定 ⬇️</div>
+            <div class="logistics-header">⬇️ 系統狀態 ⬇️</div>
 
-            <div class="card quota">
-                <h3 style="color:#ffeb3b; margin:0 0 10px 0; text-align:center;">💰 資金與額度控管</h3>
-                <div style="display:flex; gap:8px; align-items:flex-end;">
-                    <div style="flex:2;">
-                        <label>總額度(萬)</label>
-                        <div class="stepper-wrapper">
-                            <button type="button" class="stepper-btn" tabindex="-1" onclick="stepPrice('quota-total',-1)">-</button>
-                            <input type="number" inputmode="numeric" pattern="[0-9]*" id="quota-total" value="50" oninput="updateGlobalQuota()">
-                            <button type="button" class="stepper-btn" tabindex="-1" onclick="stepPrice('quota-total',1)">+</button>
-                        </div>
-                    </div>
-                    <div style="flex:2;">
-                        <label>手續費(折)</label>
-                        <div class="stepper-wrapper">
-                            <button type="button" class="stepper-btn" tabindex="-1" onclick="stepPrice('quota-discount',-1)">-</button>
-                            <input type="number" inputmode="decimal" id="quota-discount" value="2.7" step="0.1" oninput="updateGlobalQuota()">
-                            <button type="button" class="stepper-btn" tabindex="-1" onclick="stepPrice('quota-discount',1)">+</button>
-                        </div>
-                    </div>
-                    <div style="flex:1;">
-                        <button type="button" id="quota-lock-btn" class="btn" style="background:#444; padding:0; height:36px; width:100%; display:flex; justify-content:center; align-items:center; font-size:1.2rem;" onclick="toggleQuotaLock()">🔓</button>
-                    </div>
-                </div>
-                <div class="quota-box" style="background:#1a1a1a; border:1px solid #ffeb3b; padding:10px; margin-top:10px; justify-content:center; gap:10px;">
-                    <span>🛡️ 當前連動剩餘:</span>
-                    <span class="quota-val highlight" id="quota-global-remain" style="font-size:1.1rem; color:#00e676;">-</span>
-                </div>
+            <div class="card info" style="border-left-color: #ffeb3b; display:flex; justify-content:space-between; align-items:center; max-width:1400px; margin-left:auto; margin-right:auto;">
+                <div style="font-weight:bold; color:#aaa;">🛡️ 剩餘可用額度</div>
+                <div id="quota-global-remain" style="font-size:1.2rem; font-weight:bold; color:#00e676;">-</div>
             </div>
-
-            <div class="card" style="border-left-color: #ff4d4d; background-color: #1a0000; margin-top:30px; text-align:center; max-width:1400px; margin-left:auto; margin-right:auto;">
-                <h3 style="color:#ff4d4d; margin:0 0 10px 0;">🔥 每日資料重置</h3>
-                <div id="burn-status-msg" style="font-size:0.75rem; color:#aaa; margin-bottom:10px;">(安全鎖：每日 18:00 至 08:30 開放重置)</div>
-                <button type="button" id="burn-btn" class="btn" style="background-color:#444; color:#888; font-weight:900;" onclick="attemptClearAll()">🔒 非開放時間保險鎖定中</button>
-            </div>
+            
+            <button type="button" class="btn" style="background:#333; color:#fff; border:1px dashed #666; margin-bottom:30px; max-width:1400px; display:block; margin-left:auto; margin-right:auto;" onclick="openSettings()">⚙️ 開啟系統進階設定 (額度/手續費/重置)</button>
             
             <div id="btt-btn" onclick="scrollToTop()">⬆️</div>
         </div>
@@ -683,7 +696,7 @@
 
         // --- 全局核心變數 ---
         let wl = []; 
-        let sysQuota = { total: 50, discount: 2.7, locked: false };
+        let sysQuota = { total: 50, discount: 2.7, minRR: 1.5, locked: false };
         let activeLongMissions = {}; 
         let activeShortMissions = {};
         let isPanelOpen = false; // 預設收起
@@ -715,7 +728,7 @@
         }
 
         function initFirebaseSync() {
-            showToast("🔗 連線至雲端機房...");
+            showToast("🔗 連線至雲端伺服器...");
             db.ref('rooms/' + syncRoom).on('value', (snapshot) => {
                 let data = snapshot.val();
                 if(data) {
@@ -730,6 +743,7 @@
                         if(data.quota) {
                             sysQuota.total = data.quota.total || 50;
                             sysQuota.discount = data.quota.discount || 2.7;
+                            sysQuota.minRR = data.quota.minRR || 1.5;
                             sysQuota.locked = data.quota.locked || false;
                         }
 
@@ -738,6 +752,7 @@
 
                         document.getElementById('quota-total').value = sysQuota.total;
                         document.getElementById('quota-discount').value = sysQuota.discount;
+                        document.getElementById('quota-rr').value = sysQuota.minRR;
                         applyQuotaLockState();
                         
                         renderWatchlist();
@@ -776,7 +791,15 @@
             else nameInput.value = '';
         }
 
-        // ================= 額度與折數系統 =================
+        // ================= 系統設定面板控制 =================
+        function openSettings() {
+            document.getElementById('settings-modal').style.display = 'flex';
+        }
+        function closeSettings() {
+            document.getElementById('settings-modal').style.display = 'none';
+        }
+
+        // ================= 額度與參數系統 =================
         function updateGlobalQuota(fromSync = false) {
             if(isUpdatingGlobalQuota) return;
             isUpdatingGlobalQuota = true;
@@ -785,6 +808,7 @@
 
             sysQuota.total = parseFloat(document.getElementById('quota-total').value) || 0;
             sysQuota.discount = parseFloat(document.getElementById('quota-discount').value) || 2.7;
+            sysQuota.minRR = parseFloat(document.getElementById('quota-rr').value) || 1.5;
             
             let activeUsed = 0;
             Object.values(activeLongMissions).forEach(m => activeUsed += (m.cost || 0));
@@ -814,36 +838,43 @@
         function applyQuotaLockState() {
             let totalInput = document.getElementById('quota-total');
             let discInput = document.getElementById('quota-discount');
+            let rrInput = document.getElementById('quota-rr');
             let btn = document.getElementById('quota-lock-btn');
             
             if (sysQuota.locked) {
-                totalInput.disabled = true; discInput.disabled = true;
+                totalInput.disabled = true; discInput.disabled = true; rrInput.disabled = true;
                 totalInput.parentElement.querySelectorAll('button').forEach(b => b.disabled = true);
                 discInput.parentElement.querySelectorAll('button').forEach(b => b.disabled = true);
-                btn.innerText = "🔒";
+                rrInput.parentElement.querySelectorAll('button').forEach(b => b.disabled = true);
+                btn.innerText = "🔒 點擊解鎖參數";
                 btn.style.backgroundColor = "#ff9800";
             } else {
-                totalInput.disabled = false; discInput.disabled = false;
+                totalInput.disabled = false; discInput.disabled = false; rrInput.disabled = false;
                 totalInput.parentElement.querySelectorAll('button').forEach(b => b.disabled = false);
                 discInput.parentElement.querySelectorAll('button').forEach(b => b.disabled = false);
-                btn.innerText = "🔓";
+                rrInput.parentElement.querySelectorAll('button').forEach(b => b.disabled = false);
+                btn.innerText = "🔓 點擊鎖定參數";
                 btn.style.backgroundColor = "#444";
             }
         }
 
         function toggleInputPanel() { isPanelOpen = !isPanelOpen; let p = document.getElementById('input-panel'); let n = document.getElementById('quick-nav'); let b = document.getElementById('toggle-btn'); if(isPanelOpen) { p.style.display = 'block'; n.style.display = 'none'; b.innerHTML = '🔽 收起標的設定面板'; } else { p.style.display = 'none'; n.style.display = wl.length > 0 ? 'flex' : 'none'; b.innerHTML = '▶️ 展開標的設定面板'; } }
         
-        // 💡 關鍵修復：手機跳轉精準 Y 軸滾動
+        // 💡 手機精準 Y 軸滾動 (修復水平滑動干擾)
         function jumpToStockHome(id) { 
             let t = document.getElementById(id); 
             let page = document.getElementById('page-0');
-            if(t && page) { page.scrollTo({top: t.offsetTop - 70, behavior: 'smooth'}); } 
+            if(t && page) { 
+                let targetY = t.offsetTop - 60;
+                page.scrollTo({top: targetY, behavior: 'smooth'}); 
+            } 
         }
         function jumpToMission(mode, mId) { 
             let c = document.getElementById(`m-card-${mode}-${mId}`); 
             let page = document.getElementById(mode === 'long' ? 'page-1' : 'page-2');
             if(c && page) { 
-                page.scrollTo({top: c.offsetTop - 70, behavior: 'smooth'}); 
+                let targetY = c.offsetTop - 60;
+                page.scrollTo({top: targetY, behavior: 'smooth'}); 
                 // 觸發該卡片的發光特效
                 document.querySelectorAll('.mission-card.active-glow').forEach(el => el.classList.remove('active-glow'));
                 c.classList.add('active-glow');
@@ -869,11 +900,13 @@
             if (!id.startsWith('vol') && !id.startsWith('quota')) step = (dir === 1) ? getTickUp(p) : getTickDown(p);
             if (id === 'quota-total') step = 10; 
             if (id === 'quota-discount') step = 0.1;
+            if (id === 'quota-rr') step = 0.1;
 
             let newP = p + (dir * step); 
             if(id.startsWith('vol') && newP < 1) newP = 1; 
             if(id === 'quota-total' && newP < 0) newP = 0; 
             if(id === 'quota-discount' && newP <= 0) newP = 0.1;
+            if(id === 'quota-rr' && newP <= 0) newP = 0.1;
 
             el.value = Math.round(newP * 100) / 100; el.dispatchEvent(new Event('input'));
         }
@@ -981,8 +1014,8 @@
             let shorts = [document.getElementById('sb').value, document.getElementById('st1').value, document.getElementById('st2').value, document.getElementById('st3').value, document.getElementById('st4').value, st5Val];
             let hb = document.getElementById('hb').value; let ht1 = document.getElementById('ht1').value; let lowt1 = document.getElementById('lowt1').value; let lowb = document.getElementById('lowb').value;
             
-            if (!checkAscending(longs)) return alert("❌ 【規劃邏輯錯誤】\n做多點位數值必須由小到大排列！");
-            if (!checkDescending(shorts)) return alert("❌ 【規劃邏輯錯誤】\n做空點位數值必須由大到小排列！");
+            if (!checkAscending(longs)) return alert("❌ 【多軍點位邏輯錯誤】\n數字必須由小到大排列！");
+            if (!checkDescending(shorts)) return alert("❌ 【空軍點位邏輯錯誤】\n數字必須由大到小排列！");
             if (hb !== '' && ht1 !== '' && Number(hb) <= Number(ht1)) return alert("❌ 【高空反轉錯誤】\n左邊(極高點)必須大於右邊(次高點)！");
             if (lowt1 !== '' && lowb !== '' && Number(lowt1) <= Number(lowb)) return alert("❌ 【低多反轉錯誤】\n左邊(次低點)必須大於右邊(極低點)！");
 
@@ -992,8 +1025,21 @@
             document.getElementById('lt5-check').checked = false;
             document.getElementById('st5-check').checked = false;
             
+            // 新增標的後自動收合面板，並平滑滾動到最下方
+            isPanelOpen = false;
+            document.getElementById('input-panel').style.display = 'none';
+            document.getElementById('quick-nav').style.display = 'flex';
+            document.getElementById('toggle-btn').innerHTML = '▶️ 展開標的設定面板';
+            
             renderWatchlist();
-            triggerSync(); showToast("✅ 儲存並同步至雲端");
+            triggerSync(); 
+            showToast("✅ 儲存並同步至雲端");
+            
+            // 自動跳轉到剛剛新增的標的
+            setTimeout(() => {
+                let newStockId = `stock-card-${wl.length - 1}`;
+                jumpToStockHome(newStockId);
+            }, 100);
         }
 
         function editWatchlist(index) {
@@ -1022,6 +1068,7 @@
             pool[mId] = { id: mId, name: name, code: code, base: base||'', target: target||'', yc: yc||'', entry:'', exit:'', vol:'1', locked: false };
             renderMissions(type);
             triggerSync(); showToast(`✅ 已加入監控交易卡`); scrollToPage(type === 'long' ? 1 : 2);
+            setTimeout(() => { jumpToMission(type, mId); }, 100);
         }
 
         function removeMission(mode, mId) { 
@@ -1143,7 +1190,6 @@
             nav.innerHTML = navHtml;
             container.innerHTML = htmlStr;
             
-            // 💡 等待 DOM 生成後進行計算
             mIds.forEach(mId => {
                 setTimeout(() => calcMission(mode, mId), 10);
             });
@@ -1169,6 +1215,7 @@
             let base = parseFloat(m.base); let target = parseFloat(m.target); let entryStr = m.entry; let entry = parseFloat(m.entry); let exit = parseFloat(m.exit); let lots = parseInt(m.vol)||1; let yc = parseFloat(m.yc);
             let stopLoss = 0; let finalEntryBound = 0; let limitWarn = false; let sigBox = document.getElementById(`sig-${mode}-${mId}`);
             let upLimitNum = yc ? parseFloat(calcUp(yc)) : 0;
+            let currentMinRR = sysQuota.minRR || 1.5; // 💡 動態讀取自訂盈虧比
 
             if (base && target && yc) { if (isLong && target > parseFloat(calcUp(yc))+0.001) { limitWarn=true; sigBox.className="signal warn"; sigBox.innerText="⚠️ 目標大於漲停價"; } if (!isLong && target < parseFloat(calcDown(yc))-0.001) { limitWarn=true; sigBox.className="signal warn"; sigBox.innerText="⚠️ 目標小於跌停價"; } }
             
@@ -1176,7 +1223,10 @@
                 stopLoss = Math.round((isLong ? base - getTickDown(base) : base + getTickUp(base)) * 100) / 100;
                 document.getElementById(`stop-${mode}-${mId}`).innerText = stopLoss.toFixed(2);
                 let absEntry = isLong ? (base + getMaxTicks(base)*getTickUp(base)) : (base - getMaxTicks(base)*getTickDown(base));
-                let rrEntry = (target + 1.5 * stopLoss) / 2.5;
+                
+                // 💡 動態盈虧比算式：進場價 = (目標價 + 盈虧比 * 停損價) / (盈虧比 + 1)
+                let rrEntry = (target + currentMinRR * stopLoss) / (currentMinRR + 1);
+                
                 if(isLong) { finalEntryBound = Math.floor((Math.min(absEntry, rrEntry) + 0.0001)/getTickUp(base))*getTickUp(base); document.getElementById(`kz-${mode}-${mId}`).innerText = finalEntryBound < base ? "風險過高" : `${base} ~ ${finalEntryBound.toFixed(2)}`; } 
                 else { finalEntryBound = Math.ceil((Math.max(absEntry, rrEntry) - 0.0001)/getTickDown(base))*getTickDown(base); document.getElementById(`kz-${mode}-${mId}`).innerText = finalEntryBound > base ? "風險過高" : `${finalEntryBound.toFixed(2)} ~ ${base}`; }
             } else { document.getElementById(`kz-${mode}-${mId}`).innerText = "-"; document.getElementById(`stop-${mode}-${mId}`).innerText = "-"; }
@@ -1238,7 +1288,6 @@
                 document.getElementById(`rr-${mode}-${mId}`).innerText = rr.toFixed(2);
                 
                 let slData = calcPnL(entry, stopLoss, lots, isLong);
-                // 停損維持最嚴格的「全額交割」
                 document.getElementById(`loss-${mode}-${mId}`).innerHTML = `<span class="shocking-loss">NT$ ${Math.round(slData.full).toLocaleString()}</span>`;
                 
                 if(!limitWarn) {
@@ -1246,13 +1295,13 @@
                     if (currentGlobalRemain < 0) { sigBox.className = "signal stop"; sigBox.innerText = "❌ 額度不足！違約交割警告！"; } 
                     else if (isLong) {
                         if (entry < base) sigBox.className="signal stop", sigBox.innerText="❌ 逆勢多 (進場須大於等於基準)";
-                        else if (entry > finalEntryBound && rr >= 1.5) sigBox.className="signal stop", sigBox.innerText="❌ 風險過高 (虧損大於系統容許)";
-                        else if (entry > finalEntryBound && rr < 1.5) sigBox.className="signal stop", sigBox.innerText="❌ 追高警告 (盈虧比低於 1.5)";
+                        else if (entry > finalEntryBound && rr >= currentMinRR) sigBox.className="signal stop", sigBox.innerText="❌ 風險過高 (虧損大於系統容許)";
+                        else if (entry > finalEntryBound && rr < currentMinRR) sigBox.className="signal stop", sigBox.innerText=`❌ 追高警告 (盈虧比低於 ${currentMinRR})`;
                         else sigBox.className="signal go", sigBox.innerText="✅ 符合邏輯，准許進場";
                     } else {
                         if (entry > base) sigBox.className="signal stop", sigBox.innerText="❌ 逆勢空 (進場須小於等於基準)";
-                        else if (entry < finalEntryBound && rr >= 1.5) sigBox.className="signal stop", sigBox.innerText="❌ 風險過高 (虧損大於系統容許)";
-                        else if (entry < finalEntryBound && rr < 1.5) sigBox.className="signal stop", sigBox.innerText="❌ 殺低警告 (盈虧比低於 1.5)";
+                        else if (entry < finalEntryBound && rr >= currentMinRR) sigBox.className="signal stop", sigBox.innerText="❌ 風險過高 (虧損大於系統容許)";
+                        else if (entry < finalEntryBound && rr < currentMinRR) sigBox.className="signal stop", sigBox.innerText=`❌ 殺低警告 (盈虧比低於 ${currentMinRR})`;
                         else sigBox.className="signal go", sigBox.innerText="✅ 符合邏輯，准許進場";
                     }
                 }
@@ -1302,6 +1351,7 @@
                 wl = []; activeLongMissions = {}; activeShortMissions = {}; 
                 renderWatchlist(); renderMissions('long'); renderMissions('short'); updateGlobalQuota();
                 triggerSync(); showToast("🗑️ 系統已全數重置"); 
+                closeSettings();
             }
         }
     </script>
