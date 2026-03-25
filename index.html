@@ -5,11 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>V14.6 戰區總司令 (護盾貫通完美版)</title>
+    <title>V14.6 戰區總司令 (精準跳轉版)</title>
     
     <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-database-compat.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
 
     <style>
         /* 基礎設定 */
@@ -23,7 +24,7 @@
         /* 頂部導航列 */
         .top-nav { 
             position: fixed; top: 0; left: 0; width: 100%; height: 50px; 
-            background-color: #1a1a1a; display: flex; z-index: 999; 
+            background-color: #1a1a1a; display: flex; z-index: 9999; 
             box-shadow: 0 4px 10px rgba(0,0,0,0.8); border-bottom: 1px solid #333;
             justify-content: center; 
         }
@@ -131,7 +132,7 @@
         .wl-section.s-short { border-left-color: #00e676; }
         .wl-section.s-ex { border-left-color: #ff9800; }
         
-        /* 防右溢出網格 */
+        /* 防右溢出網格 (手機) */
         .target-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; margin-top: 5px; }
         .ex-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; margin-top: 5px; }
         .target-label { font-size: 0.75rem; color: #aaa; text-align: center; margin-bottom: 2px;}
@@ -143,14 +144,18 @@
         .toggle-panel-btn { background-color: #333; color: #00ffcc; border: 1px dashed #00ffcc; margin-bottom: 10px; font-size: 0.9rem;}
         
         .quick-nav-container { display: none; flex-wrap: wrap; gap: 8px; padding: 5px 0 10px 0; border-bottom: 1px solid #333; margin-bottom: 15px;}
-        .combat-nav { position: sticky; top: 0; background: #121212; z-index: 100; display: flex; flex-wrap: wrap; gap: 6px; padding: 10px 0; border-bottom: 1px dashed #444; margin-bottom: 15px;}
+        .combat-nav { position: sticky; top: -15px; padding-top: 15px; padding-bottom: 10px; margin-top: -15px; background: rgba(18,18,18,0.95); backdrop-filter: blur(5px); z-index: 100; display: flex; flex-wrap: wrap; gap: 6px; border-bottom: 1px dashed #444; margin-bottom: 15px; }
         .chip { padding: 6px 14px; background-color: #444; color: #fff; border-radius: 20px; font-size: 0.85rem; font-weight: bold; border: 1px solid #666; cursor: pointer; transition: 0.2s;}
         .chip.l { border-color: #ff4d4d; color: #ff4d4d; background: transparent;}
         .chip.s { border-color: #00e676; color: #00e676; background: transparent;}
+        .chip.locked { opacity: 0.6; border-style: dashed; }
 
         .card-compact { background-color: #1e1e1e; border-radius: 8px; padding: 10px; margin-bottom: 12px; border-left: 4px solid #444; box-shadow: 0 2px 4px rgba(0,0,0,0.4); }
         .card-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #333; padding-bottom: 5px; margin-bottom: 5px; }
         .card-header h3 { margin: 0; font-size: 1.05rem; color: #fff; }
+        .drag-handle { color: #888; font-size: 1.5rem; padding-right: 10px; cursor: grab; display: flex; align-items: center; }
+        .drag-handle:active { cursor: grabbing; color: #00ffcc; }
+        
         .btn-icon { background: transparent; border: none; font-size: 1.2rem; padding: 0; margin: 0 0 0 8px; cursor: pointer; opacity: 0.8; transition: 0.2s; display: flex; align-items: center; justify-content: center;}
         .btn-icon:disabled { opacity: 0.2; cursor: not-allowed; }
         .limits-bar { display:flex; justify-content:space-between; font-size: 0.75rem; background: #222; padding: 4px 8px; border-radius: 4px; margin-bottom: 10px;}
@@ -250,10 +255,10 @@
         
         <div class="page" id="page-0" onscroll="checkScroll()">
             
-            <button type="button" class="btn toggle-panel-btn" id="toggle-btn" onclick="toggleInputPanel()">🔽 收起戰前佈署面板</button>
+            <button type="button" class="btn toggle-panel-btn" id="toggle-btn" onclick="toggleInputPanel()">▶️ 展開戰前佈署面板</button>
             <div id="quick-nav" class="quick-nav-container"></div>
 
-            <form id="input-panel" class="card info" onsubmit="return false;">
+            <form id="input-panel" class="card info" onsubmit="return false;" style="display:none;">
                 <h3 style="color:#00ffcc; margin-top:0; text-align:center;">➕ 手動戰前佈署</h3>
                 
                 <div class="wl-title-bar">
@@ -334,8 +339,8 @@
 
             <div class="card" style="border-left-color: #ff4d4d; background-color: #1a0000; margin-top:30px; text-align:center; max-width:1400px; margin-left:auto; margin-right:auto;">
                 <h3 style="color:#ff4d4d; margin:0 0 10px 0;">🔥 戰後焦土作業</h3>
-                <div id="burn-status-msg" style="font-size:0.75rem; color:#aaa; margin-bottom:10px;">(系統安全鎖：每日 18:00 後方可解除保險)</div>
-                <button type="button" id="burn-btn" class="btn" style="background-color:#444; color:#888; font-weight:900;" onclick="attemptClearAll()">🔒 未達 18:00 保險鎖定中</button>
+                <div id="burn-status-msg" style="font-size:0.75rem; color:#aaa; margin-bottom:10px;">(系統安全鎖：每日 18:00 至 08:30 解除保險)</div>
+                <button type="button" id="burn-btn" class="btn" style="background-color:#444; color:#888; font-weight:900;" onclick="attemptClearAll()">🔒 非開放時間保險鎖定中</button>
             </div>
             
             <div id="btt-btn" onclick="scrollToTop()">⬆️</div>
@@ -630,10 +635,10 @@
         let sysQuota = { total: 50, discount: 2.7, locked: false };
         let activeLongMissions = {}; 
         let activeShortMissions = {};
-        let isPanelOpen = true;
+        let isPanelOpen = false; // 預設收起
         let isUpdatingGlobalQuota = false; // 運算迴圈防護鎖
         let isLocallyEditing = false; // 🛡️ 本地護盾狀態
-        let editReleaseTimer = null;  // 🛡️ 護盾計時器
+        let editReleaseTimer = null; // 🛡️ 護盾計時器
 
         window.onload = function() {
             if(syncRoom) { document.getElementById('auth-modal').style.display = 'none'; initFirebaseSync(); }
@@ -650,7 +655,7 @@
         window.clearRoom = function() { document.getElementById('room-pwd').value = ''; localStorage.removeItem('v144_sync_room'); alert("本機記憶已清除"); };
         window.logoutRoom = function() { if(confirm("確定要登出當前密碼鎖？\n這將解除連動並返回登入畫面。")) { localStorage.removeItem('v144_sync_room'); location.reload(); } };
 
-        // 🛡️ 本地護盾機制：在操作時阻擋雲端覆蓋 (2.5秒無敵時間，確保鍵盤不跳掉)
+        // 🛡️ 本地護盾機制：在操作時阻擋雲端覆蓋 (2.5秒無敵時間)
         function markLocalEdit() {
             isLocallyEditing = true;
             clearTimeout(editReleaseTimer);
@@ -716,7 +721,7 @@
         function updateTabs() { let idx = Math.round(slider.scrollLeft / slider.clientWidth); tabs.forEach((t, i) => { if(i===idx) t.classList.add('active'); else t.classList.remove('active'); }); }
         
         function autoFillName() { 
-            markLocalEdit(); 
+            markLocalEdit(); // 打字時開啟護盾
             let code = document.getElementById('wl-code').value.toUpperCase(); 
             let nameInput = document.getElementById('wl-name');
             if(customDict[code]) nameInput.value = customDict[code];
@@ -779,8 +784,8 @@
             }
         }
 
-        function toggleInputPanel() { isPanelOpen = !isPanelOpen; let p = document.getElementById('input-panel'); let n = document.getElementById('quick-nav'); let b = document.getElementById('toggle-btn'); if(isPanelOpen) { p.style.display = 'block'; n.style.display = 'none'; b.innerHTML = '🔽 收起戰前佈署面板'; } else { p.style.display = 'none'; n.style.display = 'flex'; b.innerHTML = '▶️ 展開戰前佈署面板'; } }
-        function jumpToStockHome(id) { let t = document.getElementById(id); if(t) { document.getElementById('page-0').scrollTo({top: t.offsetTop - 60, behavior: 'smooth'}); } }
+        function toggleInputPanel() { isPanelOpen = !isPanelOpen; let p = document.getElementById('input-panel'); let n = document.getElementById('quick-nav'); let b = document.getElementById('toggle-btn'); if(isPanelOpen) { p.style.display = 'block'; n.style.display = 'none'; b.innerHTML = '🔽 收起戰前佈署面板'; } else { p.style.display = 'none'; n.style.display = wl.length > 0 ? 'flex' : 'none'; b.innerHTML = '▶️ 展開戰前佈署面板'; } }
+        function jumpToStockHome(id) { let t = document.getElementById(id); if(t) { t.scrollIntoView({ behavior: 'smooth', block: 'start' }); } }
         function checkScroll() { document.getElementById('btt-btn').style.display = (document.getElementById('page-0').scrollTop > 300) ? 'flex' : 'none'; }
         function scrollToTop() { document.getElementById('page-0').scrollTo({top: 0, behavior: 'smooth'}); }
         function showToast(msg) { let t = document.getElementById('toast'); t.innerText = msg; t.style.display = 'block'; setTimeout(() => { t.style.display = 'none'; }, 1500); }
@@ -794,7 +799,7 @@
         
         function stepPrice(id, dir) {
             let el = document.getElementById(id); if(!el || el.disabled) return; 
-            markLocalEdit(); 
+            markLocalEdit(); // 按下按鈕立刻開啟防護盾
             let p = parseFloat(el.value); if(isNaN(p)) return;
             let step = 1; 
             if (!id.startsWith('vol') && !id.startsWith('quota')) step = (dir === 1) ? getTickUp(p) : getTickDown(p);
@@ -835,11 +840,12 @@
                 
                 let html = `<div class="card-compact" id="${stockId}">
                                 <div class="card-header">
-                                    <h3>📌 ${dName} (${dCode})</h3>
+                                    <div style="display:flex; align-items:center;">
+                                        <span class="drag-handle" title="按住拖曳">☰</span>
+                                        <h3 style="margin:0;">📌 ${dName} (${dCode})</h3>
+                                    </div>
                                     <div style="display:flex; gap:4px;">
-                                        <button type="button" class="btn-icon" style="color:#aaa; font-size:1.1rem;" onclick="moveWlItem(${index}, -1)" ${index === 0 ? 'disabled' : ''}>⬆️</button>
-                                        <button type="button" class="btn-icon" style="color:#aaa; font-size:1.1rem;" onclick="moveWlItem(${index}, 1)" ${index === wl.length - 1 ? 'disabled' : ''}>⬇️</button>
-                                        <button type="button" class="btn-icon" style="color:#00ffcc; font-size:1.1rem; margin-left:6px;" onclick="editWatchlist(${index})" title="編輯">✏️</button>
+                                        <button type="button" class="btn-icon" style="color:#00ffcc; font-size:1.1rem;" onclick="editWatchlist(${index})" title="編輯">✏️</button>
                                         <button type="button" class="btn-icon" style="color:#ff4d4d; font-size:1.1rem;" onclick="delWatchlist(${index})" title="刪除">🗑️</button>
                                     </div>
                                 </div>`;
@@ -876,7 +882,23 @@
                 if(item.lowb) exBtns.push(`<button type="button" class="btn-mini ex-l" onclick="loadToMission('long','${dName}','${dCode}',${item.lowb},'${item.lowt1 || getClosestUp(item.lowb, item)}','${ycStr}')">⚡${item.lowb}</button>`);
                 if(exBtns.length > 0) html += `<div class="row-group"><div class="row-label ex">⚡反轉</div><div class="btn-grid">${exBtns.join('')}</div></div>`;
                 container.innerHTML += html + `</div>`;
-            }); updateGlobalQuota(); 
+            }); 
+
+            // 啟用拖曳排序
+            if(window.wlSortable) { window.wlSortable.destroy(); }
+            window.wlSortable = new Sortable(container, {
+                handle: '.drag-handle',
+                animation: 150,
+                onEnd: function(evt) {
+                    markLocalEdit();
+                    let movedItem = wl.splice(evt.oldIndex, 1)[0];
+                    wl.splice(evt.newIndex, 0, movedItem);
+                    triggerSync();
+                    renderWatchlist();
+                }
+            });
+
+            updateGlobalQuota(); 
         }
 
         function addWatchlist() {
@@ -938,6 +960,7 @@
             pool[mId] = { id: mId, name: name, code: code, base: base||'', target: target||'', yc: yc||'', entry:'', exit:'', vol:'1', locked: false };
             renderMissions(type);
             triggerSync(); showToast(`✅ 佈署至雲端陣地`); scrollToPage(type === 'long' ? 1 : 2);
+            setTimeout(() => { let c = document.getElementById(`m-card-${type}-${mId}`); let p = document.getElementById(type==='long'?'page-1':'page-2'); if(c) p.scrollTo({top: c.offsetTop - 70, behavior: 'smooth'}); }, 100);
         }
 
         function removeMission(mode, mId) { 
@@ -1060,7 +1083,7 @@
             nav.innerHTML = navHtml;
             container.innerHTML = htmlStr;
             
-            // 💡 關鍵修復：必須給瀏覽器 10 毫秒的時間把 DOM 畫到畫面上，再去抓取數值！
+            // 💡 關鍵修復：給瀏覽器 10 毫秒畫好 DOM 後再進行計算
             mIds.forEach(mId => {
                 setTimeout(() => calcMission(mode, mId), 10);
             });
@@ -1074,7 +1097,7 @@
             if (!m) return;
             
             let baseEl = document.getElementById(`base-${mode}-${mId}`);
-            if (!baseEl) return; // 🛡️ 如果 DOM 還沒掛好，這裡就會被 return 掉，所以上面加了 setTimeout！
+            if (!baseEl) return; // 🛡️ 防呆：若 DOM 還沒生成直接跳過
             
             if (!m.locked) {
                 m.base = baseEl.value;
@@ -1122,7 +1145,7 @@
                 let ticksArr = getExitTicksArray(entry, stopLoss, base, target, isLong, yc); let stripHtml = '';
                 ticksArr.forEach(price => {
                     let pData = calcPnL(entry, price, lots, isLong); 
-                    let pDisc = Math.round(pData.disc); 
+                    let pDisc = Math.round(pData.disc); // 💡 出場預覽抓取折扣後損益
                     let pClass = pDisc >= 0 ? 'profit' : 'loss'; let sign = pDisc > 0 ? '+' : '';
                     let label = price === stopLoss ? '🛑停損 ' : (price === target ? '🎯目標 ' : (price === base ? '🛡️基準 ' : ''));
                     stripHtml += `<div class="btn-quick ${pClass}" onclick="setExitAndCalc('${mode}', '${mId}', ${price})"><span class="price">${label}${price}</span><span class="pnl">${sign}${pDisc.toLocaleString()}</span></div>`;
@@ -1156,6 +1179,7 @@
                 document.getElementById(`rr-${mode}-${mId}`).innerText = rr.toFixed(2);
                 
                 let slData = calcPnL(entry, stopLoss, lots, isLong);
+                // 💡 停損維持最嚴格的「全額交割 (Full)」，不打折！
                 document.getElementById(`loss-${mode}-${mId}`).innerHTML = `<span class="shocking-loss">NT$ ${Math.round(slData.full).toLocaleString()}</span>`;
                 
                 if(!limitWarn) {
@@ -1188,10 +1212,15 @@
 
         // --- 戰後焦土作業與時間檢查 ---
         function checkBurnTime() {
-            let hour = new Date().getHours();
+            let now = new Date();
+            let hour = now.getHours();
+            let min = now.getMinutes();
+            // 開放時間：大於等於18點，或小於8點，或剛好8點但小於30分
+            let isBurnTime = (hour >= 18) || (hour < 8) || (hour === 8 && min < 30);
+
             let btn = document.getElementById('burn-btn');
-            if(hour < 18) {
-                btn.innerHTML = "🔒 未達 18:00 保險鎖定中";
+            if(!isBurnTime) {
+                btn.innerHTML = "🔒 18:00 ~ 08:30 開放焦土作業";
                 btn.style.color = "#888"; btn.style.backgroundColor = "#444";
                 btn.disabled = true;
             } else {
@@ -1202,7 +1231,13 @@
         }
 
         function attemptClearAll() {
-            if (new Date().getHours() < 18) return alert("❌ 【權限拒絕】\n焦土作業僅限每日 18:00 後執行！");
+            let now = new Date();
+            let hour = now.getHours();
+            let min = now.getMinutes();
+            let isBurnTime = (hour >= 18) || (hour < 8) || (hour === 8 && min < 30);
+
+            if (!isBurnTime) return alert("❌ 【權限拒絕】\n焦土作業僅限每日 18:00 至隔日 08:30 執行！");
+            
             if (confirm("⚠️ 警告：這將徹底清空今日的「戰備清單」與「所有鎖定的陣地」。\n請問是否確定執行焦土作業？")) { 
                 markLocalEdit();
                 wl = []; activeLongMissions = {}; activeShortMissions = {}; 
