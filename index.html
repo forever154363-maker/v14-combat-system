@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>量化交易與資金控管系統 V14.8</title>
+    <title>量化交易與資金控管系統 V14.10</title>
     
     <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-database-compat.js"></script>
@@ -24,7 +24,7 @@
         /* 頂部導航列 */
         .top-nav { 
             position: fixed; top: 0; left: 0; width: 100%; height: 50px; 
-            background-color: #1a1a1a; display: flex; z-index: 9990; 
+            background-color: #1a1a1a; display: flex; z-index: 9999; 
             box-shadow: 0 4px 10px rgba(0,0,0,0.8); border-bottom: 1px solid #333;
             justify-content: center; 
         }
@@ -194,6 +194,8 @@
         
         .mission-card.mode-long { border-left-color: #ff4d4d; }
         .mission-card.mode-short { border-left-color: #00e676; }
+        
+        /* 鎖定狀態的視覺削弱 */
         .mission-card.locked { opacity: 0.75; border-left-color: #888 !important; filter: grayscale(30%); box-shadow: none; }
         
         /* 🌟 整張卡片發光效果 (由 JS 的 active-glow 觸發) */
@@ -214,7 +216,7 @@
         }
 
         .m-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px dashed #444; padding-bottom: 8px; margin-bottom: 10px;}
-        .m-header h3 { margin: 0; font-size: 1.1rem; }
+        .m-header h3 { margin: 0; font-size: 1.1rem; transition: 0.3s; }
         .m-header.mode-long h3 { color: #ff4d4d; }
         .m-header.mode-short h3 { color: #00e676; }
 
@@ -339,7 +341,12 @@
                 <div class="wl-title-bar">
                     <input type="tel" id="wl-code" placeholder="股號" oninput="autoFillName()" tabindex="1" style="width:30%;">
                     <input type="text" id="wl-name" placeholder="股名" tabindex="-1" style="width:35%;">
-                    <input type="number" inputmode="decimal" id="wl-yc" placeholder="昨收" tabindex="2" style="width:35%; color:#ffeb3b; border-color:#ffeb3b;" oninput="markLocalEdit()">
+                    <input type="number" inputmode="decimal" id="wl-yc" placeholder="昨收" tabindex="2" style="width:35%; color:#ffeb3b; border-color:#ffeb3b;" oninput="markLocalEdit(); updateYcLimits()">
+                </div>
+
+                <div style="display:flex; justify-content:flex-end; gap:15px; font-size:0.85rem; font-weight:bold; margin-top:-8px; margin-bottom:15px; padding-right:5px;">
+                    <span style="color:#ff4d4d;">🔴 漲停 <span id="preview-up">-</span></span>
+                    <span style="color:#00e676;">🟢 跌停 <span id="preview-down">-</span></span>
                 </div>
 
                 <div class="wl-section s-long">
@@ -383,12 +390,20 @@
 
             <div class="logistics-header">⬇️ 系統狀態 ⬇️</div>
 
+            <div class="card" style="border-left-color: #00ffcc; background-color: #1a1a1a; margin-bottom: 15px; max-width: 1400px; margin-left: auto; margin-right: auto;">
+                <h3 style="color:#00ffcc; margin:0 0 15px 0; text-align:center;">📊 今日戰績彙總</h3>
+                <div style="display:flex; justify-content:space-around; text-align:center; margin-bottom:15px;">
+                    <div><span style="font-size:0.8rem; color:#aaa;">已結算淨損益</span><br><span id="dash-pnl" style="font-size:1.4rem; font-weight:bold; color:#00e676;">0</span></div>
+                    <div><span style="font-size:0.8rem; color:#aaa;">勝率</span><br><span id="dash-winrate" style="font-size:1.4rem; font-weight:bold; color:#fff;">0%</span></div>
+                    <div><span style="font-size:0.8rem; color:#aaa;">賺 / 賠 (筆)</span><br><span id="dash-count" style="font-size:1.2rem; font-weight:bold; color:#fff;">0 / 0</span></div>
+                </div>
+                <button type="button" class="btn" style="background:#222; border:1px solid #00ffcc; color:#00ffcc; padding:10px; font-size:0.95rem;" onclick="exportCSV()">📥 下載今日戰績報表 (CSV)</button>
+            </div>
+
             <div class="card info" style="border-left-color: #ffeb3b; display:flex; justify-content:space-between; align-items:center; max-width:1400px; margin-left:auto; margin-right:auto;">
                 <div style="font-weight:bold; color:#aaa;">🛡️ 剩餘可用額度</div>
                 <div id="quota-global-remain" style="font-size:1.2rem; font-weight:bold; color:#00e676;">-</div>
             </div>
-            
-            <button type="button" class="btn" style="background:#333; color:#fff; border:1px dashed #666; margin-bottom:30px; max-width:1400px; display:block; margin-left:auto; margin-right:auto;" onclick="openSettings()">⚙️ 開啟系統進階設定 (額度/手續費/重置)</button>
             
             <div id="btt-btn" onclick="scrollToTop()">⬆️</div>
         </div>
@@ -655,7 +670,6 @@
                     });
                 }
             });
-            // 初始化安全鎖按鈕狀態
             checkBurnTime();
             setInterval(checkBurnTime, 60000); 
 
@@ -823,6 +837,8 @@
             Object.keys(activeLongMissions).forEach(mId => calcMission('long', mId, true));
             Object.keys(activeShortMissions).forEach(mId => calcMission('short', mId, true));
 
+            updateDashboard(); 
+
             if(!fromSync) triggerSync(); 
             isUpdatingGlobalQuota = false;
             return remain;
@@ -860,22 +876,22 @@
 
         function toggleInputPanel() { isPanelOpen = !isPanelOpen; let p = document.getElementById('input-panel'); let n = document.getElementById('quick-nav'); let b = document.getElementById('toggle-btn'); if(isPanelOpen) { p.style.display = 'block'; n.style.display = 'none'; b.innerHTML = '🔽 收起標的設定面板'; } else { p.style.display = 'none'; n.style.display = wl.length > 0 ? 'flex' : 'none'; b.innerHTML = '▶️ 展開標的設定面板'; } }
         
-        // 💡 手機精準 Y 軸滾動 (修復水平滑動干擾)
+        // 💡 新版精準錨點跳轉 (解決手機水平干擾問題)
         function jumpToStockHome(id) { 
             let t = document.getElementById(id); 
             let page = document.getElementById('page-0');
             if(t && page) { 
-                let targetY = t.offsetTop - 60;
-                page.scrollTo({top: targetY, behavior: 'smooth'}); 
+                // 只針對 Y 軸容器進行平滑滾動
+                page.scrollTo({top: t.offsetTop - 60, behavior: 'smooth'}); 
             } 
         }
         function jumpToMission(mode, mId) { 
             let c = document.getElementById(`m-card-${mode}-${mId}`); 
             let page = document.getElementById(mode === 'long' ? 'page-1' : 'page-2');
             if(c && page) { 
-                let targetY = c.offsetTop - 60;
-                page.scrollTo({top: targetY, behavior: 'smooth'}); 
-                // 觸發該卡片的發光特效
+                // 只針對 Y 軸容器進行平滑滾動
+                page.scrollTo({top: c.offsetTop - 60, behavior: 'smooth'}); 
+                // 觸發整張卡片發光特效
                 document.querySelectorAll('.mission-card.active-glow').forEach(el => el.classList.remove('active-glow'));
                 c.classList.add('active-glow');
             } 
@@ -885,13 +901,28 @@
         function scrollToTop() { document.getElementById('page-0').scrollTo({top: 0, behavior: 'smooth'}); }
         function showToast(msg) { let t = document.getElementById('toast'); t.innerText = msg; t.style.display = 'block'; setTimeout(() => { t.style.display = 'none'; }, 1500); }
 
-        // --- 點位運算數學 ---
+        // --- 點位測距與運算數學 ---
         function getTickUp(p) { if(p<10) return 0.01; if(p<50) return 0.05; if(p<100) return 0.1; if(p<500) return 0.5; if(p<1000) return 1; return 5; }
         function getTickDown(p) { if(p<=10) return 0.01; if(p<=50) return 0.05; if(p<=100) return 0.1; if(p<=500) return 0.5; if(p<=1000) return 1; return 5; }
         function getMaxTicks(price) { if(price<50) return 15; if(price<100) return 10; if(price<200) return 4; return 6; }
         function calcUp(yc) { if(!yc) return '-'; let t = yc * 1.1; let tk = getTickUp(t - 0.001); return (Math.round(t / tk) * tk).toFixed(2); }
         function calcDown(yc) { if(!yc) return '-'; let t = yc * 0.9; let tk = getTickDown(t + 0.001); return (Math.round(t / tk) * tk).toFixed(2); }
         
+        // 💡 新增：即時漲跌停顯示更新
+        function updateYcLimits() {
+            let yc = parseFloat(document.getElementById('wl-yc').value);
+            let upEl = document.getElementById('preview-up');
+            let downEl = document.getElementById('preview-down');
+            
+            if (!isNaN(yc) && yc > 0) {
+                upEl.innerText = calcUp(yc);
+                downEl.innerText = calcDown(yc);
+            } else {
+                upEl.innerText = '-';
+                downEl.innerText = '-';
+            }
+        }
+
         function stepPrice(id, dir) {
             let el = document.getElementById(id); if(!el || el.disabled) return; 
             markLocalEdit(); 
@@ -909,6 +940,7 @@
             if(id === 'quota-rr' && newP <= 0) newP = 0.1;
 
             el.value = Math.round(newP * 100) / 100; el.dispatchEvent(new Event('input'));
+            if(id === 'wl-yc') updateYcLimits(); // 同步更新測距儀
         }
 
         function getClosestDown(price, item) { let a = [item.lb, item.lt1, item.lt2, item.lt3, item.lt4, item.lt5, item.sb, item.st1, item.st2, item.st3, item.st4, item.st5].map(Number).filter(n => n && n < price); return a.length ? Math.max(...a) : ''; }
@@ -1014,8 +1046,8 @@
             let shorts = [document.getElementById('sb').value, document.getElementById('st1').value, document.getElementById('st2').value, document.getElementById('st3').value, document.getElementById('st4').value, st5Val];
             let hb = document.getElementById('hb').value; let ht1 = document.getElementById('ht1').value; let lowt1 = document.getElementById('lowt1').value; let lowb = document.getElementById('lowb').value;
             
-            if (!checkAscending(longs)) return alert("❌ 【多軍點位邏輯錯誤】\n數字必須由小到大排列！");
-            if (!checkDescending(shorts)) return alert("❌ 【空軍點位邏輯錯誤】\n數字必須由大到小排列！");
+            if (!checkAscending(longs)) return alert("❌ 【規劃邏輯錯誤】\n做多點位數值必須由小到大排列！");
+            if (!checkDescending(shorts)) return alert("❌ 【規劃邏輯錯誤】\n做空點位數值必須由大到小排列！");
             if (hb !== '' && ht1 !== '' && Number(hb) <= Number(ht1)) return alert("❌ 【高空反轉錯誤】\n左邊(極高點)必須大於右邊(次高點)！");
             if (lowt1 !== '' && lowb !== '' && Number(lowt1) <= Number(lowb)) return alert("❌ 【低多反轉錯誤】\n左邊(次低點)必須大於右邊(極低點)！");
 
@@ -1024,8 +1056,8 @@
             document.querySelectorAll('#input-panel input[type="number"], #input-panel input[type="tel"], #input-panel input[type="text"]').forEach(i => i.value = ''); 
             document.getElementById('lt5-check').checked = false;
             document.getElementById('st5-check').checked = false;
+            updateYcLimits(); // 清空時重置測距儀
             
-            // 新增標的後自動收合面板，並平滑滾動到最下方
             isPanelOpen = false;
             document.getElementById('input-panel').style.display = 'none';
             document.getElementById('quick-nav').style.display = 'flex';
@@ -1035,7 +1067,6 @@
             triggerSync(); 
             showToast("✅ 儲存並同步至雲端");
             
-            // 自動跳轉到剛剛新增的標的
             setTimeout(() => {
                 let newStockId = `stock-card-${wl.length - 1}`;
                 jumpToStockHome(newStockId);
@@ -1054,6 +1085,7 @@
             let downLimit = item.yc ? calcDown(item.yc) : '';
             document.getElementById('lt5-check').checked = (item.lt5 !== '' && item.lt5 === upLimit);
             document.getElementById('st5-check').checked = (item.st5 !== '' && item.st5 === downLimit);
+            updateYcLimits(); // 帶入時更新測距儀
 
             wl.splice(index, 1); renderWatchlist(); triggerSync();
             document.getElementById('input-panel').style.display = 'block'; isPanelOpen = true; document.getElementById('toggle-btn').innerHTML = '🔽 收起標的設定面板'; scrollToTop();
@@ -1085,7 +1117,7 @@
 
         window.toggleLockMission = function(mode, mId) {
             let cardId = `m-card-${mode}-${mId}`;
-            markLocalEdit(cardId); // 點擊鎖定時，該張卡片發光
+            markLocalEdit(cardId); 
             let pool = mode === 'long' ? activeLongMissions : activeShortMissions;
             if (pool[mId]) {
                 if(!pool[mId].locked && !pool[mId].entry) return alert("請先填入進場價再進行鎖定！");
@@ -1197,6 +1229,8 @@
 
         function calcMission(mode, mId, fromSync = false) {
             if (isUpdatingGlobalQuota && !fromSync) return;
+            
+            if (!fromSync) markLocalEdit(`m-card-${mode}-${mId}`); 
 
             let isLong = mode === 'long'; let m = (isLong ? activeLongMissions : activeShortMissions)[mId];
             if (!m) return;
@@ -1215,7 +1249,7 @@
             let base = parseFloat(m.base); let target = parseFloat(m.target); let entryStr = m.entry; let entry = parseFloat(m.entry); let exit = parseFloat(m.exit); let lots = parseInt(m.vol)||1; let yc = parseFloat(m.yc);
             let stopLoss = 0; let finalEntryBound = 0; let limitWarn = false; let sigBox = document.getElementById(`sig-${mode}-${mId}`);
             let upLimitNum = yc ? parseFloat(calcUp(yc)) : 0;
-            let currentMinRR = sysQuota.minRR || 1.5; // 💡 動態讀取自訂盈虧比
+            let currentMinRR = sysQuota.minRR || 1.5; 
 
             if (base && target && yc) { if (isLong && target > parseFloat(calcUp(yc))+0.001) { limitWarn=true; sigBox.className="signal warn"; sigBox.innerText="⚠️ 目標大於漲停價"; } if (!isLong && target < parseFloat(calcDown(yc))-0.001) { limitWarn=true; sigBox.className="signal warn"; sigBox.innerText="⚠️ 目標小於跌停價"; } }
             
@@ -1223,8 +1257,6 @@
                 stopLoss = Math.round((isLong ? base - getTickDown(base) : base + getTickUp(base)) * 100) / 100;
                 document.getElementById(`stop-${mode}-${mId}`).innerText = stopLoss.toFixed(2);
                 let absEntry = isLong ? (base + getMaxTicks(base)*getTickUp(base)) : (base - getMaxTicks(base)*getTickDown(base));
-                
-                // 💡 動態盈虧比算式：進場價 = (目標價 + 盈虧比 * 停損價) / (盈虧比 + 1)
                 let rrEntry = (target + currentMinRR * stopLoss) / (currentMinRR + 1);
                 
                 if(isLong) { finalEntryBound = Math.floor((Math.min(absEntry, rrEntry) + 0.0001)/getTickUp(base))*getTickUp(base); document.getElementById(`kz-${mode}-${mId}`).innerText = finalEntryBound < base ? "風險過高" : `${base} ~ ${finalEntryBound.toFixed(2)}`; } 
@@ -1318,12 +1350,73 @@
             if(!fromSync) triggerSync(); 
         }
 
+        // --- 📊 戰情儀表板更新 ---
+        function updateDashboard() {
+            let totalPnl = 0;
+            let wins = 0;
+            let losses = 0;
+            
+            let processMission = (m, isLong) => {
+                if (m.entry && m.exit) {
+                    let pData = calcPnL(m.entry, m.exit, parseInt(m.vol)||1, isLong);
+                    let pDisc = Math.round(pData.disc);
+                    totalPnl += pDisc;
+                    if (pDisc > 0) wins++;
+                    else losses++; 
+                }
+            };
+
+            Object.values(activeLongMissions).forEach(m => processMission(m, true));
+            Object.values(activeShortMissions).forEach(m => processMission(m, false));
+
+            let totalTrades = wins + losses;
+            let winRate = totalTrades > 0 ? Math.round((wins / totalTrades) * 100) : 0;
+
+            let pnlEl = document.getElementById('dash-pnl');
+            let sign = totalPnl > 0 ? "+" : "";
+            pnlEl.innerText = sign + totalPnl.toLocaleString();
+            pnlEl.style.color = totalPnl >= 0 ? "#00e676" : "#ff4d4d";
+
+            document.getElementById('dash-winrate').innerText = winRate + "%";
+            document.getElementById('dash-count').innerText = `${wins} / ${losses}`;
+        }
+
+        // --- 📥 CSV 戰績匯出 ---
+        function exportCSV() {
+            let rows = [["標的", "代碼", "方向", "基準價", "目標價", "進場價", "出場價", "張數", "淨損益(含手續費)"]];
+            
+            let processForExport = (m, isLong) => {
+                if (m.entry && m.exit) {
+                    let pData = calcPnL(m.entry, m.exit, parseInt(m.vol)||1, isLong);
+                    let pDisc = Math.round(pData.disc);
+                    rows.push([ m.name, m.code, isLong ? "做多" : "做空", m.base, m.target, m.entry, m.exit, m.vol || 1, pDisc ]);
+                }
+            };
+
+            Object.values(activeLongMissions).forEach(m => processForExport(m, true));
+            Object.values(activeShortMissions).forEach(m => processForExport(m, false));
+
+            if (rows.length === 1) return alert("❌ 匯出失敗：目前沒有已結算的交易紀錄！\n(需確實填入進場與出場價)");
+
+            let csvContent = "data:text/csv;charset=utf-8,\uFEFF" + rows.map(e => e.join(",")).join("\n");
+            let encodedUri = encodeURI(csvContent);
+            let link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            
+            let d = new Date();
+            let dateStr = `${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}`;
+            link.setAttribute("download", `量化結算報表_${dateStr}.csv`);
+            
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
         // --- 系統重置與時間檢查 ---
         function checkBurnTime() {
             let now = new Date();
             let hour = now.getHours();
             let min = now.getMinutes();
-            // 開放時間：大於等於18點，或小於8點，或剛好8點但小於30分
             let isBurnTime = (hour >= 18) || (hour < 8) || (hour === 8 && min < 30);
 
             let btn = document.getElementById('burn-btn');
