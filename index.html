@@ -53,7 +53,7 @@
            ========================================= */
         @media (min-width: 768px) {
             .page { padding: 30px 4vw 120px 4vw; }
-            #input-panel, .k-table-container, .logistics-header, .rule-card, .card:not(.card-compact):not(.mission-card) { 
+            #input-panel, .k-table-container, .logistics-header, .rule-card, .card:not(.card-compact):not(.mission-card), .review-container { 
                 max-width: 1400px; margin-left: auto; margin-right: auto; 
             }
             .target-grid { grid-template-columns: repeat(6, minmax(0, 1fr)) !important; }
@@ -67,7 +67,7 @@
         }
         
         /* 卡片與通用樣式 */
-        .card { background-color: #1e1e1e; border-radius: 10px; padding: 12px; margin-bottom: 15px; border-left: 5px solid #444; box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
+        .card { background-color: #1e1e1e; border-radius: 10px; padding: 12px; margin-bottom: 15px; border-left: 5px solid #444; box-shadow: 0 4px 6px rgba(0,0,0,0.3); position: relative;}
         .card.info { border-left-color: #00ffcc; }
         .rule-card { border-left-color: #00ffcc; background-color: #1a1a1a; margin-top: 30px; }
         
@@ -89,13 +89,15 @@
         .btn-clear { position: absolute; right: 5px; top: 10px; width: 28px; height: 28px; border-radius: 50%; background-color: #444; color: #fff; border: none; font-size: 0.9rem; font-weight: bold; display: flex; justify-content: center; align-items: center; cursor: pointer; z-index: 5;}
         .btn-clear:disabled { display: none; }
 
-        /* 自訂核取方塊 */
+        /* 自訂核取方塊與輸入框 */
         .check-wrapper { display:flex; justify-content:center; align-items:center; height:36px; background:#2c2c2c; border:1px solid #444; border-radius:6px; cursor:pointer; margin:0; transition:0.2s; }
         .check-wrapper:active { background: #444; }
         .check-wrapper input { width: 20px; height: 20px; cursor: pointer; margin: 0; }
         
         .input-group { margin-bottom: 10px; }
         label { display: block; font-size: 0.85rem; color: #aaa; margin-bottom: 4px; }
+        input[type="text"].clean-input, input[type="number"].clean-input, input[type="time"].clean-input { width: 100%; box-sizing: border-box; background-color: #2c2c2c; border: 1px solid #444; color: #fff; padding: 10px; border-radius: 6px; font-size: 1rem;}
+        input[type="text"].clean-input:focus, input[type="number"].clean-input:focus { outline: none; border-color: #00ffcc; background-color: #333;}
         
         /* 訊號燈與結算結果 */
         .signal { text-align: center; padding: 10px; border-radius: 6px; font-weight: bold; background-color: #333; font-size: 1rem; margin: 10px 0; }
@@ -139,6 +141,7 @@
         .btn:active { transform: scale(0.95); }
         .btn:disabled { background-color: #444 !important; color: #888 !important; cursor: not-allowed; border-color: #444 !important; box-shadow: none !important;}
         .btn-add { background-color: #00ffcc; color: #000; margin-top: 10px;}
+        .btn-pnl { background-color: #3a3a3a; color: #fff; margin-top: 10px; border: 1px solid #555; }
         .toggle-panel-btn { background-color: #333; color: #00ffcc; border: 1px dashed #00ffcc; margin-bottom: 10px; font-size: 0.9rem;}
         
         /* 頂部快速導航列 (置頂黏性) */
@@ -216,7 +219,7 @@
         }
 
         .m-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px dashed #444; padding-bottom: 8px; margin-bottom: 10px;}
-        .m-header h3 { margin: 0; font-size: 1.1rem; transition: 0.3s; }
+        .m-header h3 { margin: 0; font-size: 1.1rem; }
         .m-header.mode-long h3 { color: #ff4d4d; }
         .m-header.mode-short h3 { color: #00e676; }
 
@@ -263,6 +266,29 @@
             .kl { width: 14px; height: 50px; }
             .kl .wick { left: 6px; }
             .k-yellow-tip { font-size: 0.85rem; margin-top: 6px; }
+        }
+
+        /* =========================================
+           📝 覆盤模式專屬樣式
+           ========================================= */
+        .review-container { display: flex; flex-direction: column; gap: 20px; margin-top: 10px; padding-bottom: 50px;}
+        .review-panel { display: grid; grid-template-columns: 1fr; gap: 15px; }
+        
+        .ohlc-input-group { background: #252525; border-radius: 8px; padding: 12px; border: 1px solid #444; margin-bottom: 10px; position: relative;}
+        .ohlc-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 8px; }
+        .ohlc-grid input { width: 100%; text-align: center; border-radius: 4px; padding: 8px 4px;}
+        .label-red { color: #ff4d4d; font-weight: bold; }
+        .label-green { color: #00e676; font-weight: bold; }
+        .label-cyan { color: #00ffcc; font-weight: bold; }
+        .label-magenta { color: #ff00ff; font-weight: bold; }
+
+        .chart-stage { background: #1a1a1a; border-radius: 10px; border: 2px solid #333; min-height: 400px; position: relative; display: flex; justify-content: center; align-items: center; overflow: hidden;}
+        #review-canvas { width: 100%; height: 100%; min-height: 400px; background: #000;}
+
+        @media (min-width: 992px) {
+            .review-container { flex-direction: row; align-items: flex-start; }
+            .review-panel { width: 350px; flex-shrink: 0; }
+            .chart-stage { flex: 1; height: calc(100vh - 150px); sticky; top: 70px; }
         }
     </style>
 </head>
@@ -324,6 +350,7 @@
         <div id="tab-1" class="nav-tab" onclick="scrollToPage(1)">🔴 做多</div>
         <div id="tab-2" class="nav-tab" onclick="scrollToPage(2)">🟢 做空</div>
         <div id="tab-3" class="nav-tab" onclick="scrollToPage(3)">📊 圖鑑</div>
+        <div id="tab-4" class="nav-tab" onclick="scrollToPage(4)">📝 覆盤</div>
         <div class="nav-icon" onclick="openSettings()" title="系統設定">⚙️</div>
         <div class="nav-icon" onclick="logoutRoom()" title="登出連線" style="border-left:none;">🔒</div>
     </div>
@@ -341,12 +368,7 @@
                 <div class="wl-title-bar">
                     <input type="tel" id="wl-code" placeholder="股號" oninput="autoFillName()" tabindex="1" style="width:30%;">
                     <input type="text" id="wl-name" placeholder="股名" tabindex="-1" style="width:35%;">
-                    <input type="number" inputmode="decimal" id="wl-yc" placeholder="昨收" tabindex="2" style="width:35%; color:#ffeb3b; border-color:#ffeb3b;" oninput="markLocalEdit(); updateYcLimits()">
-                </div>
-
-                <div style="display:flex; justify-content:flex-end; gap:15px; font-size:0.85rem; font-weight:bold; margin-top:-8px; margin-bottom:15px; padding-right:5px;">
-                    <span style="color:#ff4d4d;">🔴 漲停 <span id="preview-up">-</span></span>
-                    <span style="color:#00e676;">🟢 跌停 <span id="preview-down">-</span></span>
+                    <input type="number" inputmode="decimal" id="wl-yc" placeholder="昨收" tabindex="2" style="width:35%; color:#ffeb3b; border-color:#ffeb3b;" oninput="markLocalEdit()">
                 </div>
 
                 <div class="wl-section s-long">
@@ -464,17 +486,17 @@
                         <td>
                             <div class="kl-box"><div class="kl red"><div class="body" style="top:0; height:100%;"></div></div></div>
                             <div class="k-title t-red">【極多】大陽線<br>(光頭光腳大紅K)</div>
-                            <div class="k-desc">買盤絕對統治，下一根高機率繼續衝。</div>
+                            <div class="k-desc">買盤絕對統治，下一根高機率繼續衝.</div>
                         </td>
                         <td>
                             <div class="kl-box"><div class="kl red"><div class="wick" style="top:0; height:20%;"></div><div class="body" style="top:20%; height:80%;"></div></div></div>
                             <div class="k-title t-red">【強多】強勢推進<br>(光腳紅K)</div>
-                            <div class="k-desc">穩健上攻，雖然高點遇微壓，但不影響多頭氣勢。</div>
+                            <div class="k-desc">穩健上攻，雖然高點遇微壓，但不影響多頭氣勢.</div>
                         </td>
                         <td>
                             <div class="kl-box"><div class="kl red"><div class="wick" style="top:0; height:60%;"></div><div class="body" style="top:60%; height:40%;"></div></div></div>
                             <div class="k-title t-green">【⚠️極度危險】<br>避雷針 / 誘多紅</div>
-                            <div class="k-desc">主力拉高出貨！這5分鐘內套死一堆追高散戶，準備反轉向下。</div>
+                            <div class="k-desc">主力拉高出貨！這5分鐘內套死一堆追高散戶，準備反轉向下.</div>
                         </td>
                     </tr>
                     <tr>
@@ -482,17 +504,17 @@
                         <td>
                             <div class="kl-box"><div class="kl red"><div class="wick" style="top:80%; height:20%;"></div><div class="body" style="top:0; height:80%;"></div></div></div>
                             <div class="k-title t-red">【強多】光頭微下影<br>(光頭紅K)</div>
-                            <div class="k-desc">踩穩後一路往上墊，收盤收在最高點，攻勢強勁。</div>
+                            <div class="k-desc">踩穩後一路往上墊，收盤收在最高點，攻勢強勁.</div>
                         </td>
                         <td>
                             <div class="kl-box"><div class="kl red"><div class="wick" style="top:10%; height:80%;"></div><div class="body" style="top:20%; height:60%;"></div></div></div>
                             <div class="k-title t-red">【看多】標準換手紅K</div>
-                            <div class="k-desc">最常見的推進K線，多空有來有往，多方穩步佔優。</div>
+                            <div class="k-desc">最常見的推進K線，多空有來有往，多方穩步佔優.</div>
                         </td>
                         <td>
                             <div class="kl-box"><div class="kl red"><div class="wick" style="top:0; height:85%;"></div><div class="body" style="top:50%; height:25%;"></div></div></div>
                             <div class="k-title t-green">【⚠️偏空轉折】<br>力竭紅K (倒槌線)</div>
-                            <div class="k-desc">雖然底盤有撐、且收紅，但上面被打臉打得太慘，多頭沒力了。</div>
+                            <div class="k-desc">雖然底盤有撐、且收紅，但上面被打臉打得太慘，多頭沒力了.</div>
                         </td>
                     </tr>
                     <tr>
@@ -500,17 +522,17 @@
                         <td>
                             <div class="kl-box"><div class="kl red"><div class="wick" style="top:40%; height:60%;"></div><div class="body" style="top:0; height:40%;"></div></div></div>
                             <div class="k-title t-red">【⚠️極多轉折】<br>強勢掃底 (槌子線)</div>
-                            <div class="k-desc">殺低後V轉且收在最高，主力在此強勢接刀，準備發動攻擊。</div>
+                            <div class="k-desc">殺低後V轉且收在最高，主力在此強勢接刀，準備發動攻擊.</div>
                         </td>
                         <td>
                             <div class="kl-box"><div class="kl red"><div class="wick" style="top:10%; height:90%;"></div><div class="body" style="top:30%; height:20%;"></div></div></div>
                             <div class="k-title t-red">【⚠️強多轉折】<br>下檔鐵板</div>
-                            <div class="k-desc">探底後強力抽高，代表這5分鐘內下方有重兵防守，適合進場做多。</div>
+                            <div class="k-desc">探底後強力抽高，代表這5分鐘內下方有重兵防守，適合進場做多.</div>
                         </td>
                         <td>
                             <div class="kl-box"><div class="kl red"><div class="wick" style="top:0; height:100%;"></div><div class="body" style="top:40%; height:20%;"></div></div></div>
                             <div class="k-title t-warn">【⚠️震盪觀望】<br>雙殺絞肉機(長腿紡錘)</div>
-                            <div class="k-desc">上不去也下不來，多空這5分鐘內互殺極度劇烈，下一根方向不明，先收手。</div>
+                            <div class="k-desc">上不去也下不來，多空這5分鐘內互殺極度劇烈，下一根方向不明，先收手.</div>
                         </td>
                     </tr>
                 </table>
@@ -531,17 +553,17 @@
                         <td>
                             <div class="kl-box"><div class="kl green"><div class="body" style="top:0; height:100%;"></div></div></div>
                             <div class="k-title t-green">【極空】大陰線<br>(光頭光腳大綠K)</div>
-                            <div class="k-desc">賣盤絕對統治，這5分鐘呈現崩跌狀態，下一根高機率續殺。</div>
+                            <div class="k-desc">賣盤絕對統治，這5分鐘呈現崩跌狀態，下一根高機率續殺.</div>
                         </td>
                         <td>
                             <div class="kl-box"><div class="kl green"><div class="wick" style="top:0; height:20%;"></div><div class="body" style="top:20%; height:80%;"></div></div></div>
                             <div class="k-title t-green">【強空】開高走低<br>(光腳綠K)</div>
-                            <div class="k-desc">開盤誘多假抽一下，馬上被空軍按在地上摩擦，殺到底。</div>
+                            <div class="k-desc">開盤誘多假抽一下，馬上被空軍按在地上摩擦，殺到底.</div>
                         </td>
                         <td>
                             <div class="kl-box"><div class="kl green"><div class="wick" style="top:0; height:60%;"></div><div class="body" style="top:60%; height:40%;"></div></div></div>
                             <div class="k-title t-green">【⚠️極空轉折】<br>墓碑線</div>
-                            <div class="k-desc">主力拉高倒貨！反彈完全失敗，上方全是冤魂，準備大跌。</div>
+                            <div class="k-desc">主力拉高倒貨！反彈完全失敗，上方全是冤魂，準備大跌.</div>
                         </td>
                     </tr>
                     <tr>
@@ -549,17 +571,17 @@
                         <td>
                             <div class="kl-box"><div class="kl green"><div class="wick" style="top:80%; height:20%;"></div><div class="body" style="top:0; height:80%;"></div></div></div>
                             <div class="k-title t-green">【強空】弱勢緩跌<br>(光頭綠K)</div>
-                            <div class="k-desc">一路殺，到底部稍微踩個煞車，但空方氣勢依然壓制全場。</div>
+                            <div class="k-desc">一路殺，到底部稍微踩個煞車，但空方氣勢依然壓制全場.</div>
                         </td>
                         <td>
                             <div class="kl-box"><div class="kl green"><div class="wick" style="top:10%; height:80%;"></div><div class="body" style="top:20%; height:60%;"></div></div></div>
                             <div class="k-title t-green">【看空】標準下殺綠K</div>
-                            <div class="k-desc">最常見的退水K線，多空正常交火，空方穩步佔優。</div>
+                            <div class="k-desc">最常見的退水K線，多空正常交火，空方穩步佔優.</div>
                         </td>
                         <td>
                             <div class="kl-box"><div class="kl green"><div class="wick" style="top:0; height:85%;"></div><div class="body" style="top:50%; height:25%;"></div></div></div>
                             <div class="k-title t-green">【強空】假突破真下殺<br>(倒槌線)</div>
-                            <div class="k-desc">衝高失敗後一路破底，上方套牢賣壓重，反彈無望。</div>
+                            <div class="k-desc">衝高失敗後一路破底，上方套牢賣壓重，反彈無望.</div>
                         </td>
                     </tr>
                     <tr>
@@ -567,17 +589,17 @@
                         <td>
                             <div class="kl-box"><div class="kl green"><div class="wick" style="top:40%; height:60%;"></div><div class="body" style="top:0; height:40%;"></div></div></div>
                             <div class="k-title t-red">【⚠️偏多轉折】<br>深水炸彈 (槌子線)</div>
-                            <div class="k-desc">一路殺到極低點突然爆量買回，空方殺不下去，隨時準備V轉向上。</div>
+                            <div class="k-desc">一路殺到極低點突然爆量買回，空方殺不下去，隨時準備V轉向上.</div>
                         </td>
                         <td>
                             <div class="kl-box"><div class="kl green"><div class="wick" style="top:10%; height:90%;"></div><div class="body" style="top:30%; height:20%;"></div></div></div>
                             <div class="k-title t-warn">【⚠️危險轉折】<br>探底誘空</div>
-                            <div class="k-desc">雖然收綠，但下面有一根長長的避震器，追空極容易被嘎爆，先撤退。</div>
+                            <div class="k-desc">雖然收綠，但下面有一根長長的避震器，追空極容易被嘎爆，先撤退.</div>
                         </td>
                         <td>
                             <div class="kl-box"><div class="kl green"><div class="wick" style="top:0; height:100%;"></div><div class="body" style="top:40%; height:20%;"></div></div></div>
                             <div class="k-title t-warn">【⚠️震盪觀望】<br>雙殺絞肉機(長腿紡錘)</div>
-                            <div class="k-desc">這5分鐘內上沖下洗，主力在亂洗籌碼，不要在這種線型裡面猜方向。</div>
+                            <div class="k-desc">這5分鐘內上沖下洗，主力在亂洗籌碼，不要在這種線型裡面猜方向.</div>
                         </td>
                     </tr>
                 </table>
@@ -598,12 +620,12 @@
                         <td>
                             <div class="kl-box"><div class="kl white"><div class="body" style="top:48%;"></div></div></div>
                             <div class="k-title t-warn">【⚠️極端】死水一字線</div>
-                            <div class="k-desc">5分鐘內一動也不動，只有漲跌停鎖死或完全沒量才會出現。</div>
+                            <div class="k-desc">5分鐘內一動也不動，只有漲跌停鎖死或完全沒量才會出現.</div>
                         </td>
                         <td>
                             <div class="kl-box"><div class="kl white"><div class="wick" style="top:0; height:50%;"></div><div class="body" style="top:48%;"></div></div></div>
                             <div class="k-title t-green">【偏空】倒 T 字星</div>
-                            <div class="k-desc">想往上漲但被完全壓回起點，空方在此處略佔上風。</div>
+                            <div class="k-desc">想往上漲但被完全壓回起點，空方在此處略佔上風.</div>
                         </td>
                         <td>
                             <div class="kl-box"><div class="kl white"><div class="wick" style="top:0; height:100%;"></div><div class="body" style="top:98%;"></div></div></div>
@@ -616,17 +638,17 @@
                         <td>
                             <div class="kl-box"><div class="kl white"><div class="wick" style="top:50%; height:50%;"></div><div class="body" style="top:48%;"></div></div></div>
                             <div class="k-title t-red">【偏多】正 T 字星</div>
-                            <div class="k-desc">稍微跌一下就被買回起點，下方有微弱買盤墊著。</div>
+                            <div class="k-desc">稍微跌一下就被買回起點，下方有微弱買盤墊著.</div>
                         </td>
                         <td>
                             <div class="kl-box"><div class="kl white"><div class="wick" style="top:30%; height:40%;"></div><div class="body" style="top:48%;"></div></div></div>
                             <div class="k-title t-warn">【中立觀望】小十字星</div>
-                            <div class="k-desc">多空都在休息喘氣，這5分鐘毫無波瀾，等下一根K線決定方向。</div>
+                            <div class="k-desc">多空都在休息喘氣，這5分鐘毫無波瀾，等下一根K線決定方向.</div>
                         </td>
                         <td>
                             <div class="kl-box"><div class="kl white"><div class="wick" style="top:0; height:85%;"></div><div class="body" style="top:70%;"></div></div></div>
                             <div class="k-title t-green">【偏空】射擊之星</div>
-                            <div class="k-desc">上方壓力明顯大於下方支撐，多方反撲失敗的機率高。</div>
+                            <div class="k-desc">上方壓力明顯大於下方支撐，多方反撲失敗的機率高.</div>
                         </td>
                     </tr>
                     <tr>
@@ -639,7 +661,7 @@
                         <td>
                             <div class="kl-box"><div class="kl white"><div class="wick" style="top:0; height:100%;"></div><div class="body" style="top:30%;"></div></div></div>
                             <div class="k-title t-red">【⚠️偏多轉折】<br>鐵鎚十字</div>
-                            <div class="k-desc">向下試探重重踢到鐵板，多頭展現強大防守韌性。</div>
+                            <div class="k-desc">向下試探重重踢到鐵板，多頭展現強大防守韌性.</div>
                         </td>
                         <td>
                             <div class="kl-box"><div class="kl white"><div class="wick" style="top:0; height:100%;"></div><div class="body" style="top:48%;"></div></div></div>
@@ -650,6 +672,55 @@
                 </table>
             </div>
 
+        </div>
+
+        <div class="page" id="page-4">
+            <h3 style="color:#00ffcc; text-align:center; margin-top:0; margin-bottom: 20px;">📝 盤後戰術覆盤畫布</h3>
+            
+            <div class="review-container">
+                <div class="review-panel">
+                    <div class="card info">
+                        <h3 style="color:#fff; margin-top:0;">1. 填入交易基本資料</h3>
+                        <div class="wl-title-bar" style="margin-bottom:10px;">
+                            <input type="text" id="rev-name" placeholder="股名 (例:華邦電)" style="width:60%;">
+                            <input type="tel" id="rev-code" placeholder="代碼" style="width:40%;">
+                        </div>
+                        
+                        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-bottom:10px;">
+                            <div><label class="label-cyan">進場時間</label><input type="time" id="rev-time-entry" class="clean-input"></div>
+                            <div><label class="label-cyan">進場價格</label><input type="number" id="rev-price-entry" step="0.01" class="clean-input" placeholder="0.00"></div>
+                        </div>
+                        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-bottom:10px;">
+                            <div><label class="label-magenta">出場時間</label><input type="time" id="rev-time-exit" class="clean-input"></div>
+                            <div><label class="label-magenta">出場價格</label><input type="number" id="rev-price-exit" step="0.01" class="clean-input" placeholder="0.00"></div>
+                        </div>
+                        <div class="input-group">
+                            <label>交易方向</label>
+                            <select id="rev-dir" class="clean-input" style="background-color:#2c2c2c; color:#fff;-webkit-appearance: none;">
+                                <option value="long">🔴 做多</option>
+                                <option value="short">🟢 做空</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <h3 style="color:#fff; margin-top:0; display:flex; justify-content:space-between; align-items:center;">
+                            2. 關鍵 5 分 K 數據
+                            <button type="button" class="btn-mini s" style="background:#00ffcc; color:#000; border:none; max-width:80px;" onclick="addOhlcInput()">➕ 新增</button>
+                        </h3>
+                        <div id="ohlc-inputs-container">
+                            </div>
+                        <button type="button" class="btn btn-add" style="margin-top:15px; background-color:#ff9800;" onclick="generateReviewChart()">🔄 生成覆盤戰術圖</button>
+                    </div>
+                </div>
+
+                <div class="chart-stage card">
+                    <canvas id="review-canvas"></canvas>
+                    <div id="chart-msg" style="position:absolute; color:#666; font-size:1.1rem; text-align:center; padding:20px;">
+                        請在左側填入數據<br>並點擊「生成覆盤戰術圖」
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -676,6 +747,9 @@
             // 🌟 全域事件監聽：當點擊任何卡片內部時，整張卡片發光！
             document.addEventListener('click', handleCardGlow);
             document.addEventListener('focusin', handleCardGlow);
+            
+            // 初始化：預設新增一組 OHLC 輸入框
+            addOhlcInput();
         });
 
         // 處理整張卡片發光的邏輯
@@ -792,7 +866,13 @@
 
         // ================= 導航與視圖控制 =================
         const slider = document.getElementById('slider');
-        const tabs = [document.getElementById('tab-0'), document.getElementById('tab-1'), document.getElementById('tab-2'), document.getElementById('tab-3')];
+        const tabs = [
+            document.getElementById('tab-0'), 
+            document.getElementById('tab-1'), 
+            document.getElementById('tab-2'), 
+            document.getElementById('tab-3'),
+            document.getElementById('tab-4') // NEW
+        ];
 
         function scrollToPage(index) { slider.scrollTo({ left: index * slider.clientWidth, behavior: 'smooth' }); }
         function updateTabs() { let idx = Math.round(slider.scrollLeft / slider.clientWidth); tabs.forEach((t, i) => { if(i===idx) t.classList.add('active'); else t.classList.remove('active'); }); }
@@ -837,7 +917,7 @@
             Object.keys(activeLongMissions).forEach(mId => calcMission('long', mId, true));
             Object.keys(activeShortMissions).forEach(mId => calcMission('short', mId, true));
 
-            updateDashboard(); 
+            updateDashboard(); // 💡 更新戰情儀表板
 
             if(!fromSync) triggerSync(); 
             isUpdatingGlobalQuota = false;
@@ -908,21 +988,6 @@
         function calcUp(yc) { if(!yc) return '-'; let t = yc * 1.1; let tk = getTickUp(t - 0.001); return (Math.round(t / tk) * tk).toFixed(2); }
         function calcDown(yc) { if(!yc) return '-'; let t = yc * 0.9; let tk = getTickDown(t + 0.001); return (Math.round(t / tk) * tk).toFixed(2); }
         
-        // 💡 新增：即時漲跌停顯示更新
-        function updateYcLimits() {
-            let yc = parseFloat(document.getElementById('wl-yc').value);
-            let upEl = document.getElementById('preview-up');
-            let downEl = document.getElementById('preview-down');
-            
-            if (!isNaN(yc) && yc > 0) {
-                upEl.innerText = calcUp(yc);
-                downEl.innerText = calcDown(yc);
-            } else {
-                upEl.innerText = '-';
-                downEl.innerText = '-';
-            }
-        }
-
         function stepPrice(id, dir) {
             let el = document.getElementById(id); if(!el || el.disabled) return; 
             markLocalEdit(); 
@@ -940,7 +1005,6 @@
             if(id === 'quota-rr' && newP <= 0) newP = 0.1;
 
             el.value = Math.round(newP * 100) / 100; el.dispatchEvent(new Event('input'));
-            if(id === 'wl-yc') updateYcLimits(); // 同步更新測距儀
         }
 
         function getClosestDown(price, item) { let a = [item.lb, item.lt1, item.lt2, item.lt3, item.lt4, item.lt5, item.sb, item.st1, item.st2, item.st3, item.st4, item.st5].map(Number).filter(n => n && n < price); return a.length ? Math.max(...a) : ''; }
@@ -1056,7 +1120,6 @@
             document.querySelectorAll('#input-panel input[type="number"], #input-panel input[type="tel"], #input-panel input[type="text"]').forEach(i => i.value = ''); 
             document.getElementById('lt5-check').checked = false;
             document.getElementById('st5-check').checked = false;
-            updateYcLimits(); // 清空時重置測距儀
             
             isPanelOpen = false;
             document.getElementById('input-panel').style.display = 'none';
@@ -1085,7 +1148,6 @@
             let downLimit = item.yc ? calcDown(item.yc) : '';
             document.getElementById('lt5-check').checked = (item.lt5 !== '' && item.lt5 === upLimit);
             document.getElementById('st5-check').checked = (item.st5 !== '' && item.st5 === downLimit);
-            updateYcLimits(); // 帶入時更新測距儀
 
             wl.splice(index, 1); renderWatchlist(); triggerSync();
             document.getElementById('input-panel').style.display = 'block'; isPanelOpen = true; document.getElementById('toggle-btn').innerHTML = '🔽 收起標的設定面板'; scrollToTop();
@@ -1326,15 +1388,15 @@
                     let currentGlobalRemain = parseFloat(document.getElementById('quota-global-remain').innerText.replace(/[^\d.-]/g, ''));
                     if (currentGlobalRemain < 0) { sigBox.className = "signal stop"; sigBox.innerText = "❌ 額度不足！違約交割警告！"; } 
                     else if (isLong) {
-                        if (entry < base) sigBox.className="signal stop", sigBox.innerText="❌ 逆勢多 (進場須大於等於基準)";
-                        else if (entry > finalEntryBound && rr >= currentMinRR) sigBox.className="signal stop", sigBox.innerText="❌ 風險過高 (虧損大於系統容許)";
-                        else if (entry > finalEntryBound && rr < currentMinRR) sigBox.className="signal stop", sigBox.innerText=`❌ 追高警告 (盈虧比低於 ${currentMinRR})`;
-                        else sigBox.className="signal go", sigBox.innerText="✅ 符合邏輯，准許進場";
+                        if (entry < base) sigBox.className="signal stop", sigBox.innerText="❌逆勢多 (進場須大於等於基準)";
+                        else if (entry > finalEntryBound && rr >= currentMinRR) sigBox.className="signal stop", sigBox.innerText="❌風險過高 (虧損大於系統容許)";
+                        else if (entry > finalEntryBound && rr < currentMinRR) sigBox.className="signal stop", sigBox.innerText=`❌追高警告 (盈虧比低於 ${currentMinRR})`;
+                        else sigBox.className="signal go", sigBox.innerText="✅符合邏輯，准許進場";
                     } else {
-                        if (entry > base) sigBox.className="signal stop", sigBox.innerText="❌ 逆勢空 (進場須小於等於基準)";
-                        else if (entry < finalEntryBound && rr >= currentMinRR) sigBox.className="signal stop", sigBox.innerText="❌ 風險過高 (虧損大於系統容許)";
-                        else if (entry < finalEntryBound && rr < currentMinRR) sigBox.className="signal stop", sigBox.innerText=`❌ 殺低警告 (盈虧比低於 ${currentMinRR})`;
-                        else sigBox.className="signal go", sigBox.innerText="✅ 符合邏輯，准許進場";
+                        if (entry > base) sigBox.className="signal stop", sigBox.innerText="❌逆勢空 (進場須小於等於基準)";
+                        else if (entry < finalEntryBound && rr >= currentMinRR) sigBox.className="signal stop", sigBox.innerText="❌風險過高 (虧損大於系統容許)";
+                        else if (entry < finalEntryBound && rr < currentMinRR) sigBox.className="signal stop", sigBox.innerText=`❌殺低警告 (盈虧比低於 ${currentMinRR})`;
+                        else sigBox.className="signal go", sigBox.innerText="✅符合邏輯，准許進場";
                     }
                 }
             } else if(!limitWarn) { sigBox.className = "signal"; sigBox.innerText = "等待進場價..."; document.getElementById(`loss-${mode}-${mId}`).innerText = "-"; }
@@ -1417,6 +1479,7 @@
             let now = new Date();
             let hour = now.getHours();
             let min = now.getMinutes();
+            // 開放時間：大於等於18點，或小於8點，或剛好8點但小於30分
             let isBurnTime = (hour >= 18) || (hour < 8) || (hour === 8 && min < 30);
 
             let btn = document.getElementById('burn-btn');
@@ -1446,6 +1509,252 @@
                 triggerSync(); showToast("🗑️ 系統已全數重置"); 
                 closeSettings();
             }
+        }
+
+        // =========================================
+        // 📝 覆盤模式腳本引擎 (Canvas Drawing)
+        // =========================================
+        let ohlcCounter = 0;
+
+        function addOhlcInput() {
+            ohlcCounter++;
+            const container = document.getElementById('ohlc-inputs-container');
+            const div = document.createElement('div');
+            div.className = 'ohlc-input-group';
+            div.id = `ohlc-group-${ohlcCounter}`;
+            div.innerHTML = `
+                <button type="button" class="btn-icon" style="position:absolute; top:8px; right:8px; color:#666; font-size:1rem;" onclick="removeOhlcInput(${ohlcCounter})">✖</button>
+                <label style="color:#00ffcc;">#${ohlcCounter} K線 (時間/開/高/低/收)</label>
+                <div style="margin-bottom:8px;"><input type="time" class="clean-input k-time" value="09:00"></div>
+                <div class="ohlc-grid">
+                    <input type="number" class="clean-input k-open" placeholder="開" step="0.01">
+                    <input type="number" class="clean-input k-high" placeholder="高" step="0.01">
+                    <input type="number" class="clean-input k-low" placeholder="低" step="0.01">
+                    <input type="number" class="clean-input k-close" placeholder="收" step="0.01">
+                </div>
+            `;
+            container.appendChild(div);
+        }
+
+        function removeOhlcInput(id) {
+            const el = document.getElementById(`ohlc-group-${id}`);
+            if(el) el.remove();
+        }
+
+        function generateReviewChart() {
+            const canvas = document.getElementById('review-canvas');
+            const ctx = canvas.getContext('2d');
+            const msgEl = document.getElementById('chart-msg');
+
+            // 1. 抓取交易資料
+            const tradeData = {
+                name: document.getElementById('rev-name').value || "未命名",
+                code: document.getElementById('rev-code').value || "----",
+                entryTime: document.getElementById('rev-time-entry').value,
+                entryPrice: parseFloat(document.getElementById('rev-price-entry').value),
+                exitTime: document.getElementById('rev-time-exit').value,
+                exitPrice: parseFloat(document.getElementById('rev-price-exit').value),
+                direction: document.getElementById('rev-dir').value
+            };
+
+            // 2. 抓取 K 線數據
+            const bars = [];
+            const groups = document.querySelectorAll('.ohlc-input-group');
+            groups.forEach(group => {
+                const time = group.querySelector('.k-time').value;
+                const o = parseFloat(group.querySelector('.k-open').value);
+                const h = parseFloat(group.querySelector('.k-high').value);
+                const l = parseFloat(group.querySelector('.k-low').value);
+                const c = parseFloat(group.querySelector('.k-close').value);
+
+                if (!isNaN(o) && !isNaN(h) && !isNaN(l) && !isNaN(c)) {
+                    bars.push({ time, o, h, l, c });
+                }
+            });
+
+            if (bars.length === 0) {
+                alert("❌ 請至少填入一根完整的 K 線數據 (開高低收)！");
+                return;
+            }
+
+            // 隱藏提示訊息，顯示畫布
+            msgEl.style.display = 'none';
+            
+            // 3. 處理 Canvas 解析度 (RWD)
+            const dpr = window.devicePixelRatio || 1;
+            const displayWidth = canvas.clientWidth;
+            const displayHeight = canvas.clientHeight;
+            canvas.width = displayWidth * dpr;
+            canvas.height = displayHeight * dpr;
+            ctx.scale(dpr, dpr);
+
+            // 4. 計算繪圖邊距與範圍
+            const padding = { top: 50, right: 70, bottom: 50, left: 60 };
+            const chartWidth = displayWidth - padding.left - padding.right;
+            const chartHeight = displayHeight - padding.top - padding.bottom;
+
+            // 計算價格極值 (包含進出場價)
+            let maxPrice = Math.max(...bars.map(b => b.h));
+            let minPrice = Math.min(...bars.map(b => b.l));
+            
+            if (!isNaN(tradeData.entryPrice)) {
+                maxPrice = Math.max(maxPrice, tradeData.entryPrice);
+                minPrice = Math.min(minPrice, tradeData.entryPrice);
+            }
+            if (!isNaN(tradeData.exitPrice)) {
+                maxPrice = Math.max(maxPrice, tradeData.exitPrice);
+                minPrice = Math.min(minPrice, tradeData.exitPrice);
+            }
+
+            // 增加 5% 緩衝空間
+            const priceRange = maxPrice - minPrice;
+            maxPrice += priceRange * 0.1;
+            minPrice -= priceRange * 0.1;
+
+            // 價格轉座標函數
+            const getY = (price) => padding.top + chartHeight - ((price - minPrice) / (maxPrice - minPrice)) * chartHeight;
+
+            // 5. 開始繪製
+            // 背景
+            ctx.fillStyle = '#000000';
+            ctx.fillRect(0, 0, displayWidth, displayHeight);
+
+            // 繪製網格與價格軸 (Y軸)
+            ctx.strokeStyle = '#333333';
+            ctx.lineWidth = 1;
+            ctx.fillStyle = '#aaaaaa';
+            ctx.font = '12px Arial';
+            ctx.textAlign = 'left';
+            ctx.textBaseline = 'middle';
+
+            const gridCount = 5;
+            for (let i = 0; i <= gridCount; i++) {
+                const price = minPrice + (priceRange * 1.2 * (i / gridCount)); // 修正範圍
+                // 這裡算得有點簡單，修正為依據 max/min 算
+                const actualPrice = minPrice + (i * (maxPrice - minPrice) / gridCount);
+                const y = getY(actualPrice);
+                
+                // 橫線
+                ctx.beginPath();
+                ctx.moveTo(padding.left, y);
+                ctx.lineTo(padding.left + chartWidth, y);
+                ctx.stroke();
+
+                // 價格文字
+                ctx.fillText(actualPrice.toFixed(2), padding.left + chartWidth + 10, y);
+            }
+
+            // 繪製 K 線 (X軸)
+            const barCount = bars.length;
+            const barWidth = (chartWidth / barCount) * 0.7; // K線寬度
+            const barGap = (chartWidth / barCount) * 0.3;   // 間隔
+
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'top';
+
+            bars.forEach((bar, index) => {
+                const x = padding.left + (index * (barWidth + barGap)) + (barGap / 2);
+                const centerX = x + barWidth / 2;
+                
+                const yOpen = getY(bar.o);
+                const yHigh = getY(bar.h);
+                const yLow = getY(bar.l);
+                const yClose = getY(bar.c);
+
+                // 確定顏色 (台灣習慣：收>開為紅)
+                const isUp = bar.c > bar.o;
+                const color = isUp ? '#ff4d4d' : (bar.c < bar.o ? '#00e676' : '#ffffff');
+                ctx.strokeStyle = color;
+                ctx.fillStyle = color;
+                ctx.lineWidth = 2;
+
+                // 繪製影線 (High - Low)
+                ctx.beginPath();
+                ctx.moveTo(centerX, yHigh);
+                ctx.lineTo(centerX, yLow);
+                ctx.stroke();
+
+                // 繪製實體 (Open - Close)
+                const bodyHeight = Math.abs(yOpen - yClose);
+                const yBodyTop = Math.min(yOpen, yClose);
+
+                if (bodyHeight < 1) {
+                    // 十字線，畫一條橫線
+                    ctx.beginPath();
+                    ctx.moveTo(x, yBodyTop);
+                    ctx.lineTo(x + barWidth, yBodyTop);
+                    ctx.stroke();
+                } else {
+                    if (isUp) {
+                        // 紅K：通常是空心，但為了清晰，這裡畫實心
+                        ctx.fillRect(x, yBodyTop, barWidth, bodyHeight);
+                    } else {
+                        // 綠K：實心
+                        ctx.fillRect(x, yBodyTop, barWidth, bodyHeight);
+                    }
+                }
+
+                // 繪製時間軸 (X軸文字)
+                ctx.fillStyle = '#888888';
+                ctx.fillText(bar.time, centerX, padding.top + chartHeight + 10);
+            });
+
+            // 6. 繪製進出場水平線
+            // 進場線 (青色)
+            if (!isNaN(tradeData.entryPrice)) {
+                const yEntry = getY(tradeData.entryPrice);
+                ctx.strokeStyle = '#00ffff'; // Cyan
+                ctx.lineWidth = 2;
+                ctx.setLineDash([5, 5]); // 虛線
+                ctx.beginPath();
+                ctx.moveTo(padding.left, yEntry);
+                ctx.lineTo(padding.left + chartWidth, yEntry);
+                ctx.stroke();
+                
+                // 標籤
+                ctx.setLineDash([]); // 恢復實線
+                ctx.fillStyle = '#00ffff';
+                ctx.font = 'bold 12px Arial';
+                ctx.textAlign = 'right';
+                ctx.fillText(`B: ${tradeData.entryPrice.toFixed(2)} (${tradeData.entryTime})`, padding.left - 10, yEntry);
+            }
+
+            // 出場線 (洋紅色)
+            if (!isNaN(tradeData.exitPrice)) {
+                const yExit = getY(tradeData.exitPrice);
+                ctx.strokeStyle = '#ff00ff'; // Magenta
+                ctx.lineWidth = 2;
+                ctx.setLineDash([5, 5]); // 虛線
+                ctx.beginPath();
+                ctx.moveTo(padding.left, yExit);
+                ctx.lineTo(padding.left + chartWidth, yExit);
+                ctx.stroke();
+                
+                // 標籤
+                ctx.setLineDash([]);
+                ctx.fillStyle = '#ff00ff';
+                ctx.font = 'bold 12px Arial';
+                ctx.textAlign = 'right';
+                ctx.fillText(`S: ${tradeData.exitPrice.toFixed(2)} (${tradeData.exitTime})`, padding.left - 10, yExit);
+            }
+
+            // 7. 繪製標題與統計
+            ctx.fillStyle = '#ffffff';
+            ctx.font = 'bold 16px Arial';
+            ctx.textAlign = 'left';
+            ctx.textBaseline = 'top';
+            ctx.fillText(`覆盤戰術圖: ${tradeData.name} (${tradeData.code})`, padding.left, 15);
+
+            if(!isNaN(tradeData.entryPrice) && !isNaN(tradeData.exitPrice)) {
+                const pnl = tradeData.direction === 'long' ? (tradeData.exitPrice - tradeData.entryPrice) : (tradeData.entryPrice - tradeData.exitPrice);
+                const pnlPercent = (pnl / tradeData.entryPrice * 100).toFixed(2);
+                ctx.fillStyle = pnl >= 0 ? '#ff4d4d' : '#00e676';
+                ctx.font = 'bold 14px Arial';
+                ctx.textAlign = 'right';
+                ctx.fillText(`點位損益: ${pnl.toFixed(2)} (${pnlPercent}%)`, displayWidth - padding.right, 17);
+            }
+            
+            showToast("🎨 覆盤戰術圖已生成");
         }
     </script>
 </body>
