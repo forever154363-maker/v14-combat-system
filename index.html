@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>量化交易與資金控管系統 V14.15</title>
+    <title>量化交易與資金控管系統 V14.16</title>
     
     <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-database-compat.js"></script>
@@ -206,31 +206,29 @@
         /* =========================================
            📝 覆盤模式專屬樣式 (極致排版與 Canvas 鎖定)
            ========================================= */
-        .rev-card-layout { 
-            display: flex; flex-direction: row; gap: 8px; align-items: stretch;
-            width: 100%;
-        }
+        .rev-card-layout { display: flex; flex-direction: column; gap: 8px; align-items: stretch; width: 100%; }
+        .rev-left { display: flex; flex-direction: column; gap: 8px; }
         
-        /* 手機版：左側佔約 55%，右側 45% */
-        .rev-left { 
-            flex: 0 0 55%; max-width: 340px; 
-            display: flex; flex-direction: column; gap: 8px; 
-        }
-        .rev-right { 
-            flex: 1; display: flex; flex-direction: column; min-width: 0;
-        }
-        
-        /* 畫布容器：高度 100% 綁定左側，不再亂長 */
-        .chart-stage { 
-            background: #1a1a1a; border-radius: 8px; border: 1px solid #444; 
-            position: relative; flex: 1; min-height: 100%; 
-            display: flex; justify-content: center; align-items: stretch; overflow: hidden;
-        }
+        /* 💡 畫布容器：高度 100% 綁定左側，不再亂長 */
+        .chart-stage { background: #1a1a1a; border-radius: 8px; border: 1px solid #444; position: relative; overflow: hidden; }
         .chart-stage canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+        
+        /* 電腦版 (>= 768px)：左右鎖定等高 */
+        @media (min-width: 768px) {
+            .rev-card-layout { flex-direction: row; }
+            .rev-left { width: 340px; flex-shrink: 0; }
+            .chart-stage { flex: 1; display: flex; justify-content: center; align-items: stretch; overflow: hidden; }
+        }
+        
+        /* 手機版 (< 768px)：上下堆疊，固定圖高 */
+        @media (max-width: 767px) {
+            .rev-card-layout { flex-direction: column; }
+            .rev-left { width: 100%; }
+            .chart-stage { width: 100%; height: 400px; margin-top: 10px; }
+        }
 
-        .ohlc-input-group { background: #252525; border-radius: 8px; padding: 8px; border: 1px solid #444; margin-bottom: 8px; position: relative;}
-        /* 網格改為 2x2，適應手機半屏寬度 */
-        .ohlc-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-top: 8px; }
+        .ohlc-input-group { background: #252525; border-radius: 8px; padding: 8px 6px; border: 1px solid #444; margin-bottom: 8px; position: relative;}
+        .ohlc-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; margin-top: 8px; }
         
         /* 💡 終極前綴輸入框設計 */
         .input-with-prefix { display: flex; align-items: center; background: #2c2c2c; border: 1px solid #444; border-radius: 4px; padding-left: 6px; overflow: hidden; transition: border 0.2s;}
@@ -248,9 +246,6 @@
         .label-green { color: #00e676; font-weight: bold; font-size:0.8rem; }
         .label-cyan { color: #00ffcc; font-weight: bold; font-size:0.8rem; }
         .label-magenta { color: #ff00ff; font-weight: bold; font-size:0.8rem; }
-        
-        .compact-time-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 6px;}
-        .compact-time-grid .clean-input { padding: 6px 4px; font-size: 0.9rem; }
     </style>
 </head>
 <body>
@@ -424,7 +419,7 @@
                     2. 做<span style="color:#00e676; font-weight:bold;">空</span>：5分K必須是<span style="color:#00e676; font-weight:bold;">綠K</span>，且收破基準。<br>
                     3. 停損：設基準退1檔(空方往上推)。盤中觸價<b>絕對嚴格停損</b>。<br>
                     4. 防鐵鎚線或吞噬，看到需有出場準備。<br>
-                    5. <b>Tick：</b><span style="color:#ff4d4d; font-weight:bold;">紅字</span>=看<span style="color:#ff4d4d; font-weight:bold;">多</span>；<span style="color:#00e676; font-weight:bold;">綠字</span>=看<span style="color:#00e676; font-weight:bold;">空</span>。
+                    5. <b>Tick：</b><span style="color:#ff4d4d; font-weight:bold;">紅字</span>=看<span style="color:#ff4d4d; font-weight:bold;">多</span>；<span style="color:#00e676; font-weight:bold;">綠字</span>=看<span style="color:#00e676; font-weight:bold;">空</span>.
                 </div>
             </div>
         </div>
@@ -476,7 +471,7 @@
                     <tr>
                         <th class="k-row-th">無下影線<br><span style="font-weight:normal; font-size:0.75rem;">(光腳)</span><br><span class="k-yellow-tip">👉 空軍狂殺，下方無撐</span></th>
                         <td><div class="kl-box"><div class="kl green"><div class="body" style="top:0; height:100%;"></div></div></div><div class="k-title t-green">【極空】大陰線<br>(光頭光腳大綠K)</div><div class="k-desc">賣盤絕對統治，這5分鐘呈現崩跌狀態，下一根高機率續殺。</div></td>
-                        <td><div class="kl-box"><div class="kl green"><div class="wick" style="top:0; height:20%;"></div><div class="body" style="top:20%; height:80%;"></div></div></div><div class="k-title t-green">【強空】開高走低<br>(光腳綠K)</div><div class="k-desc">開盤誘多假抽一下，馬上被空軍按在地上摩擦，殺到底。</div></td>
+                        <td><div class="kl-box"><div class="kl green"><div class="wick" style="top:0; height:20%;"></div><div class="body" style="top:20%; height:80%;"></div></div></div><div class="k-title t-green">【強空】開高走低<br>(光腳綠K)</div><div class="k-desc">開盤誘多假抽一下，馬上被空軍按在地上摩擦，殺到底.</div></td>
                         <td><div class="kl-box"><div class="kl green"><div class="wick" style="top:0; height:60%;"></div><div class="body" style="top:60%; height:40%;"></div></div></div><div class="k-title t-green">【⚠️極空轉折】<br>墓碑線</div><div class="k-desc">主力拉高倒貨！反彈完全失敗，上方全是冤魂，準備大跌。</div></td>
                     </tr>
                     <tr>
@@ -524,6 +519,7 @@
                     </tr>
                 </table>
             </div>
+
         </div>
 
         <div class="page" id="page-4">
@@ -611,7 +607,7 @@
         function updateTabs() { let idx = Math.round(slider.scrollLeft / slider.clientWidth); tabs.forEach((t, i) => { if(i===idx) t.classList.add('active'); else t.classList.remove('active'); }); if(idx === 4) checkAndAutoImportReviews(); }
         function autoFillName() { markLocalEdit(); let code = document.getElementById('wl-code').value.toUpperCase(); let nameInput = document.getElementById('wl-name'); if(customDict[code]) nameInput.value = customDict[code]; else nameInput.value = ''; }
 
-        // ================= 系統設定面板控制 =================
+        // ================= 設定面板 Modal 控制 =================
         function openSettings() { document.getElementById('settings-modal').style.display = 'flex'; }
         function closeSettings() { document.getElementById('settings-modal').style.display = 'none'; }
 
@@ -837,18 +833,13 @@
             let container = document.getElementById(`${mode}-missions-container`); let nav = document.getElementById(`${mode}-combat-nav`);
             let mIds = Object.keys(missions);
             
-            if(mIds.length === 0) { 
-                nav.style.display = 'none'; 
-                container.innerHTML = `<div class="empty-msg" style="text-align:center; color:#666; margin-top:50px;">目前沒有監控標的。<br>請至「標的」頁面點擊新增。</div>`; 
-                return; 
-            }
+            if(mIds.length === 0) { nav.style.display = 'none'; container.innerHTML = `<div class="empty-msg" style="text-align:center; color:#666; margin-top:50px;">目前沒有監控標的。<br>請至「標的」頁面點擊新增。</div>`; return; }
             nav.style.display = 'flex';
 
             let navHtml = ''; let htmlStr = '';
 
             mIds.forEach(mId => {
-                let m = missions[mId]; 
-                navHtml += `<div class="chip ${isLong?'l':'s'} ${m.locked ? 'locked' : ''}" onclick="jumpToMission('${mode}', '${m.id}')">${m.name} (${m.base})${m.locked?' 🔒':''}</div>`;
+                let m = missions[mId]; navHtml += `<div class="chip ${isLong?'l':'s'} ${m.locked ? 'locked' : ''}" onclick="jumpToMission('${mode}', '${m.id}')">${m.name} (${m.base})${m.locked?' 🔒':''}</div>`;
                 let limitHtml = m.yc ? `<div class="limits-bar"><span style="color:#ff4d4d; font-weight:bold;">🔴漲停 ${calcUp(m.yc)}</span><span style="color:#aaa;">昨收 ${m.yc}</span><span style="color:#00e676; font-weight:bold;">🟢跌停 ${calcDown(m.yc)}</span></div>` : '';
                 let lockState = m.locked ? 'disabled' : ''; let lockBtnColor = m.locked ? '#ffeb3b' : '#aaa'; let lockBtnText = m.locked ? '🔒 解除鎖定' : '🔓 鎖定結算';
                 
@@ -1167,6 +1158,27 @@
             check(oInp); check(hInp); check(lInp); check(cInp);
         }
 
+        // 💡 時間文字自動補冒號
+        function autoFormatTime(el, rId, index, field) {
+            let v = el.value.replace(/[^\d]/g, ''); // 移除所有非數字
+            if(v.length >= 2) {
+                let h = parseInt(v.substr(0, 2)); if(h > 23) h = 23; if(h < 0) h = 0;
+                v = String(h).padStart(2, '0') + v.substr(2);
+            }
+            if(v.length >= 3) {
+                v = v.substr(0, 2) + ':' + v.substr(2, 2);
+            }
+            el.value = v; 
+            if(v.length === 5) { // 格式完整後更新
+                if(index === null) { // 進出場時間
+                    if(field === 'entryTime') updateRevTimeSync(rId, v);
+                    else updateRev(rId, field, v);
+                } else { // K線時間
+                    updateOhlcRow(rId, index, field, v);
+                }
+            }
+        }
+
         function renderReviews() {
             const container = document.getElementById('reviews-container'); let htmlStr = '';
             let rIds = Object.keys(activeReviewMissions);
@@ -1187,13 +1199,13 @@
                     ohlcHtml += `
                         <div class="ohlc-input-group">
                             <button type="button" class="btn-icon" style="position:absolute; top:5px; right:5px; color:#666; font-size:1.2rem;" onclick="removeOhlcRow('${rId}', ${idx})">✖</button>
-                            <label style="color:#00ffcc;">#${idx+1} K線時間</label>
-                            <div style="margin-bottom:6px;"><input type="time" id="rev-${rId}-t-${idx}" class="clean-input" style="padding:4px;" value="${oData.t}" oninput="updateOhlcRow('${rId}', ${idx}, 't', this.value)"></div>
+                            <label style="color:#00ffcc;">#${idx+1} K線時間 (24h格式如0905)</label>
+                            <div style="margin-bottom:6px;"><input type="text" id="rev-${rId}-t-${idx}" class="clean-input" style="padding:4px; font-weight:bold; text-align:center;" placeholder="HH:MM" maxlength="5" value="${oData.t}" oninput="autoFormatTime(this, '${rId}', ${idx}, 't')"></div>
                             <div class="ohlc-grid">
-                                <div class="input-with-prefix ${oClass}"><span class="prefix">開:</span><input type="number" id="rev-${rId}-o-${idx}" placeholder="---" step="0.01" value="${oData.o}" oninput="updateOhlcRow('${rId}', ${idx}, 'o', this.value)"></div>
-                                <div class="input-with-prefix ${hClass}"><span class="prefix">高:</span><input type="number" id="rev-${rId}-h-${idx}" placeholder="---" step="0.01" value="${oData.h}" oninput="updateOhlcRow('${rId}', ${idx}, 'h', this.value)"></div>
-                                <div class="input-with-prefix ${lClass}"><span class="prefix">低:</span><input type="number" id="rev-${rId}-l-${idx}" placeholder="---" step="0.01" value="${oData.l}" oninput="updateOhlcRow('${rId}', ${idx}, 'l', this.value)"></div>
-                                <div class="input-with-prefix ${cClass}"><span class="prefix">收:</span><input type="number" id="rev-${rId}-c-${idx}" placeholder="---" step="0.01" value="${oData.c}" oninput="updateOhlcRow('${rId}', ${idx}, 'c', this.value)"></div>
+                                <div class="input-with-prefix ${oClass}"><span class="prefix">開:</span><input type="number" id="rev-${rId}-o-${idx}" placeholder="---" step="any" value="${oData.o}" oninput="updateOhlcRow('${rId}', ${idx}, 'o', this.value)"></div>
+                                <div class="input-with-prefix ${hClass}"><span class="prefix">高:</span><input type="number" id="rev-${rId}-h-${idx}" placeholder="---" step="any" value="${oData.h}" oninput="updateOhlcRow('${rId}', ${idx}, 'h', this.value)"></div>
+                                <div class="input-with-prefix ${lClass}"><span class="prefix">低:</span><input type="number" id="rev-${rId}-l-${idx}" placeholder="---" step="any" value="${oData.l}" oninput="updateOhlcRow('${rId}', ${idx}, 'l', this.value)"></div>
+                                <div class="input-with-prefix ${cClass}"><span class="prefix">收:</span><input type="number" id="rev-${rId}-c-${idx}" placeholder="---" step="any" value="${oData.c}" oninput="updateOhlcRow('${rId}', ${idx}, 'c', this.value)"></div>
                             </div>
                         </div>`;
                 });
@@ -1219,13 +1231,13 @@
                                     <span style="color:#00e676;">跌停 <span id="rev-down-${rId}">${ycVal?calcDown(ycVal):'-'}</span></span>
                                 </div>
                                 
-                                <div class="compact-time-grid">
-                                    <div><label class="label-cyan">進場時間</label><input type="time" class="clean-input" value="${r.entryTime}" oninput="updateRevTimeSync('${rId}', this.value)"></div>
-                                    <div><label class="label-cyan">進場價</label><input type="number" class="clean-input" step="0.01" value="${r.entryPrice}" oninput="updateRev('${rId}', 'entryPrice', this.value)"></div>
+                                <div style="display:flex; gap:6px; margin-bottom:8px;">
+                                    <div style="flex:1;"><label class="label-cyan">進場 (如0907)</label><input type="text" class="clean-input" placeholder="HH:MM" maxlength="5" style="font-weight:bold; text-align:center;" value="${r.entryTime}" oninput="autoFormatTime(this, '${rId}', null, 'entryTime')"></div>
+                                    <div style="flex:1;"><label class="label-cyan">進價</label><input type="number" class="clean-input" placeholder="---" step="any" value="${r.entryPrice}" oninput="updateRev('${rId}', 'entryPrice', this.value)"></div>
                                 </div>
-                                <div class="compact-time-grid">
-                                    <div><label class="label-red">出場時間</label><input type="time" class="clean-input" value="${r.exitTime}" oninput="updateRev('${rId}', 'exitTime', this.value)"></div>
-                                    <div><label class="label-red">出場價</label><input type="number" class="clean-input" step="0.01" value="${r.exitPrice}" oninput="updateRev('${rId}', 'exitPrice', this.value)"></div>
+                                <div style="display:flex; gap:6px; margin-bottom:8px;">
+                                    <div style="flex:1;"><label class="label-red">出場 (如0920)</label><input type="text" class="clean-input" placeholder="HH:MM" maxlength="5" style="font-weight:bold; text-align:center;" value="${r.exitTime}" oninput="autoFormatTime(this, '${rId}', null, 'exitTime')"></div>
+                                    <div style="flex:1;"><label class="label-red">出價</label><input type="number" class="clean-input" placeholder="---" step="any" value="${r.exitPrice}" oninput="updateRev('${rId}', 'exitPrice', this.value)"></div>
                                 </div>
                                 
                                 <div class="input-group" style="margin-bottom:0;">
@@ -1249,7 +1261,7 @@
                             </div>
                         </div>
                         
-                        <div class="rev-right chart-stage" id="stage-${rId}">
+                        <div class="chart-stage" id="stage-${rId}">
                             <canvas id="canvas-${rId}"></canvas>
                         </div>
                     </div>
@@ -1285,7 +1297,8 @@
 
             const dpr = window.devicePixelRatio || 1;
             const displayWidth = stage.clientWidth;
-            const displayHeight = Math.max(stage.clientHeight, 400); 
+            // 電腦版高度鎖定左側，手機版固定高度
+            const displayHeight = (window.innerWidth >= 768) ? stage.closest('.rev-card-layout').querySelector('.rev-left').clientHeight : 400; 
             
             canvas.style.width = displayWidth + 'px';
             canvas.style.height = displayHeight + 'px';
@@ -1293,7 +1306,7 @@
             canvas.height = displayHeight * dpr;
             ctx.scale(dpr, dpr);
 
-            const padding = { top: 60, right: 60, bottom: 50, left: 75 }; // 增加左邊距放進出場字
+            const padding = { top: 60, right: 60, bottom: 50, left: 70 }; // 調寬左邊距
             const chartWidth = displayWidth - padding.left - padding.right;
             const chartHeight = displayHeight - padding.top - padding.bottom;
 
@@ -1334,12 +1347,11 @@
             });
 
             // 💡 緊密無縫 K 線參數設定 (移除了多餘的 gap)
-            const minBarsToShow = Math.max(bars.length, 3); 
-            const barWidth = (chartWidth / minBarsToShow) * 0.9; 
-            const barGap = (chartWidth / minBarsToShow) * 0.1;
+            const barWidth = chartWidth / bars.length * 0.95; 
+            const barGap = chartWidth / bars.length * 0.05;
 
             bars.forEach((bar, index) => {
-                const x = padding.left + (index * (barWidth + barGap)) + (barGap / 2);
+                const x = padding.left + (index * (barWidth + barGap));
                 const centerX = x + barWidth / 2;
                 const yOpen = getY(bar.o); const yHigh = getY(bar.h); const yLow = getY(bar.l); const yClose = getY(bar.c);
 
@@ -1363,39 +1375,35 @@
                 ctx.font = '10px Arial'; ctx.textBaseline = 'middle';
                 
                 ctx.fillStyle = '#ffeb3b'; ctx.textAlign = 'center';
-                ctx.fillText(bar.h, centerX, yHigh - 12);
-                ctx.fillText(bar.l, centerX, yLow + 12);
+                ctx.fillText(bar.h.toFixed(2), centerX, yHigh - 12);
+                ctx.fillText(bar.l.toFixed(2), centerX, yLow + 12);
                 
-                ctx.fillStyle = '#00ffff'; // 青色開收
-                if (isUp) {
-                    ctx.textAlign = 'right'; ctx.fillText(bar.o, x - 2, yOpen);
-                    ctx.textAlign = 'left'; ctx.fillText(bar.c, x + barWidth + 2, yClose);
-                } else {
-                    ctx.textAlign = 'right'; ctx.fillText(bar.o, x - 2, yOpen);
-                    ctx.textAlign = 'left'; ctx.fillText(bar.c, x + barWidth + 2, yClose);
-                }
+                ctx.fillStyle = '#00ffff'; ctx.textAlign = 'right';
+                ctx.fillText(bar.o.toFixed(2), x - 2, yOpen);
+                ctx.fillText(bar.c.toFixed(2), x - 2, yClose);
 
                 ctx.fillStyle = '#888888'; ctx.textAlign = 'center'; ctx.textBaseline = 'top';
                 ctx.fillText(bar.time, centerX, padding.top + chartHeight + 10);
             });
 
-            // 💡 繪製進出場線與文字防遮擋
-            ctx.textBaseline = 'middle';
+            // 💡 繪製進出場線與文字靠左對齊防遮擋
+            ctx.textBaseline = 'bottom'; ctx.textAlign = 'left';
             if (!isNaN(ep)) {
                 const yEntry = getY(ep);
-                ctx.strokeStyle = '#00ffff'; ctx.lineWidth = 2; ctx.setLineDash([5, 5]);
+                ctx.strokeStyle = '#ff00ff'; ctx.lineWidth = 2; ctx.setLineDash([5, 5]);
                 ctx.beginPath(); ctx.moveTo(padding.left, yEntry); ctx.lineTo(padding.left + chartWidth, yEntry); ctx.stroke();
-                ctx.setLineDash([]); ctx.fillStyle = '#00ffff'; ctx.font = 'bold 12px Arial'; ctx.textAlign = 'left';
-                ctx.fillText(`B: ${ep.toFixed(2)} (${r.entryTime||'-'})`, 5, yEntry); // 貼齊最左邊
+                ctx.setLineDash([]); ctx.fillStyle = '#ff00ff'; ctx.font = 'bold 12px Arial'; 
+                // 文字移到線的上方，靠左對齊
+                ctx.fillText(`B: ${ep.toFixed(2)} (${r.entryTime||'-'})`, padding.left + 5, yEntry - 4); 
             }
 
             if (!isNaN(xp)) {
                 const yExit = getY(xp);
-                ctx.strokeStyle = '#ff9800'; // 改為高對比亮橘色
-                ctx.lineWidth = 2; ctx.setLineDash([5, 5]);
+                ctx.strokeStyle = '#00ffff'; ctx.lineWidth = 2; ctx.setLineDash([5, 5]);
                 ctx.beginPath(); ctx.moveTo(padding.left, yExit); ctx.lineTo(padding.left + chartWidth, yExit); ctx.stroke();
-                ctx.setLineDash([]); ctx.fillStyle = '#ff9800'; ctx.font = 'bold 12px Arial'; ctx.textAlign = 'left';
-                ctx.fillText(`S: ${xp.toFixed(2)} (${r.exitTime||'-'})`, 5, yExit); // 貼齊最左邊
+                ctx.setLineDash([]); ctx.fillStyle = '#00ffff'; ctx.font = 'bold 12px Arial'; 
+                // 文字移到線的上方，靠左對齊
+                ctx.fillText(`S: ${xp.toFixed(2)} (${r.exitTime||'-'})`, padding.left + 5, yExit - 4); 
             }
 
             // 標題與統計
