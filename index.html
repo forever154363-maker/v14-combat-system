@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>量化交易與資金控管系統 V14.11</title>
+    <title>量化交易與資金控管系統 V14.12</title>
     
     <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-database-compat.js"></script>
@@ -67,7 +67,7 @@
         
         .input-group { margin-bottom: 10px; }
         label { display: block; font-size: 0.85rem; color: #aaa; margin-bottom: 4px; }
-        input[type="text"].clean-input, input[type="number"].clean-input, input[type="time"].clean-input, select.clean-input { width: 100%; box-sizing: border-box; background-color: #2c2c2c; border: 1px solid #444; color: #fff; padding: 10px; border-radius: 6px; font-size: 1rem;}
+        input.clean-input, select.clean-input { width: 100%; box-sizing: border-box; background-color: #2c2c2c; border: 1px solid #444; color: #fff; padding: 10px; border-radius: 6px; font-size: 1rem; transition: border 0.2s;}
         input.clean-input:focus, select.clean-input:focus { outline: none; border-color: #00ffcc; background-color: #333;}
         
         .signal { text-align: center; padding: 10px; border-radius: 6px; font-weight: bold; background-color: #333; font-size: 1rem; margin: 10px 0; }
@@ -172,7 +172,9 @@
         #settings-modal { position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(18,18,18,0.95); backdrop-filter:blur(5px); z-index:99999; display:none; flex-direction:column; justify-content:center; align-items:center; padding:20px; box-sizing:border-box; }
         #auth-modal { position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(18,18,18,0.98); z-index:99999; display:flex; flex-direction:column; justify-content:center; align-items:center; }
 
-        /* K 線圖鑑專屬樣式 */
+        /* =========================================
+           📊 K 線圖鑑專屬樣式 (完整版)
+           ========================================= */
         .k-book-table { width: 100%; min-width: 340px; table-layout: fixed; border-collapse: collapse; text-align: center; color: #fff; background-color:#1a1a1a; margin-bottom: 30px; }
         .k-book-table th, .k-book-table td { border: 1px solid #333; padding: 8px 4px; vertical-align: top; word-wrap: break-word; }
         .k-book-table th { background-color: #222; font-weight: normal; line-height: 1.4; }
@@ -208,24 +210,23 @@
         }
 
         /* =========================================
-           📝 覆盤模式專屬樣式 (Flexbox 對齊修正)
+           📝 覆盤模式專屬樣式 (修復高度與緊密 K 線)
            ========================================= */
         .rev-card-layout { display: flex; flex-direction: column; gap: 15px; }
         .rev-left { display: flex; flex-direction: column; gap: 10px; }
-        .rev-right { display: flex; flex-direction: column; min-height: 250px; }
-        .chart-stage { background: #1a1a1a; border-radius: 10px; border: 2px solid #333; position: relative; flex: 1; display: flex; justify-content: center; align-items: stretch; overflow: hidden;}
-        .chart-stage canvas { width: 100%; height: 100%; }
+        .rev-right { display: flex; flex-direction: column; min-height: 450px; flex: 1; }
+        
+        .chart-stage { background: #1a1a1a; border-radius: 10px; border: 2px solid #333; position: relative; flex: 1; min-height: 450px; display: flex; justify-content: center; align-items: stretch; overflow: hidden;}
+        .chart-stage canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
         
         @media (min-width: 992px) {
             .rev-card-layout { flex-direction: row; align-items: stretch; }
-            .rev-left { width: 320px; flex-shrink: 0; }
-            .rev-right { flex: 1; }
+            .rev-left { width: 350px; flex-shrink: 0; }
         }
 
-        /* 💡 修復手機網格溢位 */
         .ohlc-input-group { background: #252525; border-radius: 8px; padding: 12px; border: 1px solid #444; margin-bottom: 10px; position: relative;}
         .ohlc-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; margin-top: 8px; }
-        .ohlc-grid input { width: 100%; box-sizing: border-box; text-align: center; border-radius: 4px; padding: 8px 2px; min-width: 0; font-size:0.9rem;}
+        .ohlc-grid input { width: 100%; box-sizing: border-box; text-align: center; border-radius: 4px; padding: 8px 2px; min-width: 0; font-size:0.9rem; transition: color 0.2s;}
         
         .label-red { color: #ff4d4d; font-weight: bold; font-size:0.85rem; }
         .label-green { color: #00e676; font-weight: bold; font-size:0.85rem; }
@@ -278,7 +279,7 @@
             
             <div style="margin-top:30px; border-top:1px dashed #555; padding-top:20px; text-align:center;">
                 <h3 style="color:#ff4d4d; margin:0 0 10px 0;">🔥 每日資料重置</h3>
-                <div id="burn-status-msg" style="font-size:0.75rem; color:#aaa; margin-bottom:10px;">(安全鎖：每日 18:00 至 08:30 開放)</div>
+                <div id="burn-status-msg" style="font-size:0.75rem; color:#aaa; margin-bottom:10px;">(安全鎖：每日 14:00 至 08:00 開放)</div>
                 <button type="button" id="burn-btn" class="btn" style="background-color:#444; color:#888; font-weight:900;" onclick="attemptClearAll()">🔒 非開放時間保險鎖定中</button>
             </div>
         </div>
@@ -307,7 +308,7 @@
                 <div class="wl-title-bar">
                     <input type="tel" id="wl-code" placeholder="股號" oninput="autoFillName()" tabindex="1" style="width:30%;">
                     <input type="text" id="wl-name" placeholder="股名" tabindex="-1" style="width:35%;">
-                    <input type="number" inputmode="decimal" id="wl-yc" placeholder="昨收" tabindex="2" style="width:35%; color:#ffeb3b; border-color:#ffeb3b;" oninput="markLocalEdit(); updateYcLimits()">
+                    <input type="number" inputmode="decimal" id="wl-yc" placeholder="昨收" tabindex="2" style="width:35%; color:#ffeb3b; border-color:#ffeb3b;" oninput="markLocalEdit(); updateYcLimits('main')">
                 </div>
 
                 <div style="display:flex; justify-content:flex-end; gap:15px; font-size:0.85rem; font-weight:bold; margin-top:-8px; margin-bottom:15px; padding-right:5px;">
@@ -409,6 +410,7 @@
 
         <div class="page" id="page-3">
             <h3 style="color:#00ffcc; text-align:center; margin-top:0; margin-bottom: 20px;">📊 實戰 K 線型態圖鑑</h3>
+
             <div class="k-table-container">
                 <table class="k-book-table">
                     <tr><th colspan="4" class="k-main-th" style="background:#331111; border-bottom:none;"><span class="t-red">🟥 第一張表：紅 K 陣營 (收盤 &gt; 開盤)</span></th></tr>
@@ -421,12 +423,87 @@
                     </tr>
                     <tr>
                         <th class="k-row-th">無下影線<br><span style="font-weight:normal; font-size:0.75rem;">(光腳)</span><br><span class="k-yellow-tip">👉 開盤即最低，沒人想賣</span></th>
-                        <td><div class="kl-box"><div class="kl red"><div class="body" style="top:0; height:100%;"></div></div></div><div class="k-title t-red">【極多】大陽線</div></td>
-                        <td><div class="kl-box"><div class="kl red"><div class="wick" style="top:0; height:20%;"></div><div class="body" style="top:20%; height:80%;"></div></div></div><div class="k-title t-red">【強多】強勢推進</div></td>
-                        <td><div class="kl-box"><div class="kl red"><div class="wick" style="top:0; height:60%;"></div><div class="body" style="top:60%; height:40%;"></div></div></div><div class="k-title t-green">【⚠️極度危險】避雷針</div></td>
+                        <td><div class="kl-box"><div class="kl red"><div class="body" style="top:0; height:100%;"></div></div></div><div class="k-title t-red">【極多】大陽線<br>(光頭光腳大紅K)</div><div class="k-desc">買盤絕對統治，下一根高機率繼續衝。</div></td>
+                        <td><div class="kl-box"><div class="kl red"><div class="wick" style="top:0; height:20%;"></div><div class="body" style="top:20%; height:80%;"></div></div></div><div class="k-title t-red">【強多】強勢推進<br>(光腳紅K)</div><div class="k-desc">穩健上攻，雖然高點遇微壓，但不影響多頭氣勢。</div></td>
+                        <td><div class="kl-box"><div class="kl red"><div class="wick" style="top:0; height:60%;"></div><div class="body" style="top:60%; height:40%;"></div></div></div><div class="k-title t-green">【⚠️極度危險】<br>避雷針 / 誘多紅</div><div class="k-desc">主力拉高出貨！這5分鐘內套死一堆追高散戶，準備反轉向下。</div></td>
+                    </tr>
+                    <tr>
+                        <th class="k-row-th">短下影線<br><span style="font-weight:normal; font-size:0.75rem;">(&lt;實體)</span><br><span class="k-yellow-tip">👉 開盤微跌即拉回，下有撐</span></th>
+                        <td><div class="kl-box"><div class="kl red"><div class="wick" style="top:80%; height:20%;"></div><div class="body" style="top:0; height:80%;"></div></div></div><div class="k-title t-red">【強多】光頭微下影<br>(光頭紅K)</div><div class="k-desc">踩穩後一路往上墊，收盤收在最高點，攻勢強勁。</div></td>
+                        <td><div class="kl-box"><div class="kl red"><div class="wick" style="top:10%; height:80%;"></div><div class="body" style="top:20%; height:60%;"></div></div></div><div class="k-title t-red">【看多】標準換手紅K</div><div class="k-desc">最常見的推進K線，多空有來有往，多方穩步佔優。</div></td>
+                        <td><div class="kl-box"><div class="kl red"><div class="wick" style="top:0; height:85%;"></div><div class="body" style="top:50%; height:25%;"></div></div></div><div class="k-title t-green">【⚠️偏空轉折】<br>力竭紅K (倒槌線)</div><div class="k-desc">雖然底盤有撐、且收紅，但上面被打臉打得太慘，多頭沒力了。</div></td>
+                    </tr>
+                    <tr>
+                        <th class="k-row-th">長下影線<br><span style="font-weight:normal; font-size:0.75rem;">(&gt;實體)</span><br><span class="k-yellow-tip">👉 殺低被瘋狂買回，鐵板一塊</span></th>
+                        <td><div class="kl-box"><div class="kl red"><div class="wick" style="top:40%; height:60%;"></div><div class="body" style="top:0; height:40%;"></div></div></div><div class="k-title t-red">【⚠️極多轉折】<br>強勢掃底 (槌子線)</div><div class="k-desc">殺低後V轉且收在最高，主力在此強勢接刀，準備發動攻擊。</div></td>
+                        <td><div class="kl-box"><div class="kl red"><div class="wick" style="top:10%; height:90%;"></div><div class="body" style="top:30%; height:20%;"></div></div></div><div class="k-title t-red">【⚠️強多轉折】<br>下檔鐵板</div><div class="k-desc">探底後強力抽高，代表這5分鐘內下方有重兵防守，適合進場做多。</div></td>
+                        <td><div class="kl-box"><div class="kl red"><div class="wick" style="top:0; height:100%;"></div><div class="body" style="top:40%; height:20%;"></div></div></div><div class="k-title t-warn">【⚠️震盪觀望】<br>雙殺絞肉機(長腿紡錘)</div><div class="k-desc">上不去也下不來，多空這5分鐘內互殺極度劇烈，下一根方向不明，先收手。</div></td>
                     </tr>
                 </table>
             </div>
+
+            <div class="k-table-container">
+                <table class="k-book-table">
+                    <tr><th colspan="4" class="k-main-th" style="background:#0f2b1a; border-bottom:none;"><span class="t-green">🟩 第二張表：綠 K 陣營 (收盤 &lt; 開盤)</span></th></tr>
+                    <tr><th colspan="4" class="k-sub-th" style="background:#051a0f;">【盤面判定】：綠K代表這5分鐘內「賣單總量勝出」。影線決定了空方是「碾壓局」還是「踢到鐵板」。</th></tr>
+                    <tr>
+                        <th></th>
+                        <th class="k-col-th">無上影線<br><span style="font-weight:normal; font-size:0.75rem;">(光頭)</span><span class="k-yellow-tip">👉 開盤即最高，沒人想買</span></th>
+                        <th class="k-col-th">短上影線<br><span style="font-weight:normal; font-size:0.75rem;">(&lt;實體)</span><span class="k-yellow-tip">👉 微幅反彈，瞬間被空</span></th>
+                        <th class="k-col-th">長上影線<br><span style="font-weight:normal; font-size:0.75rem;">(&gt;實體)</span><span class="k-yellow-tip">👉 彈高被打臉，空頭死壓</span></th>
+                    </tr>
+                    <tr>
+                        <th class="k-row-th">無下影線<br><span style="font-weight:normal; font-size:0.75rem;">(光腳)</span><br><span class="k-yellow-tip">👉 空軍狂殺，下方無撐</span></th>
+                        <td><div class="kl-box"><div class="kl green"><div class="body" style="top:0; height:100%;"></div></div></div><div class="k-title t-green">【極空】大陰線<br>(光頭光腳大綠K)</div><div class="k-desc">賣盤絕對統治，這5分鐘呈現崩跌狀態，下一根高機率續殺。</div></td>
+                        <td><div class="kl-box"><div class="kl green"><div class="wick" style="top:0; height:20%;"></div><div class="body" style="top:20%; height:80%;"></div></div></div><div class="k-title t-green">【強空】開高走低<br>(光腳綠K)</div><div class="k-desc">開盤誘多假抽一下，馬上被空軍按在地上摩擦，殺到底。</div></td>
+                        <td><div class="kl-box"><div class="kl green"><div class="wick" style="top:0; height:60%;"></div><div class="body" style="top:60%; height:40%;"></div></div></div><div class="k-title t-green">【⚠️極空轉折】<br>墓碑線</div><div class="k-desc">主力拉高倒貨！反彈完全失敗，上方全是冤魂，準備大跌。</div></td>
+                    </tr>
+                    <tr>
+                        <th class="k-row-th">短下影線<br><span style="font-weight:normal; font-size:0.75rem;">(&lt;實體)</span><br><span class="k-yellow-tip">👉 殺到底有微弱買盤抵抗</span></th>
+                        <td><div class="kl-box"><div class="kl green"><div class="wick" style="top:80%; height:20%;"></div><div class="body" style="top:0; height:80%;"></div></div></div><div class="k-title t-green">【強空】弱勢緩跌<br>(光頭綠K)</div><div class="k-desc">一路殺，到底部稍微踩個煞車，但空方氣勢依然壓制全場。</div></td>
+                        <td><div class="kl-box"><div class="kl green"><div class="wick" style="top:10%; height:80%;"></div><div class="body" style="top:20%; height:60%;"></div></div></div><div class="k-title t-green">【看空】標準下殺綠K</div><div class="k-desc">最常見的退水K線，多空正常交火，空方穩步佔優。</div></td>
+                        <td><div class="kl-box"><div class="kl green"><div class="wick" style="top:0; height:85%;"></div><div class="body" style="top:50%; height:25%;"></div></div></div><div class="k-title t-green">【強空】假突破真下殺<br>(倒槌線)</div><div class="k-desc">衝高失敗後一路破底，上方套牢賣壓重，反彈無望。</div></td>
+                    </tr>
+                    <tr>
+                        <th class="k-row-th">長下影線<br><span style="font-weight:normal; font-size:0.75rem;">(&gt;實體)</span><br><span class="k-yellow-tip">👉 殺低被打臉，買盤極重</span></th>
+                        <td><div class="kl-box"><div class="kl green"><div class="wick" style="top:40%; height:60%;"></div><div class="body" style="top:0; height:40%;"></div></div></div><div class="k-title t-red">【⚠️偏多轉折】<br>深水炸彈 (槌子線)</div><div class="k-desc">一路殺到極低點突然爆量買回，空方殺不下去，隨時準備V轉向上。</div></td>
+                        <td><div class="kl-box"><div class="kl green"><div class="wick" style="top:10%; height:90%;"></div><div class="body" style="top:30%; height:20%;"></div></div></div><div class="k-title t-warn">【⚠️危險轉折】<br>探底誘空</div><div class="k-desc">雖然收綠，但下面有一根長長的避震器，追空極容易被嘎爆，先撤退。</div></td>
+                        <td><div class="kl-box"><div class="kl green"><div class="wick" style="top:0; height:100%;"></div><div class="body" style="top:40%; height:20%;"></div></div></div><div class="k-title t-warn">【⚠️震盪觀望】<br>雙殺絞肉機(長腿紡錘)</div><div class="k-desc">這5分鐘內上沖下洗，主力在亂洗籌碼，不要在這種線型裡面猜方向。</div></td>
+                    </tr>
+                </table>
+            </div>
+
+            <div class="k-table-container">
+                <table class="k-book-table">
+                    <tr><th colspan="4" class="k-main-th" style="background:#2a2a2a; border-bottom:none;"><span style="color:#ddd;">⬜ 第三張表：白 K 陣營 (收盤 = 開盤 / 十字星)</span></th></tr>
+                    <tr><th colspan="4" class="k-sub-th" style="background:#1a1a1a;">【盤面判定】：這5分鐘內多空打平。白K出現代表「趨勢暫停」，往往是準備變盤的發令槍！</th></tr>
+                    <tr>
+                        <th></th>
+                        <th class="k-col-th">無上影線<br><span style="font-weight:normal; font-size:0.75rem;">(光頭)</span><span class="k-yellow-tip">👉 高點等於開收盤</span></th>
+                        <th class="k-col-th">短上影線<br><span style="font-weight:normal; font-size:0.75rem;">(&lt;下影線)</span><span class="k-yellow-tip">👉 高點微幅凸出</span></th>
+                        <th class="k-col-th">長上影線<br><span style="font-weight:normal; font-size:0.75rem;">(&gt;下影線)</span><span class="k-yellow-tip">👉 高點極度凸出</span></th>
+                    </tr>
+                    <tr>
+                        <th class="k-row-th">無下影線<br><span style="font-weight:normal; font-size:0.75rem;">(光腳)</span><br><span class="k-yellow-tip">👉 低點等於開收盤</span></th>
+                        <td><div class="kl-box"><div class="kl white"><div class="body" style="top:48%;"></div></div></div><div class="k-title t-warn">【⚠️極端】死水一字線</div><div class="k-desc">5分鐘內一動也不動，只有漲跌停鎖死或完全沒量才會出現。</div></td>
+                        <td><div class="kl-box"><div class="kl white"><div class="wick" style="top:0; height:50%;"></div><div class="body" style="top:48%;"></div></div></div><div class="k-title t-green">【偏空】倒 T 字星</div><div class="k-desc">想往上漲但被完全壓回起點，空方在此處略佔上風。</div></td>
+                        <td><div class="kl-box"><div class="kl white"><div class="wick" style="top:0; height:100%;"></div><div class="body" style="top:98%;"></div></div></div><div class="k-title t-green">【⚠️極空轉折】<br>墓碑十字</div><div class="k-desc">向上拉升遇到毀滅性賣壓，被徹底打回原形，高檔見此必逃命！</div></td>
+                    </tr>
+                    <tr>
+                        <th class="k-row-th">短下影線<br><span style="font-weight:normal; font-size:0.75rem;">(&lt;上影線)</span><br><span class="k-yellow-tip">👉 低點微幅下探</span></th>
+                        <td><div class="kl-box"><div class="kl white"><div class="wick" style="top:50%; height:50%;"></div><div class="body" style="top:48%;"></div></div></div><div class="k-title t-red">【偏多】正 T 字星</div><div class="k-desc">稍微跌一下就被買回起點，下方有微弱買盤墊著。</div></td>
+                        <td><div class="kl-box"><div class="kl white"><div class="wick" style="top:30%; height:40%;"></div><div class="body" style="top:48%;"></div></div></div><div class="k-title t-warn">【中立觀望】小十字星</div><div class="k-desc">多空都在休息喘氣，這5分鐘毫無波瀾，等下一根K線決定方向。</div></td>
+                        <td><div class="kl-box"><div class="kl white"><div class="wick" style="top:0; height:85%;"></div><div class="body" style="top:70%;"></div></div></div><div class="k-title t-green">【偏空】射擊之星</div><div class="k-desc">上方壓力明顯大於下方支撐，多方反撲失敗的機率高。</div></td>
+                    </tr>
+                    <tr>
+                        <th class="k-row-th">長下影線<br><span style="font-weight:normal; font-size:0.75rem;">(&gt;上影線)</span><br><span class="k-yellow-tip">👉 低點極度深探</span></th>
+                        <td><div class="kl-box"><div class="kl white"><div class="wick" style="top:0; height:100%;"></div><div class="body" style="top:0;"></div></div></div><div class="k-title t-red">【⚠️極多轉折】<br>蜻蜓十字</div><div class="k-desc">恐怖下殺後被神秘力量「全數買回原點」，低檔見此準備做多！</div></td>
+                        <td><div class="kl-box"><div class="kl white"><div class="wick" style="top:0; height:100%;"></div><div class="body" style="top:30%;"></div></div></div><div class="k-title t-red">【⚠️偏多轉折】<br>鐵鎚十字</div><div class="k-desc">向下試探重重踢到鐵板，多頭展現強大防守韌性。</div></td>
+                        <td><div class="kl-box"><div class="kl white"><div class="wick" style="top:0; height:100%;"></div><div class="body" style="top:48%;"></div></div></div><div class="k-title t-warn">【⚠️極險轉折】<br>長腿十字</div><div class="k-desc">這5分鐘內經歷了暴漲暴跌，雙方死傷慘重，原趨勢極可能在此反轉！</div></td>
+                    </tr>
+                </table>
+            </div>
+
         </div>
 
         <div class="page" id="page-4">
@@ -463,7 +540,7 @@
             checkBurnTime();
             setInterval(checkBurnTime, 60000); 
 
-            // 自動匯入偵測迴圈 (每10秒檢查一次)
+            // 自動匯入偵測迴圈
             setInterval(checkAndAutoImportReviews, 10000);
 
             document.addEventListener('click', handleCardGlow);
@@ -495,12 +572,11 @@
         let currentStateString = "";
         let syncTimeout;
 
-        // --- 全局核心變數 ---
         let wl = []; 
         let sysQuota = { total: 50, discount: 2.7, minRR: 1.5, locked: false };
         let activeLongMissions = {}; 
         let activeShortMissions = {};
-        let activeReviewMissions = {}; // 📝 覆盤資料庫
+        let activeReviewMissions = {}; 
         
         let isPanelOpen = false; 
         let isUpdatingGlobalQuota = false; 
@@ -522,7 +598,7 @@
         window.clearRoom = function() { document.getElementById('room-pwd').value = ''; localStorage.removeItem('v144_sync_room'); alert("本機記憶已清除"); };
         window.logoutRoom = function() { if(confirm("確定要登出當前密碼鎖？\n這將解除連動並返回登入畫面。")) { localStorage.removeItem('v144_sync_room'); location.reload(); } };
 
-        function markLocalEdit() {
+        function markLocalEdit(cardId = null) {
             isLocallyEditing = true;
             clearTimeout(editReleaseTimer);
             editReleaseTimer = setTimeout(() => { isLocallyEditing = false; }, 2500); 
@@ -535,19 +611,13 @@
                 if(data) {
                     let incomingString = JSON.stringify(data);
                     if(incomingString !== currentStateString) {
-                        
                         if(isLocallyEditing) return; 
 
                         currentStateString = incomingString; 
                         wl = data.wl || [];
                         
                         if(data.quota) {
-                            sysQuota = {
-                                total: data.quota.total || 50,
-                                discount: data.quota.discount || 2.7,
-                                minRR: data.quota.minRR || 1.5,
-                                locked: data.quota.locked || false
-                            };
+                            sysQuota = { total: data.quota.total || 50, discount: data.quota.discount || 2.7, minRR: data.quota.minRR || 1.5, locked: data.quota.locked || false };
                         }
 
                         activeLongMissions = data.longMissions || {};
@@ -560,9 +630,8 @@
                         applyQuotaLockState();
                         
                         renderWatchlist();
-                        renderMissions('long'); 
-                        renderMissions('short');
-                        renderReviews(); // 📝 繪製覆盤清單
+                        renderMissions('long'); renderMissions('short');
+                        renderReviews(); 
                         updateGlobalQuota(true); 
                         showToast("☁️ 雲端數據已同步");
                     }
@@ -575,13 +644,7 @@
             markLocalEdit(); 
             clearTimeout(syncTimeout);
             syncTimeout = setTimeout(() => {
-                let state = { 
-                    wl: wl, 
-                    quota: sysQuota, 
-                    longMissions: activeLongMissions, 
-                    shortMissions: activeShortMissions,
-                    reviewMissions: activeReviewMissions
-                };
+                let state = { wl: wl, quota: sysQuota, longMissions: activeLongMissions, shortMissions: activeShortMissions, reviewMissions: activeReviewMissions };
                 currentStateString = JSON.stringify(state);
                 db.ref('rooms/' + syncRoom).set(state);
             }, 800); 
@@ -595,7 +658,7 @@
         function updateTabs() { 
             let idx = Math.round(slider.scrollLeft / slider.clientWidth); 
             tabs.forEach((t, i) => { if(i===idx) t.classList.add('active'); else t.classList.remove('active'); }); 
-            if(idx === 4) checkAndAutoImportReviews(); // 💡 切換到覆盤時順便檢查匯入
+            if(idx === 4) checkAndAutoImportReviews(); 
         }
         
         function autoFillName() { 
@@ -641,30 +704,17 @@
             return remain;
         }
 
-        window.toggleQuotaLock = function() {
-            markLocalEdit();
-            sysQuota.locked = !sysQuota.locked;
-            applyQuotaLockState();
-            triggerSync();
-        };
+        window.toggleQuotaLock = function() { markLocalEdit(); sysQuota.locked = !sysQuota.locked; applyQuotaLockState(); triggerSync(); };
 
         function applyQuotaLockState() {
-            let totalInput = document.getElementById('quota-total');
-            let discInput = document.getElementById('quota-discount');
-            let rrInput = document.getElementById('quota-rr');
-            let btn = document.getElementById('quota-lock-btn');
-            
+            let totalInput = document.getElementById('quota-total'); let discInput = document.getElementById('quota-discount'); let rrInput = document.getElementById('quota-rr'); let btn = document.getElementById('quota-lock-btn');
             if (sysQuota.locked) {
                 totalInput.disabled = true; discInput.disabled = true; rrInput.disabled = true;
-                totalInput.parentElement.querySelectorAll('button').forEach(b => b.disabled = true);
-                discInput.parentElement.querySelectorAll('button').forEach(b => b.disabled = true);
-                rrInput.parentElement.querySelectorAll('button').forEach(b => b.disabled = true);
+                totalInput.parentElement.querySelectorAll('button').forEach(b => b.disabled = true); discInput.parentElement.querySelectorAll('button').forEach(b => b.disabled = true); rrInput.parentElement.querySelectorAll('button').forEach(b => b.disabled = true);
                 btn.innerText = "🔒 點擊解鎖參數"; btn.style.backgroundColor = "#ff9800";
             } else {
                 totalInput.disabled = false; discInput.disabled = false; rrInput.disabled = false;
-                totalInput.parentElement.querySelectorAll('button').forEach(b => b.disabled = false);
-                discInput.parentElement.querySelectorAll('button').forEach(b => b.disabled = false);
-                rrInput.parentElement.querySelectorAll('button').forEach(b => b.disabled = false);
+                totalInput.parentElement.querySelectorAll('button').forEach(b => b.disabled = false); discInput.parentElement.querySelectorAll('button').forEach(b => b.disabled = false); rrInput.parentElement.querySelectorAll('button').forEach(b => b.disabled = false);
                 btn.innerText = "🔓 點擊鎖定參數"; btn.style.backgroundColor = "#444";
             }
         }
@@ -673,6 +723,7 @@
         
         function jumpToStockHome(id) { let t = document.getElementById(id); let page = document.getElementById('page-0'); if(t && page) { page.scrollTo({top: t.offsetTop - 60, behavior: 'smooth'}); } }
         function jumpToMission(mode, mId) { let c = document.getElementById(`m-card-${mode}-${mId}`); let page = document.getElementById(mode === 'long' ? 'page-1' : 'page-2'); if(c && page) { page.scrollTo({top: c.offsetTop - 60, behavior: 'smooth'}); document.querySelectorAll('.mission-card.active-glow').forEach(el => el.classList.remove('active-glow')); c.classList.add('active-glow'); } }
+        
         function checkScroll() { document.getElementById('btt-btn').style.display = (document.getElementById('page-0').scrollTop > 300) ? 'flex' : 'none'; }
         function scrollToTop() { document.getElementById('page-0').scrollTo({top: 0, behavior: 'smooth'}); }
         function showToast(msg) { let t = document.getElementById('toast'); t.innerText = msg; t.style.display = 'block'; setTimeout(() => { t.style.display = 'none'; }, 1500); }
@@ -683,12 +734,14 @@
         function calcUp(yc) { if(!yc) return '-'; let t = yc * 1.1; let tk = getTickUp(t - 0.001); return (Math.round(t / tk) * tk).toFixed(2); }
         function calcDown(yc) { if(!yc) return '-'; let t = yc * 0.9; let tk = getTickDown(t + 0.001); return (Math.round(t / tk) * tk).toFixed(2); }
         
-        function updateYcLimits() {
-            let yc = parseFloat(document.getElementById('wl-yc').value);
-            let upEl = document.getElementById('preview-up');
-            let downEl = document.getElementById('preview-down');
-            if (!isNaN(yc) && yc > 0) { upEl.innerText = calcUp(yc); downEl.innerText = calcDown(yc); } 
-            else { upEl.innerText = '-'; downEl.innerText = '-'; }
+        function updateYcLimits(rId = 'main') {
+            let ycInput = rId === 'main' ? document.getElementById('wl-yc') : document.getElementById(`rev-yc-${rId}`);
+            let yc = parseFloat(ycInput ? ycInput.value : '');
+            let upEl = rId === 'main' ? document.getElementById('preview-up') : document.getElementById(`rev-up-${rId}`);
+            let downEl = rId === 'main' ? document.getElementById('preview-down') : document.getElementById(`rev-down-${rId}`);
+            
+            if (!isNaN(yc) && yc > 0 && upEl && downEl) { upEl.innerText = calcUp(yc); downEl.innerText = calcDown(yc); } 
+            else if (upEl && downEl) { upEl.innerText = '-'; downEl.innerText = '-'; }
         }
 
         function stepPrice(id, dir) {
@@ -697,22 +750,13 @@
             let p = parseFloat(el.value); if(isNaN(p)) return;
             let step = 1; 
             if (!id.startsWith('vol') && !id.startsWith('quota')) step = (dir === 1) ? getTickUp(p) : getTickDown(p);
-            if (id === 'quota-total') step = 10; 
-            if (id === 'quota-discount') step = 0.1;
-            if (id === 'quota-rr') step = 0.1;
-
+            if (id === 'quota-total') step = 10; if (id === 'quota-discount') step = 0.1; if (id === 'quota-rr') step = 0.1;
             let newP = p + (dir * step); 
-            if(id.startsWith('vol') && newP < 1) newP = 1; 
-            if(id === 'quota-total' && newP < 0) newP = 0; 
-            if(id === 'quota-discount' && newP <= 0) newP = 0.1;
-            if(id === 'quota-rr' && newP <= 0) newP = 0.1;
-
+            if(id.startsWith('vol') && newP < 1) newP = 1; if(id === 'quota-total' && newP < 0) newP = 0; if(id === 'quota-discount' && newP <= 0) newP = 0.1; if(id === 'quota-rr' && newP <= 0) newP = 0.1;
             el.value = Math.round(newP * 100) / 100; el.dispatchEvent(new Event('input'));
-            if(id === 'wl-yc') updateYcLimits(); 
+            if(id === 'wl-yc') updateYcLimits('main'); 
         }
 
-        function getClosestDown(price, item) { let a = [item.lb, item.lt1, item.lt2, item.lt3, item.lt4, item.lt5, item.sb, item.st1, item.st2, item.st3, item.st4, item.st5].map(Number).filter(n => n && n < price); return a.length ? Math.max(...a) : ''; }
-        function getClosestUp(price, item) { let a = [item.lb, item.lt1, item.lt2, item.lt3, item.lt4, item.lt5, item.sb, item.st1, item.st2, item.st3, item.st4, item.st5].map(Number).filter(n => n && n > price); return a.length ? Math.min(...a) : ''; }
         function checkAscending(arr) { let n = arr.filter(x => x !== '').map(Number); for(let i=0; i<n.length-1; i++) { if(n[i] >= n[i+1]) return false; } return true; }
         function checkDescending(arr) { let n = arr.filter(x => x !== '').map(Number); for(let i=0; i<n.length-1; i++) { if(n[i] <= n[i+1]) return false; } return true; }
 
@@ -738,8 +782,7 @@
                 if(rawLongs.length > 0) {
                     let longsHtml = []; 
                     for(let i=0; i<rawLongs.length-1; i++) longsHtml.push(`<button type="button" class="btn-mini l" onclick="loadToMission('long','${dName}','${dCode}',${rawLongs[i]},${rawLongs[i+1]},'${ycStr}')">${rawLongs[i]}</button>`);
-                    let lastLong = rawLongs[rawLongs.length - 1];
-                    let isLimitUp = (lastLong === parseFloat(upLimit));
+                    let lastLong = rawLongs[rawLongs.length - 1]; let isLimitUp = (lastLong === parseFloat(upLimit));
                     longsHtml.push(`<div class="btn-mini-static" style="border-color:#ff4d4d; color:#ff4d4d;">${isLimitUp ? '漲停<br>' : ''}${lastLong}</div>`);
                     html += `<div class="row-group"><div class="row-label l">🔴做多</div><div class="btn-grid">${longsHtml.join('')}</div></div>`;
                 }
@@ -748,15 +791,14 @@
                 if(rawShorts.length > 0) {
                     let shortsHtml = []; 
                     for(let i=0; i<rawShorts.length-1; i++) shortsHtml.push(`<button type="button" class="btn-mini s" onclick="loadToMission('short','${dName}','${dCode}',${rawShorts[i]},${rawShorts[i+1]},'${ycStr}')">${rawShorts[i]}</button>`);
-                    let lastShort = rawShorts[rawShorts.length - 1];
-                    let isLimitDown = (lastShort === parseFloat(downLimit));
+                    let lastShort = rawShorts[rawShorts.length - 1]; let isLimitDown = (lastShort === parseFloat(downLimit));
                     shortsHtml.push(`<div class="btn-mini-static" style="border-color:#00e676; color:#00e676;">${isLimitDown ? '跌停<br>' : ''}${lastShort}</div>`);
                     html += `<div class="row-group"><div class="row-label s">🟢做空</div><div class="btn-grid">${shortsHtml.join('')}</div></div>`;
                 }
 
                 let exBtns = [];
-                if(item.hb) exBtns.push(`<button type="button" class="btn-mini ex-s" onclick="loadToMission('short','${dName}','${dCode}',${item.hb},'${item.ht1 || getClosestDown(item.hb, item)}','${ycStr}')">⚡${item.hb}</button>`);
-                if(item.lowb) exBtns.push(`<button type="button" class="btn-mini ex-l" onclick="loadToMission('long','${dName}','${dCode}',${item.lowb},'${item.lowt1 || getClosestUp(item.lowb, item)}','${ycStr}')">⚡${item.lowb}</button>`);
+                if(item.hb) exBtns.push(`<button type="button" class="btn-mini ex-s" onclick="loadToMission('short','${dName}','${dCode}',${item.hb},'${item.ht1 || ''}','${ycStr}')">⚡${item.hb}</button>`);
+                if(item.lowb) exBtns.push(`<button type="button" class="btn-mini ex-l" onclick="loadToMission('long','${dName}','${dCode}',${item.lowb},'${item.lowt1 || ''}','${ycStr}')">⚡${item.lowb}</button>`);
                 if(exBtns.length > 0) html += `<div class="row-group"><div class="row-label ex">⚡反轉</div><div class="btn-grid">${exBtns.join('')}</div></div>`;
                 container.innerHTML += html + `</div>`;
             }); 
@@ -774,15 +816,11 @@
             let name = document.getElementById('wl-name').value; let code = document.getElementById('wl-code').value; let yc = document.getElementById('wl-yc').value;
             if(!name && !code) return alert("請輸入股名或股號！");
             
-            let useLimitUp = document.getElementById('lt5-check').checked;
-            let useLimitDown = document.getElementById('st5-check').checked;
-            
+            let useLimitUp = document.getElementById('lt5-check').checked; let useLimitDown = document.getElementById('st5-check').checked;
             if (useLimitUp && !yc) return alert("❌ 【設定錯誤】若勾選自動漲停，請先輸入昨收！");
             if (useLimitDown && !yc) return alert("❌ 【設定錯誤】若勾選自動跌停，請先輸入昨收！");
 
-            let lt5Val = useLimitUp ? calcUp(yc) : '';
-            let st5Val = useLimitDown ? calcDown(yc) : '';
-
+            let lt5Val = useLimitUp ? calcUp(yc) : ''; let st5Val = useLimitDown ? calcDown(yc) : '';
             let longs = [document.getElementById('lb').value, document.getElementById('lt1').value, document.getElementById('lt2').value, document.getElementById('lt3').value, document.getElementById('lt4').value, lt5Val];
             let shorts = [document.getElementById('sb').value, document.getElementById('st1').value, document.getElementById('st2').value, document.getElementById('st3').value, document.getElementById('st4').value, st5Val];
             let hb = document.getElementById('hb').value; let ht1 = document.getElementById('ht1').value; let lowt1 = document.getElementById('lowt1').value; let lowb = document.getElementById('lowb').value;
@@ -796,7 +834,7 @@
             
             document.querySelectorAll('#input-panel input[type="number"], #input-panel input[type="tel"], #input-panel input[type="text"]').forEach(i => i.value = ''); 
             document.getElementById('lt5-check').checked = false; document.getElementById('st5-check').checked = false;
-            updateYcLimits(); 
+            updateYcLimits('main'); 
             
             isPanelOpen = false; document.getElementById('input-panel').style.display = 'none'; document.getElementById('quick-nav').style.display = 'flex'; document.getElementById('toggle-btn').innerHTML = '▶️ 展開標的設定面板';
             renderWatchlist(); triggerSync(); showToast("✅ 儲存並同步至雲端");
@@ -804,8 +842,7 @@
         }
 
         function editWatchlist(index) {
-            markLocalEdit();
-            let item = wl[index];
+            markLocalEdit(); let item = wl[index];
             document.getElementById('wl-code').value = item.code || ''; document.getElementById('wl-name').value = item.name || ''; document.getElementById('wl-yc').value = item.yc || '';
             document.getElementById('lb').value = item.lb || ''; document.getElementById('lt1').value = item.lt1 || ''; document.getElementById('lt2').value = item.lt2 || ''; document.getElementById('lt3').value = item.lt3 || ''; document.getElementById('lt4').value = item.lt4 || ''; 
             document.getElementById('sb').value = item.sb || ''; document.getElementById('st1').value = item.st1 || ''; document.getElementById('st2').value = item.st2 || ''; document.getElementById('st3').value = item.st3 || ''; document.getElementById('st4').value = item.st4 || ''; 
@@ -813,7 +850,7 @@
             
             let upLimit = item.yc ? calcUp(item.yc) : ''; let downLimit = item.yc ? calcDown(item.yc) : '';
             document.getElementById('lt5-check').checked = (item.lt5 !== '' && item.lt5 === upLimit); document.getElementById('st5-check').checked = (item.st5 !== '' && item.st5 === downLimit);
-            updateYcLimits(); 
+            updateYcLimits('main'); 
 
             wl.splice(index, 1); renderWatchlist(); triggerSync();
             document.getElementById('input-panel').style.display = 'block'; isPanelOpen = true; document.getElementById('toggle-btn').innerHTML = '🔽 收起標的設定面板'; scrollToTop();
@@ -822,18 +859,15 @@
         function delWatchlist(index) { markLocalEdit(); wl.splice(index, 1); renderWatchlist(); triggerSync(); }
 
         function loadToMission(type, name, code, base, target, yc) {
-            markLocalEdit();
-            let safeBase = base ? String(base).replace('.', '_') : '0'; let mId = code + '_' + safeBase;
+            markLocalEdit(); let safeBase = base ? String(base).replace('.', '_') : '0'; let mId = code + '_' + safeBase;
             let pool = type === 'long' ? activeLongMissions : activeShortMissions;
             pool[mId] = { id: mId, name: name, code: code, base: base||'', target: target||'', yc: yc||'', entry:'', exit:'', vol:'1', locked: false };
-            renderMissions(type);
-            triggerSync(); showToast(`✅ 已加入監控交易卡`); scrollToPage(type === 'long' ? 1 : 2);
+            renderMissions(type); triggerSync(); showToast(`✅ 已加入監控交易卡`); scrollToPage(type === 'long' ? 1 : 2);
             setTimeout(() => { jumpToMission(type, mId); }, 100);
         }
 
         function removeMission(mode, mId) { 
-            markLocalEdit();
-            let pool = mode === 'long' ? activeLongMissions : activeShortMissions;
+            markLocalEdit(); let pool = mode === 'long' ? activeLongMissions : activeShortMissions;
             if(pool[mId].locked) { if(!confirm("⚠️ 該交易卡已處於【鎖定結算】狀態！\n強制刪除將釋放佔用的額度。確定要刪除嗎？")) return; }
             delete pool[mId]; renderMissions(mode); updateGlobalQuota(); triggerSync(); 
         }
@@ -1046,52 +1080,24 @@
             document.getElementById('dash-winrate').innerText = winRate + "%"; document.getElementById('dash-count').innerText = `${wins} / ${losses}`;
         }
 
-        function checkBurnTime() {
-            let now = new Date(); let hour = now.getHours(); let min = now.getMinutes();
-            let isBurnTime = (hour >= 14) || (hour < 8); // 配合14:00匯入，焦土開放時間提早
-            let btn = document.getElementById('burn-btn');
-            if(!isBurnTime) { btn.innerHTML = "🔒 14:00 ~ 08:00 開放系統重置"; btn.style.color = "#888"; btn.style.backgroundColor = "#444"; btn.disabled = true; } 
-            else { btn.innerHTML = "🗑️ 一鍵清空今日所有標的與記錄"; btn.style.color = "#fff"; btn.style.backgroundColor = "#ff4d4d"; btn.disabled = false; }
-        }
-
-        function attemptClearAll() {
-            let now = new Date(); let hour = now.getHours(); let min = now.getMinutes();
-            let isBurnTime = (hour >= 14) || (hour < 8);
-            if (!isBurnTime) return alert("❌ 【權限拒絕】\n重置作業僅限每日 14:00 至隔日 08:00 執行！");
-            if (confirm("⚠️ 警告：這將徹底清空今日的「監控清單」與「所有交易記錄」。\n請問是否確定執行系統重置？")) { 
-                markLocalEdit(); wl = []; activeLongMissions = {}; activeShortMissions = {}; activeReviewMissions = {};
-                renderWatchlist(); renderMissions('long'); renderMissions('short'); renderReviews(); updateGlobalQuota();
-                triggerSync(); showToast("🗑️ 系統已全數重置"); closeSettings();
-            }
-        }
-
         // =========================================
-        // 📝 覆盤模式腳本引擎 (包含同步、繪圖、CSV)
+        // 📝 覆盤模式腳本引擎 (包含同步、即時繪圖、CSV)
         // =========================================
 
         function checkAndAutoImportReviews() {
-            let now = new Date();
-            let hour = now.getHours();
-            // 💡 設定為 14:00 後自動匯入
+            let now = new Date(); let hour = now.getHours();
             if (hour >= 14 || hour < 8) {
                 let changed = false;
                 let process = (missions, dir) => {
                     for (let mId in missions) {
                         let m = missions[mId];
-                        // 條件：已鎖定 + 有進出場價
                         if (m.locked && m.entry && m.exit) {
                             let rId = `rev_${m.id}`;
                             if (!activeReviewMissions[rId]) {
                                 activeReviewMissions[rId] = {
-                                    id: rId,
-                                    code: m.code,
-                                    name: m.name,
-                                    entryPrice: m.entry,
-                                    exitPrice: m.exit,
-                                    entryTime: '09:00',
-                                    exitTime: '13:00',
-                                    dir: dir,
-                                    isOhlcOpen: false, // 💡 預設收合 K 線區
+                                    id: rId, code: m.code, name: m.name, yc: m.yc || '', 
+                                    entryPrice: m.entry, exitPrice: m.exit, entryTime: '09:00', exitTime: '13:00', dir: dir,
+                                    isOhlcOpen: false, 
                                     ohlc: [{ id: Date.now() + Math.random(), t:'09:00', o:'', h:'', l:'', c:'' }]
                                 };
                                 changed = true;
@@ -1099,43 +1105,26 @@
                         }
                     }
                 };
-                process(activeLongMissions, 'long');
-                process(activeShortMissions, 'short');
-
-                if (changed) {
-                    renderReviews();
-                    triggerSync();
-                    showToast("📥 已自動匯入鎖定結算的陣地至覆盤！");
-                }
+                process(activeLongMissions, 'long'); process(activeShortMissions, 'short');
+                if (changed) { renderReviews(); triggerSync(); showToast("📥 已自動匯入鎖定的陣地至覆盤！"); }
             }
         }
 
         function addManualReview() {
-            markLocalEdit();
-            let rId = `rev_manual_${Date.now()}`;
+            markLocalEdit(); let rId = `rev_manual_${Date.now()}`;
             activeReviewMissions[rId] = {
-                id: rId,
-                code: '', name: '', entryPrice: '', exitPrice: '', entryTime: '09:00', exitTime: '13:00', dir: 'long',
-                isOhlcOpen: true, // 手動新增預設展開
-                ohlc: [{ id: Date.now() + Math.random(), t:'09:00', o:'', h:'', l:'', c:'' }]
+                id: rId, code: '', name: '', yc: '', entryPrice: '', exitPrice: '', entryTime: '09:00', exitTime: '13:00', dir: 'long',
+                isOhlcOpen: true, ohlc: [{ id: Date.now() + Math.random(), t:'09:00', o:'', h:'', l:'', c:'' }]
             };
-            renderReviews();
-            triggerSync();
+            renderReviews(); triggerSync();
         }
 
         function removeReview(rId) {
-            markLocalEdit();
-            if(confirm("確定要刪除這張覆盤卡片嗎？")) {
-                delete activeReviewMissions[rId];
-                renderReviews();
-                triggerSync();
-            }
+            markLocalEdit(); if(confirm("確定要刪除這張覆盤卡片嗎？")) { delete activeReviewMissions[rId]; renderReviews(); triggerSync(); }
         }
 
-        // 💡 點擊代碼自動帶入股名 (覆盤區專用)
         function autoFillRevName(rId) {
-            let codeInput = document.getElementById(`rev-code-${rId}`);
-            let code = codeInput ? codeInput.value.toUpperCase() : '';
+            let codeInput = document.getElementById(`rev-code-${rId}`); let code = codeInput ? codeInput.value.toUpperCase() : '';
             if (customDict[code]) {
                 activeReviewMissions[rId].name = customDict[code];
                 let nameInput = document.getElementById(`rev-name-${rId}`);
@@ -1148,15 +1137,24 @@
             markLocalEdit(`rev-card-${rId}`);
             if (activeReviewMissions[rId]) {
                 activeReviewMissions[rId][field] = val;
-                triggerSync(); // 觸發背景同步，不重新繪製 UI 以免失去焦點
+                triggerSync(); 
+                generateReviewChart(rId); 
+                if(field === 'yc') {
+                    updateYcLimits(rId);
+                    // 當 YC 改變時，重新檢查所有已輸入的 OHLC 是否越界
+                    activeReviewMissions[rId].ohlc.forEach((_, idx) => checkRevLimits(rId, idx));
+                }
             }
         }
 
         function toggleOhlc(rId) {
-            markLocalEdit(`rev-card-${rId}`);
-            if (activeReviewMissions[rId]) {
-                activeReviewMissions[rId].isOhlcOpen = !activeReviewMissions[rId].isOhlcOpen;
-                renderReviews();
+            let el = document.getElementById(`ohlc-content-${rId}`);
+            let btn = document.getElementById(`toggle-btn-${rId}`);
+            if (el && btn) {
+                let isHidden = el.style.display === 'none';
+                el.style.display = isHidden ? 'block' : 'none';
+                btn.innerText = isHidden ? '▼ 收合' : '▶ 展開';
+                activeReviewMissions[rId].isOhlcOpen = isHidden;
                 triggerSync();
             }
         }
@@ -1164,19 +1162,25 @@
         function addOhlcRow(rId) {
             markLocalEdit(`rev-card-${rId}`);
             if (activeReviewMissions[rId]) {
-                activeReviewMissions[rId].ohlc.push({ id: Date.now() + Math.random(), t:'09:00', o:'', h:'', l:'', c:'' });
-                renderReviews();
-                triggerSync();
+                // 💡 時間自動 +5 分鐘
+                let lastTime = '09:00';
+                let ohlcList = activeReviewMissions[rId].ohlc;
+                if (ohlcList.length > 0) {
+                    let t = ohlcList[ohlcList.length - 1].t;
+                    if (t && t.includes(':')) {
+                        let [h, m] = t.split(':').map(Number);
+                        m += 5; if (m >= 60) { h++; m -= 60; }
+                        lastTime = `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`;
+                    }
+                }
+                activeReviewMissions[rId].ohlc.push({ id: Date.now() + Math.random(), t: lastTime, o:'', h:'', l:'', c:'' });
+                renderReviews(); triggerSync();
             }
         }
 
         function removeOhlcRow(rId, index) {
             markLocalEdit(`rev-card-${rId}`);
-            if (activeReviewMissions[rId]) {
-                activeReviewMissions[rId].ohlc.splice(index, 1);
-                renderReviews();
-                triggerSync();
-            }
+            if (activeReviewMissions[rId]) { activeReviewMissions[rId].ohlc.splice(index, 1); renderReviews(); triggerSync(); }
         }
 
         function updateOhlcRow(rId, index, field, val) {
@@ -1184,25 +1188,44 @@
             if (activeReviewMissions[rId] && activeReviewMissions[rId].ohlc[index]) {
                 activeReviewMissions[rId].ohlc[index][field] = val;
                 triggerSync();
+                generateReviewChart(rId); // 💡 打字即繪圖
+                checkRevLimits(rId, index); // 💡 即時檢查漲跌停
             }
         }
 
-        // 💡 渲染覆盤列表
-        function renderReviews() {
-            const container = document.getElementById('reviews-container');
-            let htmlStr = '';
+        // 💡 檢查 5分K 是否觸及漲跌停，並立刻變色警告
+        function checkRevLimits(rId, index) {
+            let r = activeReviewMissions[rId]; if (!r) return;
+            let yc = parseFloat(r.yc); 
+            if (isNaN(yc)) return; 
             
-            let rIds = Object.keys(activeReviewMissions);
-            if(rIds.length === 0) {
-                container.innerHTML = `<div class="empty-msg" style="text-align:center; color:#666; margin-top:30px;">目前沒有覆盤紀錄。<br>請點擊上方新增，或等待系統自動匯入。</div>`;
-                return;
+            let upLimit = parseFloat(calcUp(yc)); 
+            let downLimit = parseFloat(calcDown(yc));
+
+            let oInp = document.getElementById(`rev-${rId}-o-${index}`);
+            let hInp = document.getElementById(`rev-${rId}-h-${index}`);
+            let lInp = document.getElementById(`rev-${rId}-l-${index}`);
+            let cInp = document.getElementById(`rev-${rId}-c-${index}`);
+
+            const check = (el) => {
+                if(!el) return;
+                let v = parseFloat(el.value);
+                if (isNaN(v)) { el.style.color = ''; el.style.fontWeight = ''; return; }
+                if (v >= upLimit) { el.style.color = '#ff4d4d'; el.style.fontWeight = 'bold'; }
+                else if (v <= downLimit && v > 0) { el.style.color = '#00e676'; el.style.fontWeight = 'bold'; }
+                else { el.style.color = ''; el.style.fontWeight = 'normal'; }
             }
+            check(oInp); check(hInp); check(lInp); check(cInp);
+        }
+
+        function renderReviews() {
+            const container = document.getElementById('reviews-container'); let htmlStr = '';
+            let rIds = Object.keys(activeReviewMissions);
+            if(rIds.length === 0) { container.innerHTML = `<div class="empty-msg" style="text-align:center; color:#666; margin-top:30px;">目前沒有覆盤紀錄。<br>每天 14:00 後系統將自動匯入鎖定的陣地。</div>`; return; }
 
             rIds.forEach(rId => {
-                let r = activeReviewMissions[rId];
-                let isLong = r.dir === 'long';
+                let r = activeReviewMissions[rId]; let isLong = r.dir === 'long';
                 
-                // 產生 OHLC 的 HTML
                 let ohlcHtml = '';
                 r.ohlc.forEach((oData, idx) => {
                     ohlcHtml += `
@@ -1211,10 +1234,10 @@
                             <label style="color:#00ffcc;">#${idx+1} K線 (時間/開/高/低/收)</label>
                             <div style="margin-bottom:6px;"><input type="time" class="clean-input" value="${oData.t}" oninput="updateOhlcRow('${rId}', ${idx}, 't', this.value)"></div>
                             <div class="ohlc-grid">
-                                <input type="number" class="clean-input" placeholder="開" step="0.01" value="${oData.o}" oninput="updateOhlcRow('${rId}', ${idx}, 'o', this.value)">
-                                <input type="number" class="clean-input" placeholder="高" step="0.01" value="${oData.h}" oninput="updateOhlcRow('${rId}', ${idx}, 'h', this.value)">
-                                <input type="number" class="clean-input" placeholder="低" step="0.01" value="${oData.l}" oninput="updateOhlcRow('${rId}', ${idx}, 'l', this.value)">
-                                <input type="number" class="clean-input" placeholder="收" step="0.01" value="${oData.c}" oninput="updateOhlcRow('${rId}', ${idx}, 'c', this.value)">
+                                <input type="number" id="rev-${rId}-o-${idx}" class="clean-input" placeholder="開" step="0.01" value="${oData.o}" oninput="updateOhlcRow('${rId}', ${idx}, 'o', this.value)">
+                                <input type="number" id="rev-${rId}-h-${idx}" class="clean-input" placeholder="高" step="0.01" value="${oData.h}" oninput="updateOhlcRow('${rId}', ${idx}, 'h', this.value)">
+                                <input type="number" id="rev-${rId}-l-${idx}" class="clean-input" placeholder="低" step="0.01" value="${oData.l}" oninput="updateOhlcRow('${rId}', ${idx}, 'l', this.value)">
+                                <input type="number" id="rev-${rId}-c-${idx}" class="clean-input" placeholder="收" step="0.01" value="${oData.c}" oninput="updateOhlcRow('${rId}', ${idx}, 'c', this.value)">
                             </div>
                         </div>`;
                 });
@@ -1231,8 +1254,9 @@
                             <div class="card info" style="padding:10px; margin-bottom:0;">
                                 <div style="color:#fff; font-weight:bold; margin-bottom:8px; font-size:0.95rem;">進出場數據</div>
                                 <div class="wl-title-bar" style="margin-bottom:8px;">
-                                    <input type="tel" class="clean-input" id="rev-code-${rId}" placeholder="代碼" style="width:40%;" value="${r.code}" oninput="updateRev('${rId}', 'code', this.value); autoFillRevName('${rId}')">
-                                    <input type="text" class="clean-input" id="rev-name-${rId}" placeholder="股名" style="width:60%;" value="${r.name}" oninput="updateRev('${rId}', 'name', this.value)">
+                                    <input type="tel" class="clean-input" id="rev-code-${rId}" placeholder="代碼" style="width:30%;" value="${r.code}" oninput="updateRev('${rId}', 'code', this.value); autoFillRevName('${rId}')">
+                                    <input type="text" class="clean-input" id="rev-name-${rId}" placeholder="股名" style="width:40%;" value="${r.name}" oninput="updateRev('${rId}', 'name', this.value)">
+                                    <input type="number" class="clean-input" id="rev-yc-${rId}" placeholder="昨收" style="width:30%; color:#ffeb3b;" value="${r.yc||''}" oninput="updateRev('${rId}', 'yc', this.value)">
                                 </div>
                                 <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-bottom:8px;">
                                     <div><label class="label-cyan">進場時間</label><input type="time" class="clean-input" value="${r.entryTime}" oninput="updateRev('${rId}', 'entryTime', this.value)"></div>
@@ -1254,54 +1278,50 @@
                             <div class="card" style="padding:10px; margin-bottom:0;">
                                 <div style="display:flex; justify-content:space-between; align-items:center; cursor:pointer;" onclick="toggleOhlc('${rId}')">
                                     <span style="color:#fff; font-weight:bold; font-size:0.95rem;">關鍵 5 分 K 數據</span>
-                                    <span style="color:#aaa;">${r.isOhlcOpen ? '▼ 收合' : '▶ 展開'}</span>
+                                    <span style="color:#aaa;" id="toggle-btn-${rId}">${r.isOhlcOpen ? '▼ 收合' : '▶ 展開'}</span>
                                 </div>
                                 
-                                <div style="display:${r.isOhlcOpen ? 'block' : 'none'}; margin-top:15px;">
+                                <div id="ohlc-content-${rId}" style="display:${r.isOhlcOpen ? 'block' : 'none'}; margin-top:15px;">
                                     ${ohlcHtml}
                                     <button type="button" class="btn" style="background:#333; color:#00ffcc; border:1px dashed #00ffcc; padding:8px; margin-top:5px;" onclick="addOhlcRow('${rId}')">➕ 新增一根 K 線</button>
                                 </div>
                             </div>
-                            
-                            <button type="button" class="btn btn-add" style="background-color:#ff9800; margin-top:5px;" onclick="generateReviewChart('${rId}')">🔄 繪製/更新戰術圖</button>
                         </div>
                         
                         <div class="rev-right chart-stage" id="stage-${rId}">
                             <canvas id="canvas-${rId}"></canvas>
-                            <div id="chart-msg-${rId}" style="position:absolute; color:#666; font-size:1.1rem; text-align:center; padding:20px;">
-                                請填入數據並點擊<br>「繪製/更新戰術圖」
-                            </div>
                         </div>
                     </div>
                 </div>`;
             });
 
             container.innerHTML = htmlStr;
+            
+            // 渲染完成後，立刻繪製圖表並檢查漲跌停防呆
+            rIds.forEach(rId => {
+                setTimeout(() => {
+                    generateReviewChart(rId);
+                    activeReviewMissions[rId].ohlc.forEach((_, idx) => checkRevLimits(rId, idx));
+                }, 10);
+            });
         }
 
-        // 💡 繪製戰術圖核心引擎 (已優化高度限制)
+        // 💡 終極無縫 K 線繪圖引擎
         function generateReviewChart(rId) {
-            markLocalEdit(`rev-card-${rId}`);
-            
             const r = activeReviewMissions[rId];
             if (!r) return;
 
             const canvas = document.getElementById(`canvas-${rId}`);
             const ctx = canvas.getContext('2d');
-            const msgEl = document.getElementById(`chart-msg-${rId}`);
             const stage = document.getElementById(`stage-${rId}`);
+            if (!canvas || !ctx || !stage) return;
 
             const bars = r.ohlc.filter(b => !isNaN(parseFloat(b.o)) && !isNaN(parseFloat(b.h)) && !isNaN(parseFloat(b.l)) && !isNaN(parseFloat(b.c)))
                                .map(b => ({ time: b.t, o: parseFloat(b.o), h: parseFloat(b.h), l: parseFloat(b.l), c: parseFloat(b.c) }));
 
-            if (bars.length === 0) { alert("❌ 請至少填入一根完整的 K 線數據 (開高低收)！"); return; }
-
-            msgEl.style.display = 'none';
-            
-            // 💡 動態捕捉容器高度 (讓圖表與左邊資料等高)
             const dpr = window.devicePixelRatio || 1;
             const displayWidth = stage.clientWidth;
-            const displayHeight = Math.max(stage.clientHeight, 350); // 最少給 350px 避免壓扁
+            const displayHeight = Math.max(stage.clientHeight, 450); // 最少給 450px 避免壓扁
             
             canvas.style.width = displayWidth + 'px';
             canvas.style.height = displayHeight + 'px';
@@ -1309,43 +1329,45 @@
             canvas.height = displayHeight * dpr;
             ctx.scale(dpr, dpr);
 
-            const padding = { top: 50, right: 70, bottom: 50, left: 60 };
+            const padding = { top: 50, right: 60, bottom: 50, left: 60 };
             const chartWidth = displayWidth - padding.left - padding.right;
             const chartHeight = displayHeight - padding.top - padding.bottom;
+
+            ctx.fillStyle = '#000000';
+            ctx.fillRect(0, 0, displayWidth, displayHeight);
+
+            if (bars.length === 0) {
+                ctx.fillStyle = '#666'; ctx.font = '16px Arial'; ctx.textAlign = 'center';
+                ctx.fillText("請在左側填入開高低收數據，即可自動成圖", displayWidth/2, displayHeight/2);
+                return; 
+            }
 
             let maxPrice = Math.max(...bars.map(b => b.h));
             let minPrice = Math.min(...bars.map(b => b.l));
             
-            let ep = parseFloat(r.entryPrice);
-            let xp = parseFloat(r.exitPrice);
+            let ep = parseFloat(r.entryPrice); let xp = parseFloat(r.exitPrice);
             if (!isNaN(ep)) { maxPrice = Math.max(maxPrice, ep); minPrice = Math.min(minPrice, ep); }
             if (!isNaN(xp)) { maxPrice = Math.max(maxPrice, xp); minPrice = Math.min(minPrice, xp); }
 
             const priceRange = maxPrice - minPrice;
-            maxPrice += priceRange * 0.1 || 1; // 避免 range 為 0
-            minPrice -= priceRange * 0.1 || 1;
+            maxPrice += priceRange * 0.1 || 1; minPrice -= priceRange * 0.1 || 1;
 
             const getY = (price) => padding.top + chartHeight - ((price - minPrice) / (maxPrice - minPrice)) * chartHeight;
 
-            // 背景
-            ctx.fillStyle = '#000000';
-            ctx.fillRect(0, 0, displayWidth, displayHeight);
-
-            // 網格與 Y 軸
+            // 繪製網格與 Y 軸
             ctx.strokeStyle = '#333333'; ctx.lineWidth = 1; ctx.fillStyle = '#aaaaaa'; ctx.font = '12px Arial'; ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
             const gridCount = 5;
             for (let i = 0; i <= gridCount; i++) {
                 const actualPrice = minPrice + (i * (maxPrice - minPrice) / gridCount);
                 const y = getY(actualPrice);
                 ctx.beginPath(); ctx.moveTo(padding.left, y); ctx.lineTo(padding.left + chartWidth, y); ctx.stroke();
-                ctx.fillText(actualPrice.toFixed(2), padding.left + chartWidth + 10, y);
+                ctx.fillText(actualPrice.toFixed(2), padding.left + chartWidth + 5, y);
             }
 
-            // X 軸 K 線
-            const barCount = bars.length;
-            const barWidth = (chartWidth / barCount) * 0.7;
-            const barGap = (chartWidth / barCount) * 0.3;
-            ctx.textAlign = 'center'; ctx.textBaseline = 'top';
+            // 💡 緊密無縫 K 線參數設定
+            const minBarsToShow = Math.max(bars.length, 3); // 至少留 3 根的空間，避免單根佔滿畫面
+            const barWidth = (chartWidth / minBarsToShow) * 0.95; // 95% 寬度，極小縫隙
+            const barGap = (chartWidth / minBarsToShow) * 0.05;
 
             bars.forEach((bar, index) => {
                 const x = padding.left + (index * (barWidth + barGap)) + (barGap / 2);
@@ -1356,17 +1378,45 @@
                 const color = isUp ? '#ff4d4d' : (bar.c < bar.o ? '#00e676' : '#ffffff');
                 ctx.strokeStyle = color; ctx.fillStyle = color; ctx.lineWidth = 2;
 
+                // 畫上下影線
                 ctx.beginPath(); ctx.moveTo(centerX, yHigh); ctx.lineTo(centerX, yLow); ctx.stroke();
+                
+                // 畫實體
                 const bodyHeight = Math.abs(yOpen - yClose);
                 const yBodyTop = Math.min(yOpen, yClose);
-
                 if (bodyHeight < 1) { ctx.beginPath(); ctx.moveTo(x, yBodyTop); ctx.lineTo(x + barWidth, yBodyTop); ctx.stroke(); } 
                 else { ctx.fillRect(x, yBodyTop, barWidth, bodyHeight); }
 
-                ctx.fillStyle = '#888888'; ctx.fillText(bar.time, centerX, padding.top + chartHeight + 10);
+                // 💡 繪製四大數字標籤 (H, L, O, C)
+                ctx.font = '10px Arial';
+                ctx.textBaseline = 'middle';
+                
+                // 最高點 (黃)
+                ctx.fillStyle = '#ffeb3b'; ctx.textAlign = 'center';
+                ctx.fillText(bar.h, centerX, yHigh - 10);
+                
+                // 最低點 (黃)
+                ctx.fillText(bar.l, centerX, yLow + 10);
+                
+                // 開盤/收盤 (青色，標註在實體旁)
+                ctx.fillStyle = '#00ffcc';
+                if (isUp) {
+                    // 紅K：開在下，收在上
+                    ctx.textAlign = 'right'; ctx.fillText(bar.o, x - 2, yOpen);
+                    ctx.textAlign = 'left'; ctx.fillText(bar.c, x + barWidth + 2, yClose);
+                } else {
+                    // 綠K：開在上，收在下
+                    ctx.textAlign = 'right'; ctx.fillText(bar.o, x - 2, yOpen);
+                    ctx.textAlign = 'left'; ctx.fillText(bar.c, x + barWidth + 2, yClose);
+                }
+
+                // X軸時間
+                ctx.fillStyle = '#888888'; ctx.textAlign = 'center'; ctx.textBaseline = 'top';
+                ctx.fillText(bar.time, centerX, padding.top + chartHeight + 10);
             });
 
-            // 繪製進出場水平線
+            // 繪製進出場線
+            ctx.textBaseline = 'middle';
             if (!isNaN(ep)) {
                 const yEntry = getY(ep);
                 ctx.strokeStyle = '#00ffff'; ctx.lineWidth = 2; ctx.setLineDash([5, 5]);
@@ -1393,8 +1443,6 @@
                 ctx.fillStyle = pnl >= 0 ? '#ff4d4d' : '#00e676'; ctx.font = 'bold 14px Arial'; ctx.textAlign = 'right';
                 ctx.fillText(`點位損益: ${pnl.toFixed(2)} (${pnlPercent}%)`, displayWidth - padding.right, 17);
             }
-            
-            showToast("🎨 覆盤戰術圖繪製完成");
         }
 
         // --- 📥 CSV 覆盤戰績匯出 ---
@@ -1411,9 +1459,7 @@
                     pnlStr = (r.dir === 'long' ? (xp - ep) : (ep - xp)).toFixed(2);
                 }
                 
-                // 整理 K 線字串
                 let kStr = r.ohlc.map(k => `[${k.t}] ${k.o}/${k.h}/${k.l}/${k.c}`).join(" | ");
-
                 rows.push([ r.code, r.name, dir, r.entryTime, r.entryPrice, r.exitTime, r.exitPrice, pnlStr, kStr ]);
             }
 
@@ -1421,39 +1467,32 @@
 
             let csvContent = "data:text/csv;charset=utf-8,\uFEFF" + rows.map(e => e.join(",")).join("\n");
             let encodedUri = encodeURI(csvContent);
-            let link = document.createElement("a");
-            link.setAttribute("href", encodedUri);
-            
-            let d = new Date();
-            let dateStr = `${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}`;
-            link.setAttribute("download", `覆盤日誌_${dateStr}.csv`);
-            
-            document.body.appendChild(link); link.click(); document.body.removeChild(link);
-        }
-        
-        // --- 📥 原有的 DashBoard CSV 匯出 (包含實際獲利) ---
-        function exportCSV() {
-            let rows = [["標的", "代碼", "方向", "基準價", "目標價", "進場價", "出場價", "張數", "淨損益(含手續費)"]];
-            let processForExport = (m, isLong) => {
-                if (m.entry && m.exit) {
-                    let pData = calcPnL(m.entry, m.exit, parseInt(m.vol)||1, isLong);
-                    let pDisc = Math.round(pData.disc);
-                    rows.push([ m.name, m.code, isLong ? "做多" : "做空", m.base, m.target, m.entry, m.exit, m.vol || 1, pDisc ]);
-                }
-            };
-            Object.values(activeLongMissions).forEach(m => processForExport(m, true));
-            Object.values(activeShortMissions).forEach(m => processForExport(m, false));
-
-            if (rows.length === 1) return alert("❌ 匯出失敗：目前沒有已結算的交易紀錄！\n(需確實填入進場與出場價)");
-
-            let csvContent = "data:text/csv;charset=utf-8,\uFEFF" + rows.map(e => e.join(",")).join("\n");
-            let encodedUri = encodeURI(csvContent);
             let link = document.createElement("a"); link.setAttribute("href", encodedUri);
+            
             let d = new Date(); let dateStr = `${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}`;
-            link.setAttribute("download", `量化結算報表_${dateStr}.csv`);
+            link.setAttribute("download", `覆盤日誌_${dateStr}.csv`);
             document.body.appendChild(link); link.click(); document.body.removeChild(link);
         }
 
+        // --- 系統重置與時間檢查 ---
+        function checkBurnTime() {
+            let now = new Date(); let hour = now.getHours(); let min = now.getMinutes();
+            let isBurnTime = (hour >= 14) || (hour < 8); 
+            let btn = document.getElementById('burn-btn');
+            if(!isBurnTime) { btn.innerHTML = "🔒 14:00 ~ 08:00 開放系統重置"; btn.style.color = "#888"; btn.style.backgroundColor = "#444"; btn.disabled = true; } 
+            else { btn.innerHTML = "🗑️ 一鍵清空今日所有標的與記錄"; btn.style.color = "#fff"; btn.style.backgroundColor = "#ff4d4d"; btn.disabled = false; }
+        }
+
+        function attemptClearAll() {
+            let now = new Date(); let hour = now.getHours(); let min = now.getMinutes();
+            let isBurnTime = (hour >= 14) || (hour < 8);
+            if (!isBurnTime) return alert("❌ 【權限拒絕】\n重置作業僅限每日 14:00 至隔日 08:00 執行！");
+            if (confirm("⚠️ 警告：這將徹底清空今日的「監控清單」與「所有交易記錄」。\n請問是否確定執行系統重置？")) { 
+                markLocalEdit(); wl = []; activeLongMissions = {}; activeShortMissions = {}; activeReviewMissions = {};
+                renderWatchlist(); renderMissions('long'); renderMissions('short'); renderReviews(); updateGlobalQuota();
+                triggerSync(); showToast("🗑️ 系統已全數重置"); closeSettings();
+            }
+        }
     </script>
 </body>
 </html>
