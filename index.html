@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>量化交易與資金控管系統 V14.20</title>
+    <title>量化交易與資金控管系統 V14.22</title>
     
     <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-database-compat.js"></script>
@@ -290,6 +290,30 @@
                 </div>
             </div>
 
+            <div style="margin-top:20px; border-top:1px dashed #555; padding-top:15px;">
+                <label style="color:#ff9800; font-weight:bold; font-size:0.9rem; margin-bottom:10px;">🛡️ 階梯式絕對保底停損 (%)</label>
+                <div style="display:flex; gap:5px; margin-bottom:8px;">
+                    <div style="flex:1;">
+                        <label>&lt; 50元</label>
+                        <div class="stepper-wrapper"><button type="button" class="stepper-btn" tabindex="-1" onclick="stepPrice('sl-t1',-1)">-</button><input type="number" id="sl-t1" value="1.5" step="0.1" oninput="updateGlobalQuota()"><button type="button" class="stepper-btn" tabindex="-1" onclick="stepPrice('sl-t1',1)">+</button></div>
+                    </div>
+                    <div style="flex:1;">
+                        <label>50~100元</label>
+                        <div class="stepper-wrapper"><button type="button" class="stepper-btn" tabindex="-1" onclick="stepPrice('sl-t2',-1)">-</button><input type="number" id="sl-t2" value="1.5" step="0.1" oninput="updateGlobalQuota()"><button type="button" class="stepper-btn" tabindex="-1" onclick="stepPrice('sl-t2',1)">+</button></div>
+                    </div>
+                </div>
+                <div style="display:flex; gap:5px;">
+                    <div style="flex:1;">
+                        <label>100~500元</label>
+                        <div class="stepper-wrapper"><button type="button" class="stepper-btn" tabindex="-1" onclick="stepPrice('sl-t3',-1)">-</button><input type="number" id="sl-t3" value="1.5" step="0.1" oninput="updateGlobalQuota()"><button type="button" class="stepper-btn" tabindex="-1" onclick="stepPrice('sl-t3',1)">+</button></div>
+                    </div>
+                    <div style="flex:1;">
+                        <label>&gt; 500元</label>
+                        <div class="stepper-wrapper"><button type="button" class="stepper-btn" tabindex="-1" onclick="stepPrice('sl-t4',-1)">-</button><input type="number" id="sl-t4" value="1.5" step="0.1" oninput="updateGlobalQuota()"><button type="button" class="stepper-btn" tabindex="-1" onclick="stepPrice('sl-t4',1)">+</button></div>
+                    </div>
+                </div>
+            </div>
+
             <button type="button" id="quota-lock-btn" class="btn" style="background:#444; margin-top:20px; padding:15px; font-size:1.1rem;" onclick="toggleQuotaLock()">🔓 點擊鎖定參數</button>
             
             <div style="margin-top:30px; border-top:1px dashed #555; padding-top:20px; text-align:center;">
@@ -369,42 +393,6 @@
             </form>
             
             <div id="watchlist-container"></div>
-
-            <div class="card" style="border-left-color: #ff9800; background-color: #1a1a1a; max-width: 1400px; margin-left: auto; margin-right: auto;">
-                <h3 style="color:#ff9800; margin-top:0; display:flex; justify-content:space-between; align-items:center; cursor:pointer;" onclick="toggleRiskCalc()">
-                    <span style="font-size:1.05rem;">🧮 絕對防護盾：實體檔位換算器</span>
-                    <span id="risk-calc-btn" style="color:#aaa; font-size:0.85rem;">▶ 展開</span>
-                </h3>
-                <div id="risk-calc-panel" style="display:none; margin-top:15px;">
-                    <div style="font-size:0.85rem; color:#ccc; margin-bottom:10px; line-height:1.5;">
-                        在不同股價區間，1.5% 能承受的「主力洗盤空間」完全不同。<br>請輸入預計進場價，系統將為您推算台股真實檔位。
-                    </div>
-                    <div style="display:flex; gap:10px; margin-bottom:10px;">
-                        <div style="flex:1;">
-                            <label class="label-cyan">進場價位</label>
-                            <input type="number" id="calc-entry" class="clean-input" placeholder="例如 105" step="any" oninput="runRiskCalc()">
-                        </div>
-                        <div style="flex:1;">
-                            <label class="label-cyan">保底極限 (%)</label>
-                            <input type="number" id="calc-percent" class="clean-input" value="1.5" step="0.1" oninput="runRiskCalc()">
-                        </div>
-                    </div>
-                    <div class="input-group">
-                        <select id="calc-dir" class="clean-input" style="text-align:center; font-weight:bold; padding:8px;" onchange="runRiskCalc()">
-                            <option value="long">🔴 做多 (計算向下停損)</option>
-                            <option value="short">🟢 做空 (計算向上停損)</option>
-                        </select>
-                    </div>
-                    <div class="result-box" style="margin-top:15px; border:1px solid #444;">
-                        <div class="result-row"><span>🛑 絕對保底觸發價:</span> <span id="calc-sl-price" class="highlight">-</span></div>
-                        <div class="result-row"><span>🛡️ 護城河深度 (容錯檔位):</span> <span id="calc-ticks" class="highlight">-</span></div>
-                        <div class="result-row" style="border-bottom:none;"><span>💸 單張強制斷頭損失:</span> <span id="calc-money" class="highlight">-</span></div>
-                        <div id="calc-warning" style="display:none; margin-top:10px; padding:8px; background:#660000; color:#ff4d4d; border-radius:4px; font-weight:bold; text-align:center; font-size:0.9rem;">
-                            ⚠️ 極度危險：容錯空間低於 5 檔，極易被洗盤！
-                        </div>
-                    </div>
-                </div>
-            </div>
 
             <div class="logistics-header">⬇️ 系統狀態 ⬇️</div>
 
@@ -599,7 +587,7 @@
         firebase.initializeApp(firebaseConfig); const db = firebase.database();
         let syncRoom = localStorage.getItem('v144_sync_room') || ""; let currentStateString = ""; let syncTimeout;
 
-        let wl = []; let sysQuota = { total: 50, discount: 2.7, minRR: 1.5, locked: false };
+        let wl = []; let sysQuota = { total: 50, discount: 2.7, minRR: 1.5, locked: false, slTiers: { t1: 1.5, t2: 1.5, t3: 1.5, t4: 1.5 } };
         let activeLongMissions = {}; let activeShortMissions = {}; let activeReviewMissions = {}; 
         let isPanelOpen = false; let isUpdatingGlobalQuota = false; let isLocallyEditing = false; let editReleaseTimer = null; 
 
@@ -619,9 +607,22 @@
                     if(incomingString !== currentStateString) {
                         if(isLocallyEditing) return; 
                         currentStateString = incomingString; wl = data.wl || [];
-                        if(data.quota) { sysQuota = { total: data.quota.total || 50, discount: data.quota.discount || 2.7, minRR: data.quota.minRR || 1.5, locked: data.quota.locked || false }; }
+                        if(data.quota) { 
+                            sysQuota.total = data.quota.total || 50;
+                            sysQuota.discount = data.quota.discount || 2.7;
+                            sysQuota.minRR = data.quota.minRR || 1.5;
+                            sysQuota.locked = data.quota.locked || false;
+                            sysQuota.slTiers = data.quota.slTiers || { t1: 1.5, t2: 1.5, t3: 1.5, t4: 1.5 };
+                        }
                         activeLongMissions = data.longMissions || {}; activeShortMissions = data.shortMissions || {}; activeReviewMissions = data.reviewMissions || {};
-                        document.getElementById('quota-total').value = sysQuota.total; document.getElementById('quota-discount').value = sysQuota.discount; document.getElementById('quota-rr').value = sysQuota.minRR; applyQuotaLockState();
+                        
+                        document.getElementById('quota-total').value = sysQuota.total; document.getElementById('quota-discount').value = sysQuota.discount; document.getElementById('quota-rr').value = sysQuota.minRR; 
+                        document.getElementById('sl-t1').value = sysQuota.slTiers.t1;
+                        document.getElementById('sl-t2').value = sysQuota.slTiers.t2;
+                        document.getElementById('sl-t3').value = sysQuota.slTiers.t3;
+                        document.getElementById('sl-t4').value = sysQuota.slTiers.t4;
+                        applyQuotaLockState();
+                        
                         renderWatchlist(); renderMissions('long'); renderMissions('short'); renderReviews(); updateGlobalQuota(true); showToast("☁️ 雲端數據已同步");
                     }
                 } else { triggerSync(); } 
@@ -650,7 +651,16 @@
         // ================= 額度與參數系統 =================
         function updateGlobalQuota(fromSync = false) {
             if(isUpdatingGlobalQuota) return; isUpdatingGlobalQuota = true; if(!fromSync) markLocalEdit(); 
-            sysQuota.total = parseFloat(document.getElementById('quota-total').value) || 0; sysQuota.discount = parseFloat(document.getElementById('quota-discount').value) || 2.7; sysQuota.minRR = parseFloat(document.getElementById('quota-rr').value) || 1.5;
+            sysQuota.total = parseFloat(document.getElementById('quota-total').value) || 0; 
+            sysQuota.discount = parseFloat(document.getElementById('quota-discount').value) || 2.7; 
+            sysQuota.minRR = parseFloat(document.getElementById('quota-rr').value) || 1.5;
+            
+            // 更新階梯停損
+            sysQuota.slTiers.t1 = parseFloat(document.getElementById('sl-t1').value) || 1.5;
+            sysQuota.slTiers.t2 = parseFloat(document.getElementById('sl-t2').value) || 1.5;
+            sysQuota.slTiers.t3 = parseFloat(document.getElementById('sl-t3').value) || 1.5;
+            sysQuota.slTiers.t4 = parseFloat(document.getElementById('sl-t4').value) || 1.5;
+
             let activeUsed = 0; Object.values(activeLongMissions).forEach(m => activeUsed += (m.cost || 0)); Object.values(activeShortMissions).forEach(m => activeUsed += (m.cost || 0));
             let remain = (sysQuota.total * 10000) - activeUsed;
             let remainEl = document.getElementById('quota-global-remain'); remainEl.innerText = "NT$ " + remain.toLocaleString(); remainEl.style.color = remain < 0 ? "#ff4d4d" : "#00e676";
@@ -662,14 +672,21 @@
         window.toggleQuotaLock = function() { markLocalEdit(); sysQuota.locked = !sysQuota.locked; applyQuotaLockState(); triggerSync(); };
 
         function applyQuotaLockState() {
-            let totalInput = document.getElementById('quota-total'); let discInput = document.getElementById('quota-discount'); let rrInput = document.getElementById('quota-rr'); let btn = document.getElementById('quota-lock-btn');
+            let inputs = [
+                document.getElementById('quota-total'), document.getElementById('quota-discount'), document.getElementById('quota-rr'),
+                document.getElementById('sl-t1'), document.getElementById('sl-t2'), document.getElementById('sl-t3'), document.getElementById('sl-t4')
+            ];
+            let btn = document.getElementById('quota-lock-btn');
+            
             if (sysQuota.locked) {
-                totalInput.disabled = true; discInput.disabled = true; rrInput.disabled = true;
-                totalInput.parentElement.querySelectorAll('button').forEach(b => b.disabled = true); discInput.parentElement.querySelectorAll('button').forEach(b => b.disabled = true); rrInput.parentElement.querySelectorAll('button').forEach(b => b.disabled = true);
+                inputs.forEach(el => {
+                    if(el) { el.disabled = true; el.parentElement.querySelectorAll('button').forEach(b => b.disabled = true); }
+                });
                 btn.innerText = "🔒 點擊解鎖參數"; btn.style.backgroundColor = "#ff9800";
             } else {
-                totalInput.disabled = false; discInput.disabled = false; rrInput.disabled = false;
-                totalInput.parentElement.querySelectorAll('button').forEach(b => b.disabled = false); discInput.parentElement.querySelectorAll('button').forEach(b => b.disabled = false); rrInput.parentElement.querySelectorAll('button').forEach(b => b.disabled = false);
+                inputs.forEach(el => {
+                    if(el) { el.disabled = false; el.parentElement.querySelectorAll('button').forEach(b => b.disabled = false); }
+                });
                 btn.innerText = "🔓 點擊鎖定參數"; btn.style.backgroundColor = "#444";
             }
         }
@@ -689,6 +706,7 @@
         function calcUp(yc) { if(!yc) return '-'; let t = yc * 1.1; let tk = getTickUp(t - 0.001); return (Math.round(t / tk) * tk).toFixed(2); }
         function calcDown(yc) { if(!yc) return '-'; let t = yc * 0.9; let tk = getTickDown(t + 0.001); return (Math.round(t / tk) * tk).toFixed(2); }
         
+        // 💡 台股專屬的 Tick 捨入邏輯 (精準版，用於網格)
         function roundToTaiwanTick(price) {
             if(price <= 10) return Math.round(price * 100) / 100;
             if(price <= 50) return Math.round(price * 20) / 20;
@@ -698,65 +716,14 @@
             return Math.round(price / 5) * 5;
         }
 
-        // 💡 1.5% 防守檔位推算器邏輯
-        window.runRiskCalc = function() {
-            let entry = parseFloat(document.getElementById('calc-entry').value);
-            let percent = parseFloat(document.getElementById('calc-percent').value);
-            let dir = document.getElementById('calc-dir').value;
-
-            if (isNaN(entry) || entry <= 0 || isNaN(percent) || percent < 0) {
-                document.getElementById('calc-sl-price').innerText = '-';
-                document.getElementById('calc-ticks').innerText = '-';
-                document.getElementById('calc-money').innerText = '-';
-                document.getElementById('calc-warning').style.display = 'none';
-                return;
-            }
-
-            let rawSl = dir === 'long' ? entry * (1 - percent / 100) : entry * (1 + percent / 100);
-            let slPrice = roundToTaiwanTick(rawSl);
-
-            // 計算真實檔位數
-            let ticks = 0;
-            let curr = Math.min(entry, slPrice);
-            let high = Math.max(entry, slPrice);
-            while(curr < high - 0.0001 && ticks < 200) {
-                curr += getTickUp(curr);
-                curr = Math.round(curr * 100) / 100;
-                ticks++;
-            }
-
-            let moneyRisk = Math.round(Math.abs(entry - slPrice) * 1000);
-
-            document.getElementById('calc-sl-price').innerText = slPrice.toFixed(2);
-            let ticksEl = document.getElementById('calc-ticks');
-            ticksEl.innerText = ticks + ' 檔';
-            document.getElementById('calc-money').innerText = 'NT$ ' + moneyRisk.toLocaleString();
-
-            let warnEl = document.getElementById('calc-warning');
-            if (ticks < 5) {
-                ticksEl.style.color = '#ff4d4d';
-                warnEl.style.display = 'block';
-            } else if (ticks >= 10) {
-                ticksEl.style.color = '#00e676';
-                warnEl.style.display = 'none';
-            } else {
-                ticksEl.style.color = '#ff9800';
-                warnEl.style.display = 'none';
-            }
-        };
-
-        window.toggleRiskCalc = function() {
-            let panel = document.getElementById('risk-calc-panel');
-            let btn = document.getElementById('risk-calc-btn');
-            if (panel.style.display === 'none') {
-                panel.style.display = 'block';
-                btn.innerText = '▼ 收合';
-                runRiskCalc();
-            } else {
-                panel.style.display = 'none';
-                btn.innerText = '▶ 展開';
-            }
-        };
+        // 💡 動態抓取階梯式保底 % 數
+        function getSlPct(price) {
+            if (!price) return sysQuota.slTiers.t2; 
+            if (price < 50) return sysQuota.slTiers.t1;
+            if (price < 100) return sysQuota.slTiers.t2;
+            if (price < 500) return sysQuota.slTiers.t3;
+            return sysQuota.slTiers.t4;
+        }
 
         function updateYcLimits(rId = 'main') {
             let ycInput = rId === 'main' ? document.getElementById('wl-yc') : document.getElementById(`rev-yc-${rId}`);
@@ -770,10 +737,10 @@
 
         function stepPrice(id, dir) {
             let el = document.getElementById(id); if(!el || el.disabled) return; markLocalEdit(); let p = parseFloat(el.value); if(isNaN(p)) return;
-            let step = 1; if (!id.startsWith('vol') && !id.startsWith('quota')) step = (dir === 1) ? getTickUp(p) : getTickDown(p);
-            if (id === 'quota-total') step = 10; if (id === 'quota-discount') step = 0.1; if (id === 'quota-rr') step = 0.1;
+            let step = 1; if (!id.startsWith('vol') && !id.startsWith('quota') && !id.startsWith('sl-t')) step = (dir === 1) ? getTickUp(p) : getTickDown(p);
+            if (id === 'quota-total') step = 10; if (id === 'quota-discount' || id === 'quota-rr' || id.startsWith('sl-t')) step = 0.1;
             let newP = p + (dir * step); 
-            if(id.startsWith('vol') && newP < 1) newP = 1; if(id === 'quota-total' && newP < 0) newP = 0; if(id === 'quota-discount' && newP <= 0) newP = 0.1; if(id === 'quota-rr' && newP <= 0) newP = 0.1;
+            if(id.startsWith('vol') && newP < 1) newP = 1; if(id === 'quota-total' && newP < 0) newP = 0; if((id === 'quota-discount' || id === 'quota-rr' || id.startsWith('sl-t')) && newP <= 0) newP = 0.1;
             el.value = Math.round(newP * 100) / 100; el.dispatchEvent(new Event('input'));
             if(id === 'wl-yc') updateYcLimits('main'); 
         }
@@ -825,6 +792,27 @@
                 if(item.lowb) exBtns.push(`<button type="button" class="btn-mini ex-l" onclick="loadToMission('long','${dName}','${dCode}',${item.lowb},'${item.lowt1 || item.lb || ''}','${ycStr}')">⚡${item.lowb}</button>`);
                 
                 if(exBtns.length > 0) html += `<div class="row-group"><div class="row-label ex">⚡反轉</div><div class="btn-grid">${exBtns.join('')}</div></div>`;
+                
+                let alerts = [];
+                if (item.hb) {
+                    let alertPrice = (parseFloat(item.hb) - getTickDown(parseFloat(item.hb))).toFixed(2);
+                    alerts.push(`<span style="color:#00e676; font-weight:bold;">📉 向下穿越 ${alertPrice}</span> <span style="color:#aaa; font-size:0.75rem;">(確認反轉空)</span>`);
+                }
+                if (item.lowb) {
+                    let alertPrice = (parseFloat(item.lowb) + getTickUp(parseFloat(item.lowb))).toFixed(2);
+                    alerts.push(`<span style="color:#ff4d4d; font-weight:bold;">📈 向上穿越 ${alertPrice}</span> <span style="color:#aaa; font-size:0.75rem;">(確認反轉多)</span>`);
+                }
+                
+                if (alerts.length > 0) {
+                    html += `
+                    <div style="background:#111; border:1px dashed #555; border-radius:6px; padding:6px 8px; margin-top:10px; margin-bottom:5px;">
+                        <div style="font-size:0.75rem; color:#ffeb3b; margin-bottom:4px;">🔔 APP 警示建議 (確認反轉法)：</div>
+                        <div style="display:flex; justify-content:space-around; font-size:0.9rem;">
+                            ${alerts.join('<span style="color:#555;">|</span>')}
+                        </div>
+                    </div>`;
+                }
+
                 container.innerHTML += html + `</div>`;
             }); 
 
@@ -993,7 +981,17 @@
                         <div class="result-row"><span>🛑 觸價停損 (${isLong ? '-':'退'}1檔):</span> <span id="stop-${mode}-${m.id}" class="highlight">-</span></div>
                         <div class="result-row"><span>⚖️ 實際盈虧比:</span> <span id="rr-${mode}-${m.id}" class="highlight">-</span></div>
                         <div class="result-row"><span>🟢 保本脫離價:</span> <span id="be-${mode}-${m.id}" class="highlight">-</span></div>
-                        <div class="result-row" style="margin-top:10px; padding-top:10px; border-top:1px dashed #660000;"><span>💥 若碰停損虧損:</span> <span id="loss-${mode}-${m.id}" class="highlight">-</span></div>
+                        <div class="result-row" style="margin-top:8px; padding-top:8px; border-top:1px dashed #660000;"><span>💥 技術停損虧損:</span> <span id="loss-${mode}-${m.id}" class="highlight">-</span></div>
+                        
+                        <div class="result-row" style="margin-top:8px; padding-top:8px; border-top:1px solid #555;">
+                            <span>🛡️ 絕對保底 (<span id="applied-sl-pct-${mode}-${m.id}">-</span>%) :</span>
+                            <span id="abs-sl-${mode}-${m.id}" class="highlight">-</span>
+                        </div>
+                        <div class="result-row" style="border-bottom:none; margin-bottom:0;">
+                            <span style="color:#aaa; font-size:0.85rem;">🏰 容錯: <span id="abs-ticks-${mode}-${m.id}" style="font-weight:bold; color:#fff;">-</span></span>
+                            <span style="color:#aaa; font-size:0.85rem;">💸 斷頭: <span id="abs-loss-${mode}-${m.id}" style="font-weight:bold; color:#fff;">-</span></span>
+                        </div>
+                        <div id="abs-warn-${mode}-${m.id}" style="display:none; text-align:center; padding:4px; background:#660000; color:#ff4d4d; font-weight:bold; border-radius:4px; font-size:0.8rem; margin-top:6px;">⚠️ 警告：容錯低於 5 檔，極易被洗盤！</div>
                     </div>
                     
                     <div class="input-group" style="margin-top:15px;"><label>實際出場價 (結算用)</label><div class="stepper-wrapper"><button type="button" class="stepper-btn" tabindex="-1" onclick="stepPrice('exit-${mode}-${m.id}',-1)" ${lockState}>-</button><input type="number" inputmode="decimal" id="exit-${mode}-${m.id}" value="${m.exit!==undefined?m.exit:''}" oninput="calcMission('${mode}','${m.id}')" ${lockState}><button type="button" class="stepper-btn" tabindex="-1" onclick="stepPrice('exit-${mode}-${m.id}',1)" ${lockState}>+</button></div></div>
@@ -1029,11 +1027,10 @@
             if (base && target) {
                 stopLoss = Math.round((isLong ? base - getTickDown(base) : base + getTickUp(base)) * 100) / 100;
                 document.getElementById(`stop-${mode}-${mId}`).innerText = stopLoss.toFixed(2);
-                let absEntry = isLong ? (base + getMaxTicks(base)*getTickUp(base)) : (base - getMaxTicks(base)*getTickDown(base));
                 let rrEntry = (target + currentMinRR * stopLoss) / (currentMinRR + 1);
                 
-                if(isLong) { finalEntryBound = Math.floor((Math.min(absEntry, rrEntry) + 0.0001)/getTickUp(base))*getTickUp(base); document.getElementById(`kz-${mode}-${mId}`).innerText = finalEntryBound < base ? "風險過高" : `${base} ~ ${finalEntryBound.toFixed(2)}`; } 
-                else { finalEntryBound = Math.ceil((Math.max(absEntry, rrEntry) - 0.0001)/getTickDown(base))*getTickDown(base); document.getElementById(`kz-${mode}-${mId}`).innerText = finalEntryBound > base ? "風險過高" : `${finalEntryBound.toFixed(2)} ~ ${base}`; }
+                if(isLong) { finalEntryBound = Math.floor((rrEntry + 0.00001)/getTickUp(base))*getTickUp(base); document.getElementById(`kz-${mode}-${mId}`).innerText = finalEntryBound < base ? "風險過高 (利潤不足)" : `${base} ~ ${finalEntryBound.toFixed(2)}`; } 
+                else { finalEntryBound = Math.ceil((rrEntry - 0.00001)/getTickDown(base))*getTickDown(base); document.getElementById(`kz-${mode}-${mId}`).innerText = finalEntryBound > base ? "風險過高 (利潤不足)" : `${finalEntryBound.toFixed(2)} ~ ${base}`; }
             } else { document.getElementById(`kz-${mode}-${mId}`).innerText = "-"; document.getElementById(`stop-${mode}-${mId}`).innerText = "-"; }
 
             let strip = document.getElementById(`quick-exit-strip-${mode}-${mId}`); let stripLbl = document.getElementById(`quick-lbl-${mode}-${mId}`);
@@ -1066,6 +1063,12 @@
                 strip.innerHTML = stripHtml; strip.style.display = 'flex';
             } else { strip.style.display = 'none'; stripLbl.style.display = 'none'; }
 
+            // 💡 V14.22 動態階梯防護盾運算
+            let priceForSl = entry || base; // 以進場價為基準，若無則用基準價推算
+            let riskPct = getSlPct(priceForSl);
+            let pctLabel = document.getElementById(`applied-sl-pct-${mode}-${mId}`);
+            if(pctLabel) pctLabel.innerText = riskPct;
+            
             if (entry) {
                 let cost = 0; let typeLabel = "";
                 if (isLong) { cost = entry * lots * 1000; typeLabel = "(依實際進場價計算)"; } else { if (upLimitNum > 0) { cost = upLimitNum * lots * 1000; typeLabel = "(依漲停價圈存)"; } else { cost = entry * lots * 1000; typeLabel = "(依進場價估算)"; } }
@@ -1076,15 +1079,43 @@
                 if(isLong) { while(testPnL < 0) { be += getTickUp(be); be = Math.round(be*100)/100; testPnL = calcPnL(entry, be, lots, isLong).full; } } 
                 else { while(testPnL < 0) { be -= getTickDown(be); be = Math.round(be*100)/100; testPnL = calcPnL(entry, be, lots, isLong).full; } }
                 document.getElementById(`be-${mode}-${mId}`).innerText = be.toFixed(2) + " 回本";
+                
+                // 絕對保底計算
+                let rawSl = isLong ? entry * (1 - riskPct / 100) : entry * (1 + riskPct / 100);
+                let absSlPrice = roundToTaiwanTick(rawSl);
+                let ticks = 0;
+                let curr = Math.min(entry, absSlPrice);
+                let high = Math.max(entry, absSlPrice);
+                while(curr < high - 0.0001 && ticks < 200) { curr += getTickUp(curr); curr = Math.round(curr * 100) / 100; ticks++; }
+                
+                let absLossMoney = Math.round(Math.abs(entry - absSlPrice) * lots * 1000);
+                
+                document.getElementById(`abs-sl-${mode}-${mId}`).innerText = absSlPrice.toFixed(2);
+                let ticksEl = document.getElementById(`abs-ticks-${mode}-${mId}`);
+                ticksEl.innerText = ticks + ' 檔';
+                document.getElementById(`abs-loss-${mode}-${mId}`).innerHTML = `<span class="shocking-loss" style="font-size:1rem; padding:2px 6px;">NT$ ${absLossMoney.toLocaleString()}</span>`;
+                
+                let warnEl = document.getElementById(`abs-warn-${mode}-${mId}`);
+                if (ticks < 5) { ticksEl.style.color = '#ff4d4d'; warnEl.style.display = 'block'; } 
+                else if (ticks >= 10) { ticksEl.style.color = '#00e676'; warnEl.style.display = 'none'; } 
+                else { ticksEl.style.color = '#ff9800'; warnEl.style.display = 'none'; }
+                
             } else { 
                 m.cost = 0; updateGlobalQuota(true); document.getElementById(`be-${mode}-${mId}`).innerText = "-"; document.getElementById(`quota-cost-${mode}-${mId}`).innerText = "-"; document.getElementById(`quota-type-${mode}-${mId}`).innerText = "";
+                
+                document.getElementById(`abs-sl-${mode}-${mId}`).innerText = "-";
+                let ticksEl = document.getElementById(`abs-ticks-${mode}-${mId}`);
+                if(ticksEl) { ticksEl.innerText = "-"; ticksEl.style.color = "#fff"; }
+                document.getElementById(`abs-loss-${mode}-${mId}`).innerText = "-";
+                let warnEl = document.getElementById(`abs-warn-${mode}-${mId}`);
+                if(warnEl) warnEl.style.display = "none";
             }
 
             if (entry && target && base) {
                 let risk = isLong ? (entry - stopLoss) : (stopLoss - entry); let reward = isLong ? (target - entry) : (entry - target); let rr = risk > 0 ? (reward / risk) : 0; 
                 document.getElementById(`rr-${mode}-${mId}`).innerText = rr.toFixed(2);
                 let slData = calcPnL(entry, stopLoss, lots, isLong);
-                document.getElementById(`loss-${mode}-${mId}`).innerHTML = `<span class="shocking-loss">NT$ ${Math.round(slData.full).toLocaleString()}</span>`;
+                document.getElementById(`loss-${mode}-${mId}`).innerHTML = `<span class="shocking-loss" style="font-size:1rem; padding:2px 6px;">NT$ ${Math.round(slData.full).toLocaleString()}</span>`;
                 
                 if(!limitWarn) {
                     let currentGlobalRemain = parseFloat(document.getElementById('quota-global-remain').innerText.replace(/[^\d.-]/g, ''));
