@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>量化交易與資金控管系統 V14.18</title>
+    <title>量化交易與資金控管系統 V14.20</title>
     
     <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-database-compat.js"></script>
@@ -204,30 +204,21 @@
         }
 
         /* =========================================
-           📝 覆盤模式專屬樣式 (絕對對齊與雙模佈局)
+           📝 覆盤模式專屬樣式
            ========================================= */
-        .rev-card-layout { 
-            display: flex; flex-direction: row; gap: 8px; align-items: stretch; width: 100%;
-        }
-        
+        .rev-card-layout { display: flex; flex-direction: row; gap: 8px; align-items: stretch; width: 100%; }
         .rev-left { display: flex; flex-direction: column; gap: 8px; }
         .rev-right { flex: 1; display: flex; flex-direction: column; min-width: 0; }
         
-        /* 畫布容器 */
-        .chart-stage { 
-            background: #1a1a1a; border-radius: 8px; border: 1px solid #444; 
-            position: relative; flex: 1; display: flex; justify-content: center; align-items: stretch; overflow: hidden;
-        }
+        .chart-stage { background: #1a1a1a; border-radius: 8px; border: 1px solid #444; position: relative; flex: 1; display: flex; justify-content: center; align-items: stretch; overflow: hidden; }
         .chart-stage canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
         
-        /* 電腦版 (>= 768px)：左右鎖定等高 */
         @media (min-width: 768px) {
             .rev-card-layout { flex-direction: row; }
             .rev-left { width: 340px; flex-shrink: 0; }
-            .chart-stage { min-height: 100%; } /* 高度完全靠左邊撐起 */
+            .chart-stage { min-height: 100%; } 
         }
         
-        /* 手機版 (< 768px)：上下堆疊，固定圖高 */
         @media (max-width: 767px) {
             .rev-card-layout { flex-direction: column; }
             .rev-left { width: 100%; }
@@ -242,7 +233,6 @@
         .input-with-prefix .prefix { color: #aaa; font-size: 0.8rem; font-weight: bold; user-select: none; white-space: nowrap;}
         .input-with-prefix input { flex: 1; min-width: 0; background: transparent; border: none; color: #fff; text-align: center; padding: 6px 2px; font-size: 0.95rem; outline: none; }
         
-        /* 防呆變色 */
         .input-with-prefix.limit-up .prefix { color: #ff4d4d; }
         .input-with-prefix.limit-up input { color: #ff4d4d; font-weight: bold; }
         .input-with-prefix.limit-down .prefix { color: #00e676; }
@@ -379,6 +369,42 @@
             </form>
             
             <div id="watchlist-container"></div>
+
+            <div class="card" style="border-left-color: #ff9800; background-color: #1a1a1a; max-width: 1400px; margin-left: auto; margin-right: auto;">
+                <h3 style="color:#ff9800; margin-top:0; display:flex; justify-content:space-between; align-items:center; cursor:pointer;" onclick="toggleRiskCalc()">
+                    <span style="font-size:1.05rem;">🧮 絕對防護盾：實體檔位換算器</span>
+                    <span id="risk-calc-btn" style="color:#aaa; font-size:0.85rem;">▶ 展開</span>
+                </h3>
+                <div id="risk-calc-panel" style="display:none; margin-top:15px;">
+                    <div style="font-size:0.85rem; color:#ccc; margin-bottom:10px; line-height:1.5;">
+                        在不同股價區間，1.5% 能承受的「主力洗盤空間」完全不同。<br>請輸入預計進場價，系統將為您推算台股真實檔位。
+                    </div>
+                    <div style="display:flex; gap:10px; margin-bottom:10px;">
+                        <div style="flex:1;">
+                            <label class="label-cyan">進場價位</label>
+                            <input type="number" id="calc-entry" class="clean-input" placeholder="例如 105" step="any" oninput="runRiskCalc()">
+                        </div>
+                        <div style="flex:1;">
+                            <label class="label-cyan">保底極限 (%)</label>
+                            <input type="number" id="calc-percent" class="clean-input" value="1.5" step="0.1" oninput="runRiskCalc()">
+                        </div>
+                    </div>
+                    <div class="input-group">
+                        <select id="calc-dir" class="clean-input" style="text-align:center; font-weight:bold; padding:8px;" onchange="runRiskCalc()">
+                            <option value="long">🔴 做多 (計算向下停損)</option>
+                            <option value="short">🟢 做空 (計算向上停損)</option>
+                        </select>
+                    </div>
+                    <div class="result-box" style="margin-top:15px; border:1px solid #444;">
+                        <div class="result-row"><span>🛑 絕對保底觸發價:</span> <span id="calc-sl-price" class="highlight">-</span></div>
+                        <div class="result-row"><span>🛡️ 護城河深度 (容錯檔位):</span> <span id="calc-ticks" class="highlight">-</span></div>
+                        <div class="result-row" style="border-bottom:none;"><span>💸 單張強制斷頭損失:</span> <span id="calc-money" class="highlight">-</span></div>
+                        <div id="calc-warning" style="display:none; margin-top:10px; padding:8px; background:#660000; color:#ff4d4d; border-radius:4px; font-weight:bold; text-align:center; font-size:0.9rem;">
+                            ⚠️ 極度危險：容錯空間低於 5 檔，極易被洗盤！
+                        </div>
+                    </div>
+                </div>
+            </div>
 
             <div class="logistics-header">⬇️ 系統狀態 ⬇️</div>
 
@@ -556,12 +582,7 @@
             setInterval(checkAndAutoImportReviews, 10000);
             document.addEventListener('click', handleCardGlow); document.addEventListener('focusin', handleCardGlow);
             
-            // 監聽視窗大小改變，確保畫布重繪
-            window.addEventListener('resize', () => {
-                Object.keys(activeReviewMissions).forEach(rId => {
-                    generateReviewChart(rId);
-                });
-            });
+            window.addEventListener('resize', () => { Object.keys(activeReviewMissions).forEach(rId => { generateReviewChart(rId); }); });
         });
 
         function handleCardGlow(e) {
@@ -668,7 +689,6 @@
         function calcUp(yc) { if(!yc) return '-'; let t = yc * 1.1; let tk = getTickUp(t - 0.001); return (Math.round(t / tk) * tk).toFixed(2); }
         function calcDown(yc) { if(!yc) return '-'; let t = yc * 0.9; let tk = getTickDown(t + 0.001); return (Math.round(t / tk) * tk).toFixed(2); }
         
-        // 💡 台股專屬的 Tick 捨入邏輯 (精準版，用於網格)
         function roundToTaiwanTick(price) {
             if(price <= 10) return Math.round(price * 100) / 100;
             if(price <= 50) return Math.round(price * 20) / 20;
@@ -677,6 +697,66 @@
             if(price <= 1000) return Math.round(price);
             return Math.round(price / 5) * 5;
         }
+
+        // 💡 1.5% 防守檔位推算器邏輯
+        window.runRiskCalc = function() {
+            let entry = parseFloat(document.getElementById('calc-entry').value);
+            let percent = parseFloat(document.getElementById('calc-percent').value);
+            let dir = document.getElementById('calc-dir').value;
+
+            if (isNaN(entry) || entry <= 0 || isNaN(percent) || percent < 0) {
+                document.getElementById('calc-sl-price').innerText = '-';
+                document.getElementById('calc-ticks').innerText = '-';
+                document.getElementById('calc-money').innerText = '-';
+                document.getElementById('calc-warning').style.display = 'none';
+                return;
+            }
+
+            let rawSl = dir === 'long' ? entry * (1 - percent / 100) : entry * (1 + percent / 100);
+            let slPrice = roundToTaiwanTick(rawSl);
+
+            // 計算真實檔位數
+            let ticks = 0;
+            let curr = Math.min(entry, slPrice);
+            let high = Math.max(entry, slPrice);
+            while(curr < high - 0.0001 && ticks < 200) {
+                curr += getTickUp(curr);
+                curr = Math.round(curr * 100) / 100;
+                ticks++;
+            }
+
+            let moneyRisk = Math.round(Math.abs(entry - slPrice) * 1000);
+
+            document.getElementById('calc-sl-price').innerText = slPrice.toFixed(2);
+            let ticksEl = document.getElementById('calc-ticks');
+            ticksEl.innerText = ticks + ' 檔';
+            document.getElementById('calc-money').innerText = 'NT$ ' + moneyRisk.toLocaleString();
+
+            let warnEl = document.getElementById('calc-warning');
+            if (ticks < 5) {
+                ticksEl.style.color = '#ff4d4d';
+                warnEl.style.display = 'block';
+            } else if (ticks >= 10) {
+                ticksEl.style.color = '#00e676';
+                warnEl.style.display = 'none';
+            } else {
+                ticksEl.style.color = '#ff9800';
+                warnEl.style.display = 'none';
+            }
+        };
+
+        window.toggleRiskCalc = function() {
+            let panel = document.getElementById('risk-calc-panel');
+            let btn = document.getElementById('risk-calc-btn');
+            if (panel.style.display === 'none') {
+                panel.style.display = 'block';
+                btn.innerText = '▼ 收合';
+                runRiskCalc();
+            } else {
+                panel.style.display = 'none';
+                btn.innerText = '▶ 展開';
+            }
+        };
 
         function updateYcLimits(rId = 'main') {
             let ycInput = rId === 'main' ? document.getElementById('wl-yc') : document.getElementById(`rev-yc-${rId}`);
@@ -737,7 +817,6 @@
                     html += `<div class="row-group"><div class="row-label s">🟢做空</div><div class="btn-grid">${shortsHtml.join('')}</div></div>`;
                 }
 
-                // 💡 修正反轉區間全段展開，多重陣地收網邏輯
                 let exBtns = [];
                 if(item.hb) exBtns.push(`<button type="button" class="btn-mini ex-s" onclick="loadToMission('short','${dName}','${dCode}',${item.hb},'${item.ht1 || item.sb || ''}','${ycStr}')">⚡${item.hb}</button>`);
                 if(item.ht1) exBtns.push(`<button type="button" class="btn-mini ex-s" onclick="loadToMission('short','${dName}','${dCode}',${item.ht1},'${item.sb || ''}','${ycStr}')">⚡${item.ht1}</button>`);
@@ -804,7 +883,6 @@
 
         function delWatchlist(index) { markLocalEdit(); wl.splice(index, 1); renderWatchlist(); triggerSync(); }
 
-        // 💡 修正鎖定卡片覆蓋問題：加入多重影分身驗證機制
         function loadToMission(type, name, code, base, target, yc) {
             markLocalEdit(); 
             let safeBase = base ? String(base).replace('.', '_') : '0'; 
@@ -814,7 +892,6 @@
             let mId = baseMId;
             let existingUnlockedId = null;
             
-            // 尋找是否已有「未鎖定」的同價位卡片
             for(let id in pool) {
                 if((id === baseMId || id.startsWith(baseMId + '_')) && !pool[id].locked) {
                     existingUnlockedId = id;
@@ -823,11 +900,9 @@
             }
 
             if (existingUnlockedId) {
-                // 如果有未鎖定的卡，直接拿來用並更新目標價
                 mId = existingUnlockedId;
                 pool[mId].target = target || ''; 
             } else {
-                // 如果該價位的卡片已鎖定 (或完全沒這張卡)，就生成一張新卡 (附加時間戳記)
                 if (pool[baseMId]) {
                     mId = baseMId + '_' + Date.now();
                 }
@@ -957,8 +1032,8 @@
                 let absEntry = isLong ? (base + getMaxTicks(base)*getTickUp(base)) : (base - getMaxTicks(base)*getTickDown(base));
                 let rrEntry = (target + currentMinRR * stopLoss) / (currentMinRR + 1);
                 
-                if(isLong) { finalEntryBound = Math.floor((rrEntry + 0.00001)/getTickUp(base))*getTickUp(base); document.getElementById(`kz-${mode}-${mId}`).innerText = finalEntryBound < base ? "風險過高 (利潤不足)" : `${base} ~ ${finalEntryBound.toFixed(2)}`; } 
-                else { finalEntryBound = Math.ceil((rrEntry - 0.00001)/getTickDown(base))*getTickDown(base); document.getElementById(`kz-${mode}-${mId}`).innerText = finalEntryBound > base ? "風險過高 (利潤不足)" : `${finalEntryBound.toFixed(2)} ~ ${base}`; }
+                if(isLong) { finalEntryBound = Math.floor((Math.min(absEntry, rrEntry) + 0.0001)/getTickUp(base))*getTickUp(base); document.getElementById(`kz-${mode}-${mId}`).innerText = finalEntryBound < base ? "風險過高" : `${base} ~ ${finalEntryBound.toFixed(2)}`; } 
+                else { finalEntryBound = Math.ceil((Math.max(absEntry, rrEntry) - 0.0001)/getTickDown(base))*getTickDown(base); document.getElementById(`kz-${mode}-${mId}`).innerText = finalEntryBound > base ? "風險過高" : `${finalEntryBound.toFixed(2)} ~ ${base}`; }
             } else { document.getElementById(`kz-${mode}-${mId}`).innerText = "-"; document.getElementById(`stop-${mode}-${mId}`).innerText = "-"; }
 
             let strip = document.getElementById(`quick-exit-strip-${mode}-${mId}`); let stripLbl = document.getElementById(`quick-lbl-${mode}-${mId}`);
